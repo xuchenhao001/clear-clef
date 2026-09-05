@@ -1,0 +1,14 @@
+---
+description: ClearClef visual design tokens and edition-quality UI patterns
+globs: app/**/*.tsx,components/**/*.tsx,app/globals.css
+alwaysApply: false
+---
+
+# ClearClef design
+
+Read [docs/design.md](../docs/design.md) before changing public catalog, viewer, or shared UI styling.
+
+- Canvas `#f5f5f5`, ink pill CTAs, no pastel orbs.
+- Newsreader 300 for display (work titles); Geist for UI; Geist Mono for catalog metadata and colophon.
+- Catalog index is a composer-grouped contents list with hairline rows and desktop incipit thumbnails.
+- Engraved page-1 SVG is the incipit thumbnail. No Verovio on list pages.

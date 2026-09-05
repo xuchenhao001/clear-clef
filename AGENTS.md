@@ -30,5 +30,6 @@ In-browser editor, transposition UI, comments, full-score server PNGs, MIDI play
 | Verovio | [docs/rendering.md](docs/rendering.md) |
 | Phases | [docs/roadmap.md](docs/roadmap.md) |
 | ADRs | [docs/decisions.md](docs/decisions.md) |
+| Visual design | [docs/design.md](docs/design.md) |
 
-Cursor rules under `.cursor/rules/` reinforce product, ingest, and viewer constraints when matching files are open.
+Cursor rules under `.cursor/rules/` reinforce product, ingest, viewer, and design constraints when matching files are open.

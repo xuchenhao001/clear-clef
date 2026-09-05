@@ -11,5 +11,6 @@ Reference for product decisions, architecture, and implementation order. Prefer 
 5. [rendering.md](rendering.md) — Verovio viewer and previews
 6. [roadmap.md](roadmap.md) — what to build next
 7. [decisions.md](decisions.md) — short ADRs
+8. [design.md](design.md) — visual system (tokens, typography, catalog components)
 
 Agent-oriented summary: [../AGENTS.md](../AGENTS.md). Cursor rules live under [../.cursor/rules/](../.cursor/rules/).

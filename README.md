@@ -58,6 +58,7 @@ Do not commit `.dev.vars` or `.env.local`. Copy from [`.dev.vars.example`](.dev.
 | [docs/rendering.md](docs/rendering.md) | Verovio viewer and previews |
 | [docs/roadmap.md](docs/roadmap.md) | Implementation phases |
 | [docs/decisions.md](docs/decisions.md) | ADRs |
+| [docs/design.md](docs/design.md) | Visual system and catalog layout |
 | [AGENTS.md](AGENTS.md) | Instructions for coding agents |
 
 ## Not in v1
