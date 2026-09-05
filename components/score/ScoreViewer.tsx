@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { ViewerSkeleton } from "@/components/score/viewer-skeleton";
 import { shouldLoadMxlBuffer } from "@/lib/score-file";
 
 type ScoreViewerProps = {
@@ -92,22 +93,15 @@ export default function ScoreViewer({
     return toolkit.renderToSVG(currentPage);
   }, [toolkit, currentPage]);
 
-  const pageLabel = useMemo(
-    () => `Page ${currentPage} of ${pageCount || 1}`,
-    [currentPage, pageCount],
-  );
+  const pageLabel = `${currentPage} / ${pageCount || 1}`;
 
   if (loading) {
-    return (
-      <div className="rounded-2xl border border-edition-hairline bg-edition-canvas px-6 py-16 text-center text-sm text-edition-muted">
-        Preparing the score…
-      </div>
-    );
+    return <ViewerSkeleton />;
   }
 
   if (error) {
     return (
-      <div className="rounded-2xl border border-destructive/30 bg-destructive/5 px-6 py-8 text-sm text-destructive">
+      <div className="rounded-xl border border-edition-semantic-error/30 bg-edition-semantic-error/5 px-6 py-8 text-sm text-edition-semantic-error">
         {error}
       </div>
     );
@@ -116,10 +110,12 @@ export default function ScoreViewer({
   return (
     <section
       aria-label={`Engraved score for ${title}`}
-      className="overflow-hidden rounded-2xl border border-edition-hairline bg-edition-canvas text-edition-ink"
+      className="overflow-hidden rounded-xl border border-edition-hairline bg-edition-canvas text-edition-ink"
     >
       <div className="flex items-center justify-between gap-4 border-b border-edition-hairline px-4 py-3">
-        <p className="font-mono text-sm text-edition-muted">{pageLabel}</p>
+        <p className="type-caption-mono" aria-label={`Page ${pageLabel}`}>
+          {pageLabel}
+        </p>
         <div className="flex items-center gap-2">
           <Button
             type="button"

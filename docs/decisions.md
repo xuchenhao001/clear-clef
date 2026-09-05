@@ -35,7 +35,7 @@ Short architecture decision records. Update when a decision is reversed.
 - **Status:** Accepted
 - **Context:** Full-score SVG is large; Verovio WASM is heavy for Worker CPU/time limits.
 - **Decision:** Engrave in the browser for viewing; generate page-1 preview once at ingest and store in R2.
-- **Consequences:** Preview pipeline is part of ingest (phase 5); catalog cards stay static. See [rendering.md](rendering.md).
+- **Consequences:** Preview pipeline is part of ingest (phase 5); catalog row previews stay static. See [rendering.md](rendering.md).
 
 ## ADR-006: Copyright / license metadata is mandatory
 

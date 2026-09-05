@@ -1,14 +1,15 @@
 import Link from "next/link";
-import { listFilterOptions } from "@/lib/scores/queries";
+import { hasCatalogFilters } from "@/lib/catalog/search-params";
+import { listFilterOptions, type CatalogFilters } from "@/lib/scores/queries";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "cn";
 
 type CatalogFiltersProps = {
-  current?: {
-    key?: string;
-    difficulty?: string;
-    license?: string;
-    tag?: string;
-  };
+  current?: CatalogFilters;
 };
+
+const selectClassName =
+  "w-full rounded-md border border-edition-hairline-strong bg-edition-surface-card px-3 py-2 text-sm text-edition-ink outline-none focus-visible:ring-3 focus-visible:ring-edition-hairline-strong/50";
 
 export async function CatalogFilters({ current }: CatalogFiltersProps) {
   const options = await listFilterOptions();
@@ -41,19 +42,23 @@ export async function CatalogFilters({ current }: CatalogFiltersProps) {
     },
   ];
 
-  const hasFilters = Boolean(
-    current?.key || current?.difficulty || current?.license || current?.tag,
-  );
+  const hasFilters = hasCatalogFilters(current ?? {});
 
   return (
-    <form method="get" className="grid gap-4 rounded-2xl border border-border p-4 sm:grid-cols-2 lg:grid-cols-5">
+    <form
+      method="get"
+      className="flex flex-wrap items-end gap-x-4 gap-y-4"
+    >
       {fields.map((field) => (
-        <label key={field.name} className="flex flex-col gap-2 text-sm">
-          <span className="font-medium">{field.label}</span>
+        <label
+          key={field.name}
+          className="flex min-w-[8rem] flex-1 flex-col gap-2 text-sm"
+        >
+          <span className="font-medium text-edition-ink">{field.label}</span>
           <select
             name={field.name}
             defaultValue={field.current ?? ""}
-            className="rounded-lg border border-border bg-background px-3 py-2"
+            className={selectClassName}
           >
             <option value="">Any</option>
             {field.values.map((value) => {
@@ -68,18 +73,12 @@ export async function CatalogFilters({ current }: CatalogFiltersProps) {
           </select>
         </label>
       ))}
-      <div className="flex items-end gap-2">
-        <button
-          type="submit"
-          className="inline-flex rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/80"
-        >
+      <div className="flex items-center gap-2">
+        <button type="submit" className={cn(buttonVariants())}>
           Apply
         </button>
         {hasFilters ? (
-          <Link
-            href="/"
-            className="inline-flex rounded-lg border border-border px-3 py-2 text-sm hover:bg-muted"
-          >
+          <Link href="/" className={cn(buttonVariants({ variant: "outline" }))}>
             Clear
           </Link>
         ) : null}

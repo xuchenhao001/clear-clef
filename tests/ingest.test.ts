@@ -88,6 +88,20 @@ describe("ingest", () => {
     expect(extractScoreMetadata(creditOnly).title).toBe("Credit Title");
   });
 
+  it("extracts catalog number from work-number", () => {
+    const xml = sanitizeMusicXml(`<?xml version="1.0"?>
+<score-partwise version="4.0">
+  <work>
+    <work-title>Prelude</work-title>
+    <work-number>BWV 846</work-number>
+  </work>
+  <part-list><score-part id="P1"><part-name>Piano</part-name></score-part></part-list>
+  <part id="P1"><measure number="1"><attributes><key><fifths>0</fifths></key></attributes></measure></part>
+</score-partwise>`);
+
+    expect(extractScoreMetadata(xml).catalogNumber).toBe("BWV 846");
+  });
+
   it("formats keys across sharps, flats, minor, and missing mode", () => {
     const makeXml = (fifths: number, mode?: string) => sanitizeMusicXml(`<?xml version="1.0"?>
 <score-partwise version="4.0">

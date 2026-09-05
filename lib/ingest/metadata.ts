@@ -13,6 +13,7 @@ const parser = new XMLParser({
 export type ExtractedScoreMetadata = {
   title: string;
   composer: string | null;
+  catalogNumber: string | null;
   lyricist: string | null;
   key: string | null;
   timeSignature: string | null;
@@ -139,6 +140,7 @@ export function extractScoreMetadata(xml: string): ExtractedScoreMetadata {
   }
 
   const workTitle = firstString(scorePartwise.work?.["work-title"]);
+  const catalogNumber = firstString(scorePartwise.work?.["work-number"]);
   const movementTitle = firstString(scorePartwise["movement-title"]);
   const creditTitle = extractTitleFromCredits(scorePartwise);
   const title = workTitle ?? movementTitle ?? creditTitle ?? "Untitled";
@@ -193,6 +195,7 @@ export function extractScoreMetadata(xml: string): ExtractedScoreMetadata {
   return {
     title,
     composer,
+    catalogNumber,
     lyricist,
     key: formatKey(fifths, mode),
     timeSignature,

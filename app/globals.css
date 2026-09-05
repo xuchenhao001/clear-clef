@@ -40,10 +40,21 @@
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
   --color-edition-canvas: var(--edition-canvas);
+  --color-edition-canvas-soft: var(--edition-canvas-soft);
   --color-edition-ink: var(--edition-ink);
+  --color-edition-body: var(--edition-body);
   --color-edition-muted: var(--edition-muted);
+  --color-edition-muted-soft: var(--edition-muted-soft);
   --color-edition-hairline: var(--edition-hairline);
+  --color-edition-hairline-soft: var(--edition-hairline-soft);
+  --color-edition-hairline-strong: var(--edition-hairline-strong);
   --color-edition-surface-page: var(--edition-surface-page);
+  --color-edition-surface-card: var(--edition-surface-card);
+  --color-edition-surface-strong: var(--edition-surface-strong);
+  --color-edition-primary: var(--edition-primary);
+  --color-edition-on-primary: var(--edition-on-primary);
+  --color-edition-semantic-success: var(--edition-semantic-success);
+  --color-edition-semantic-error: var(--edition-semantic-error);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -54,6 +65,8 @@
 }
 
 :root {
+  color-scheme: light;
+  accent-color: var(--edition-ink);
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -87,13 +100,26 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
   --edition-canvas: #f5f5f5;
+  --edition-canvas-soft: #fafafa;
   --edition-ink: #0c0a09;
+  --edition-body: #4e4e4e;
   --edition-muted: #777169;
+  --edition-muted-soft: #a8a29e;
   --edition-hairline: #e7e5e4;
+  --edition-hairline-soft: #f0efed;
+  --edition-hairline-strong: #d6d3d1;
   --edition-surface-page: #ffffff;
+  --edition-surface-card: #ffffff;
+  --edition-surface-strong: #f0efed;
+  --edition-primary: #292524;
+  --edition-on-primary: #ffffff;
+  --edition-semantic-success: #16a34a;
+  --edition-semantic-error: #dc2626;
 }
 
 .dark {
+  color-scheme: dark;
+  accent-color: var(--edition-ink);
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -119,16 +145,26 @@
   --chart-5: oklch(0.269 0 0);
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.922 0 0);
+  --sidebar-primary-foreground: oklch(0.205 0 0);
   --sidebar-accent: oklch(0.269 0 0);
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
-  --edition-canvas: #0c0a09;
-  --edition-ink: #f5f5f5;
+  --edition-canvas: #171412;
+  --edition-canvas-soft: #1c1917;
+  --edition-ink: #f5f5f4;
+  --edition-body: #d6d3d1;
   --edition-muted: #a8a29e;
-  --edition-hairline: #292524;
+  --edition-muted-soft: #78716c;
+  --edition-hairline: #3f3a36;
+  --edition-hairline-soft: #292524;
+  --edition-hairline-strong: #57534e;
+  --edition-surface-page: #ffffff;
+  --edition-surface-card: #1c1917;
+  --edition-surface-strong: #292524;
+  --edition-primary: #e7e5e4;
+  --edition-on-primary: #1c1917;
 }
 
 @layer base {
@@ -136,9 +172,43 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-edition-canvas text-edition-ink;
   }
   html {
     @apply font-sans;
+  }
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--edition-muted-soft);
+  }
+}
+
+@layer utilities {
+  .type-catalog-h1 {
+    @apply text-[2rem] font-medium leading-[1.15] tracking-tight text-edition-ink md:text-[2.5rem];
+  }
+
+  .type-work-title {
+    @apply text-lg font-medium leading-[1.35] text-edition-ink;
+  }
+
+  .type-group-label {
+    @apply text-[0.9375rem] font-medium leading-[1.4] text-edition-muted;
+  }
+
+  .type-body-md {
+    @apply text-base leading-normal text-edition-body;
+  }
+
+  .type-body-sm {
+    @apply text-[0.9375rem] leading-normal text-edition-body;
+  }
+
+  .type-caption-mono {
+    @apply font-mono text-xs leading-normal text-edition-muted;
+  }
+
+  .type-nav-link {
+    @apply text-[0.9375rem] font-medium leading-snug text-edition-muted;
   }
 }

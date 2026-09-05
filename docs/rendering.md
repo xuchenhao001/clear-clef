@@ -37,11 +37,11 @@ const tk = new VerovioToolkit(module);
 
 `GET /api/scores/{id}/file` streams the public score object from R2. Viewer never needs Worker-side WASM for full-score engraving.
 
-## Previews (catalog cards)
+## Previews (catalog rows)
 
 - Generate **page-1 SVG** once at ingest in the **admin browser** (Verovio after upload succeeds).
 - Store via `PUT /api/admin/scores/{id}/preview` as `scores/{id}/preview.svg` in R2.
-- List cards use `GET /api/scores/{id}/preview` — **do not** engrave on the server per request.
+- Catalog rows use `GET /api/scores/{id}/preview` on desktop — **do not** engrave on the server per request.
 
 ## Fonts
 

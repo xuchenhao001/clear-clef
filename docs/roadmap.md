@@ -36,9 +36,17 @@ Implementation order for ClearClef.
 
 ## Phase 5 — Previews and filters (done)
 
-- Page-1 SVG previews on cards (generated in admin browser at ingest)
+- Page-1 SVG previews on catalog rows (generated in admin browser at ingest)
 - Tags (many-to-many)
 - Piano-oriented filters: key, difficulty, license
+
+## Phase 6 — Genre-neutral catalog UI (done)
+
+- Credit-grouped contents list (replaces card grid)
+- Geist-only edition tokens; lamp-model viewer chrome
+- Optional `catalog_number` (thematic/opus from MusicXML `<work-number>` or admin override)
+- Sparse metadata line (`catalog_number · key · time`) on list and detail
+- See [design.md](design.md)
 
 ## Out of scope for v1
 

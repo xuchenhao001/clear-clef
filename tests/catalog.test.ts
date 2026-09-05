@@ -90,4 +90,43 @@ describe("catalog queries", () => {
     expect(rows).toHaveLength(1);
     expect(rows[0]?.slug).toBe("cc0-score");
   });
+
+  it("returns catalog metadata and tags on list rows", async () => {
+    ({ sqlite, db } = createTestDb(catalogSchema));
+    applyMigrations(sqlite);
+
+    const now = new Date();
+    await db.insert(catalogSchema.scores).values({
+      id: "score-bwv",
+      slug: "bwv-846",
+      title: "Prelude in C major",
+      composer: "J.S. Bach",
+      catalogNumber: "BWV 846",
+      key: "C major",
+      timeSignature: "4/4",
+      license: "Public Domain",
+      visibility: "public",
+      createdAt: now,
+    });
+
+    await db.insert(catalogSchema.tags).values({
+      id: "tag-prelude",
+      slug: "prelude",
+      label: "Prelude",
+    });
+    await db.insert(catalogSchema.scoreTags).values({
+      scoreId: "score-bwv",
+      tagId: "tag-prelude",
+    });
+
+    const rows = await listPublicScores({}, db as never);
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({
+      slug: "bwv-846",
+      catalogNumber: "BWV 846",
+      key: "C major",
+      timeSignature: "4/4",
+      tags: [{ slug: "prelude", label: "Prelude" }],
+    });
+  });
 });

@@ -55,7 +55,7 @@ flowchart TB
 
 1. List and detail pages are **Server Components**.
 2. They query D1 for metadata (`visibility = 'public'`).
-3. They render HTML title, composer, license, tags, and (later) a static page-1 preview URL.
+3. They render HTML title, composer, license, tags, and a static page-1 preview when available.
 4. They **must not** import Verovio or any WASM.
 
 ### Score viewer (client-only)

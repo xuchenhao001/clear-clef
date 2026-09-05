@@ -26,6 +26,7 @@ export type UploadScoreInput = {
   visibility: "public" | "unlisted" | "private";
   ownerId: string;
   sourceUrl?: string | null;
+  catalogNumber?: string | null;
   tagList?: string[];
 };
 
@@ -53,6 +54,8 @@ export async function uploadScore(
 
   const metadata = extractScoreMetadata(xml);
   const canonicalXml = sanitizeMusicXml(xml);
+  const catalogNumber =
+    input.catalogNumber?.trim() || metadata.catalogNumber?.trim() || null;
   const id = crypto.randomUUID();
   const slug = await createUniqueSlug(metadata.title, slugExists);
   const originalKey =
@@ -83,6 +86,7 @@ export async function uploadScore(
     slug,
     title: metadata.title,
     composer: metadata.composer,
+    catalogNumber,
     lyricist: metadata.lyricist,
     sourceUrl: input.sourceUrl ?? null,
     license: input.license.trim(),

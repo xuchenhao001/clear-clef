@@ -14,6 +14,7 @@ export async function POST(request: Request) {
     const license = String(formData.get("license") ?? "");
     const visibility = String(formData.get("visibility") ?? "public");
     const sourceUrl = formData.get("sourceUrl");
+    const catalogNumber = formData.get("catalogNumber");
     const tags = String(formData.get("tags") ?? "")
       .split(",")
       .map((tag) => tag.trim())
@@ -35,6 +36,7 @@ export async function POST(request: Request) {
       visibility: visibility as "public" | "unlisted" | "private",
       ownerId: session.user.id,
       sourceUrl: sourceUrl ? String(sourceUrl) : null,
+      catalogNumber: catalogNumber ? String(catalogNumber) : null,
       tagList: tags,
     });
 

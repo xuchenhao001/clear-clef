@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ScoreRights } from "@/components/score/ScoreRights";
 import { ScoreViewerLoader } from "@/components/score/ScoreViewerLoader";
+import { formatCatalogLine } from "@/lib/scores/catalog-line";
 import { isMxlR2Key } from "@/lib/score-file";
 import { getPublicScoreBySlug } from "@/lib/scores/queries";
 
@@ -20,10 +22,10 @@ export async function generateMetadata({
     return { title: "Score not found" };
   }
 
-  const composer = score.composer ? ` — ${score.composer}` : "";
+  const composer = score.composer ? ` - ${score.composer}` : "";
   return {
     title: `${score.title}${composer}`,
-    description: `${score.title} by ${score.composer ?? "unknown composer"}. License: ${score.license}.`,
+    description: `${score.title} by ${score.composer ?? "unknown credit"}. License: ${score.license}.`,
   };
 }
 
@@ -35,39 +37,52 @@ export default async function ScoreDetailPage({ params }: ScorePageProps) {
   }
 
   const compressed = score.r2Key ? isMxlR2Key(score.r2Key) : false;
+  const metadataLine = formatCatalogLine({
+    catalogNumber: score.catalogNumber,
+    key: score.key,
+    timeSignature: score.timeSignature,
+  });
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-6 py-10">
-      <div className="space-y-3">
-        <Link href="/" className="text-sm text-zinc-500 hover:text-foreground">
-          ← Back to catalog
+    <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-10 px-6 py-10 md:gap-12 md:py-16">
+      <div className="space-y-4">
+        <Link
+          href="/"
+          className="type-body-sm text-edition-muted hover:text-edition-ink"
+        >
+          Back to catalog
         </Link>
-        <h1 className="text-4xl font-semibold tracking-tight">{score.title}</h1>
-        <p className="text-lg text-zinc-600 dark:text-zinc-400">
-          {score.composer ?? "Unknown composer"}
-          {score.lyricist ? ` · lyrics by ${score.lyricist}` : ""}
-        </p>
-        <dl className="grid gap-2 text-sm text-zinc-600 sm:grid-cols-2 dark:text-zinc-400">
-          <div>
-            <dt className="font-medium text-foreground">License</dt>
-            <dd>{score.license}</dd>
-          </div>
+        <header className="space-y-2">
+          {score.composer ? (
+            <p className="type-body-sm text-edition-muted">{score.composer}</p>
+          ) : null}
+          <h1 className="type-work-title text-xl md:text-2xl">{score.title}</h1>
+          {score.lyricist ? (
+            <p className="type-body-sm text-edition-muted">
+              Lyrics by {score.lyricist}
+            </p>
+          ) : null}
+          {metadataLine ? (
+            <p className="type-caption-mono">{metadataLine}</p>
+          ) : null}
+        </header>
+        <dl className="grid gap-3 text-sm sm:grid-cols-2">
           {score.key ? (
             <div>
-              <dt className="font-medium text-foreground">Key</dt>
-              <dd>{score.key}</dd>
+              <dt className="font-medium text-edition-ink">Key</dt>
+              <dd className="text-edition-body">{score.key}</dd>
             </div>
           ) : null}
           {score.timeSignature ? (
             <div>
-              <dt className="font-medium text-foreground">Time</dt>
-              <dd>{score.timeSignature}</dd>
+              <dt className="font-medium text-edition-ink">Time</dt>
+              <dd className="text-edition-body">{score.timeSignature}</dd>
             </div>
           ) : null}
           {score.difficulty ? (
             <div>
-              <dt className="font-medium text-foreground">Difficulty</dt>
-              <dd>{score.difficulty}</dd>
+              <dt className="font-medium text-edition-ink">Difficulty</dt>
+              <dd className="text-edition-body">{score.difficulty}</dd>
             </div>
           ) : null}
         </dl>
@@ -76,7 +91,7 @@ export default async function ScoreDetailPage({ params }: ScorePageProps) {
             {score.tags.map((tag) => (
               <li
                 key={tag.slug}
-                className="rounded-full bg-muted px-3 py-1 text-xs font-medium"
+                className="rounded-full bg-edition-surface-strong px-3 py-1 text-xs font-medium text-edition-body"
               >
                 {tag.label}
               </li>
@@ -90,6 +105,8 @@ export default async function ScoreDetailPage({ params }: ScorePageProps) {
         compressed={compressed}
         title={score.title}
       />
+
+      <ScoreRights license={score.license} sourceUrl={score.sourceUrl} />
     </div>
   );
 }

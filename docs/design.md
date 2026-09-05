@@ -1,22 +1,22 @@
 # ClearClef design system
 
-Visual reference for ClearClef's public catalog and viewer. Token structure is inspired by editorial product systems (quiet paper, ink CTAs, light display type). Components and surfaces are specific to a **music edition catalog**, not a generic SaaS marketing site.
+Visual reference for ClearClef's public catalog and viewer. A **genre-neutral score library**: quiet stone canvas, Geist typography, engraved notation as row previews. Not a classical publisher edition and not a generic SaaS marketing site.
 
 **Dials:** `DESIGN_VARIANCE: 6` · `MOTION_INTENSITY: 3` · `VISUAL_DENSITY: 3`
 
-**Canonical catalog layout:** composer-grouped **contents list** (see [Catalog index](#catalog-index)). Production `/` restyle is a follow-up.
+**Canonical catalog layout:** credit-grouped **contents list** (see [Catalog index](#catalog-index)).
 
 ## Overview
 
-ClearClef reads like a small music publisher's desk: warm stone paper, engraved notation as incipit thumbnails, title-page typography for work identity, and Geist for product chrome.
+ClearClef reads like a small score library: stone paper, hairline rows, page-1 preview thumbnails on desktop, and Geist throughout.
 
 **Key characteristics:**
 
 - Off-white stone canvas `{colors.canvas}` (#f5f5f5), warm near-black ink `{colors.ink}` (#0c0a09).
 - No saturated CTA color. Primary action is an ink pill at `{rounded.pill}`.
-- Display runs **Newsreader** at weight 300 (optical size ~72 for heroes). Never bold display headlines.
-- UI runs **Geist** at 400/500. Score metadata runs **Geist Mono**.
-- Engraved preview SVG appears as a small incipit thumbnail on catalog rows (desktop). No decorative stave backgrounds in chrome.
+- **Geist** 400/500 for chrome, titles, and group labels. **Geist Mono** for metadata (key, time, optional catalog number, page index, rights line).
+- No display serif. Genre-neutral means the same chrome for any credited name or work title.
+- Page-1 preview SVG at row right on desktop. No decorative stave backgrounds in chrome.
 - Soft pill geometry for CTAs; hairline dividers for catalog rows.
 - Generous section rhythm (~96px between major bands).
 
@@ -27,35 +27,37 @@ ClearClef reads like a small music publisher's desk: warm stone paper, engraved 
 | Token | Hex | Use |
 | --- | --- | --- |
 | `{colors.primary}` | #292524 | Ink pill background (primary CTA). Used scarcely. |
-| `{colors.primary-active}` | #0c0a09 | Press state. |
+| `{colors.primary-active}` | #0c0a09 | Press state (light mode). |
+| `{colors.primary-dark}` | #f5f5f5 | Ink pill background in dark mode. |
+| `{colors.on-primary-dark}` | #0c0a09 | Text on dark-mode pill. |
 
 ### Surface
 
 | Token | Hex | Use |
 | --- | --- | --- |
 | `{colors.canvas}` | #f5f5f5 | Page floor. Public catalog default. |
-| `{colors.canvas-soft}` | #fafafa | Subtle alternating band (optional). |
-| `{colors.surface-card}` | #ffffff | Score plates, viewer page, form inputs. |
+| `{colors.canvas-soft}` | #fafafa | Row hover, subtle band. |
+| `{colors.surface-card}` | #ffffff | Viewer page, preview frame, form inputs. |
 | `{colors.surface-strong}` | #f0efed | Disabled plates, tag backgrounds. |
 
 ### Hairlines
 
 | Token | Hex | Use |
 | --- | --- | --- |
-| `{colors.hairline}` | #e7e5e4 | Default 1px divider, card outline. |
+| `{colors.hairline}` | #e7e5e4 | Default 1px divider. |
 | `{colors.hairline-soft}` | #f0efed | Lighter divider. |
-| `{colors.hairline-strong}` | #d6d3d1 | Input borders, stronger panel outline. |
+| `{colors.hairline-strong}` | #d6d3d1 | Input borders, stronger outline. |
 
 ### Text
 
 | Token | Hex | Use |
 | --- | --- | --- |
-| `{colors.ink}` | #0c0a09 | Display, primary text. |
+| `{colors.ink}` | #0c0a09 | Primary text. |
 | `{colors.body}` | #4e4e4e | Running text. |
 | `{colors.body-strong}` | #292524 | Emphasis. |
-| `{colors.muted}` | #777169 | Composer line, sub-titles. |
+| `{colors.muted}` | #777169 | Credit line, subtitles. |
 | `{colors.muted-soft}` | #a8a29e | Disabled, helper text. |
-| `{colors.on-primary}` | #ffffff | Text on ink pill. |
+| `{colors.on-primary}` | #ffffff | Text on ink pill (light mode). |
 
 ### Semantic
 
@@ -66,20 +68,23 @@ ClearClef reads like a small music publisher's desk: warm stone paper, engraved 
 
 ### Dark mode — lamp on a stand (locked)
 
-Public surfaces follow **system** `prefers-color-scheme` via `class="dark"` on `<html>` ([`components/theme-init.tsx`](../components/theme-init.tsx)). The catalog is light-first in spirit; when the OS is dark, chrome darkens like a room at night while **engraved notation stays ink on white paper**.
+Theme defaults to **System** (`prefers-color-scheme`). Users can override via the header **Light / Dark / System** menu ([`components/theme-menu.tsx`](../components/theme-menu.tsx)); choice persists in `localStorage` and is applied before paint ([`components/theme-init.tsx`](../components/theme-init.tsx)). Chrome darkens while **engraved notation stays ink on white paper**.
 
 | Surface | Light | Dark (lamp) |
 | --- | --- | --- |
-| Catalog chrome (nav, body, filters) | `{colors.canvas}` #f5f5f5 | Deep stone `{colors.ink}` #0c0a09 |
-| Catalog text | `{colors.ink}` | `{colors.on-primary}` / light ink |
-| Incipit thumbnail frame | White + hairline | **White frame unchanged** — do not invert R2 preview SVG |
-| Viewer stand (outer shell, toolbar) | `{colors.canvas}` | `{colors.ink}` stone |
-| Viewer page (inner) | `{colors.surface-card}` #ffffff | **#ffffff unchanged** |
+| Catalog chrome (nav, body, filters) | `{colors.canvas}` #f5f5f5 | Charcoal `{colors.canvas}` #171412 |
+| Form fields / admin plate | `{colors.surface-card}` #ffffff | Elevated `{colors.surface-card}` #1c1917 |
+| Catalog text | `{colors.ink}` | `{colors.ink}` #f5f5f4 |
+| Row hover | `{colors.canvas-soft}` #fafafa | `{colors.canvas-soft}` #1c1917 |
+| Preview thumbnail matte | `{colors.canvas-soft}` + white page | Charcoal matte + **white page unchanged** |
+| Viewer stand (outer shell, toolbar) | `{colors.canvas}` | Charcoal `{colors.canvas}` |
+| Viewer page (inner) | `{colors.surface-page}` #ffffff | **#ffffff unchanged** (`surface-page`, not `surface-card`) |
 | Verovio SVG | Black on white (default) | **Unchanged** — no `svgCss`, no CSS `filter: invert` |
+| Primary CTA pill | `{colors.primary}` on `{colors.on-primary}` | `{colors.primary}` #e7e5e4 on `{colors.on-primary}` #1c1917 |
 
-**Rejected:** light-only public catalog (no system dark), full notation inversion (light glyphs on dark page).
+**Rejected:** light-only public catalog, full notation inversion, sun/moon icon toggle.
 
-R2 page-1 previews are stored once at ingest as black-on-white SVG ([`ingest.md`](ingest.md)). Lamp model avoids dual assets and matches publisher engraving.
+R2 page-1 previews are stored once at ingest as black-on-white SVG ([`ingest.md`](ingest.md)).
 
 ## Typography
 
@@ -87,38 +92,33 @@ R2 page-1 previews are stored once at ingest as black-on-white SVG ([`ingest.md`
 
 | Role | Family | License | Load |
 | --- | --- | --- | --- |
-| Display | Newsreader 300 | SIL OFL | `next/font/google` |
-| UI / body | Geist 400/500 | OFL | Already in root layout |
-| Metadata | Geist Mono | OFL | Already in root layout |
+| UI / titles | Geist 400/500 | OFL | Root layout |
+| Metadata | Geist Mono 400 | OFL | Root layout |
 
-**Do not** use Waldenburg, Playfair Display, Fraunces, Instrument Serif, or EB Garamond as defaults. **Never** set nav, buttons, filters, or admin forms in the display serif.
+**Do not** load Newsreader or other display serifs for public catalog surfaces. **Never** mix a second serif for emphasis.
 
 ### Hierarchy
 
-| Token | Size | Weight | Line height | Letter spacing | Font | Use |
-| --- | --- | --- | --- | --- | --- | --- |
-| `{typography.display-xl}` | 48px | 300 | 1.08 | -0.96px | Newsreader | Catalog H1 |
-| `{typography.display-lg}` | 36px | 300 | 1.17 | -0.36px | Newsreader | Section heads |
-| `{typography.display-md}` | 32px | 300 | 1.13 | -0.32px | Newsreader | Score title (detail) |
-| `{typography.display-sm}` | 24px | 300 | 1.2 | 0 | Newsreader | Card work titles |
-| `{typography.title-md}` | 20px | 500 | 1.35 | 0 | Geist | Component titles |
-| `{typography.body-md}` | 16px | 400 | 1.5 | 0.16px | Geist | Body |
-| `{typography.body-sm}` | 15px | 400 | 1.47 | 0.15px | Geist | Footer, captions |
-| `{typography.caption-mono}` | 12px | 400 | 1.5 | 0 | Geist Mono | Catalog line, colophon |
-| `{typography.button}` | 15px | 500 | 1.0 | 0 | Geist | CTA pill |
-| `{typography.nav-link}` | 15px | 500 | 1.4 | 0 | Geist | Top nav |
+| Token | Size | Weight | Line height | Font | Use |
+| --- | --- | --- | --- | --- | --- |
+| `{typography.catalog-h1}` | 32-40px | 500 | 1.15 | Geist | Catalog H1 |
+| `{typography.work-title}` | 18-20px | 500 | 1.35 | Geist | Row and detail work title |
+| `{typography.group-label}` | 15px | 500 | 1.4 | Geist | Credit group heading (smaller than work title) |
+| `{typography.body-md}` | 16px | 400 | 1.5 | Geist | Body |
+| `{typography.body-sm}` | 15px | 400 | 1.47 | Geist | Captions, difficulty |
+| `{typography.caption-mono}` | 12px | 400 | 1.5 | Geist Mono | Metadata line, rights line |
+| `{typography.button}` | 15px | 500 | 1.0 | Geist | CTA pill |
+| `{typography.nav-link}` | 15px | 500 | 1.4 | Geist | Top nav |
 
-Use `font-variation-settings: "opsz" 72, "wght" 300` (or 48 for smaller display) on Newsreader at large sizes.
-
-### Title page stack
+### Score header stack
 
 Score identity on catalog rows and detail pages:
 
-1. **Composer** - Geist, `{typography.body-sm}`, `{colors.muted}`
-2. **Work title** - Newsreader 300, `{typography.display-sm}` or `{typography.display-md}`
-3. **Catalog line** - Geist Mono, `{typography.caption-mono}` (e.g. `BWV 846 · C major · 4/4`)
+1. **Credit** (composer column) - Geist, `{typography.body-sm}`, `{colors.muted}` — group label on index only
+2. **Work title** - Geist `{typography.work-title}`
+3. **Metadata line** - Geist Mono, `{typography.caption-mono}` — optional; catalog number, key, time (omit when empty)
 
-Detail pages lead **composer then title**, like a printed edition title page.
+Detail pages lead **credit then title**. Fallback group label: `Uncredited`.
 
 ## Layout
 
@@ -127,85 +127,94 @@ Detail pages lead **composer then title**, like a printed edition title page.
 - Base unit: 4px.
 - Tokens: `{spacing.xs}` 8px · `{spacing.base}` 16px · `{spacing.lg}` 24px · `{spacing.xl}` 32px · `{spacing.section}` 96px.
 - Catalog content max width: ~1200px (`max-w-[1200px]`).
-- Public catalog index is a **contents list**: composer sections, hairline-divided rows, optional incipit at desktop right.
+- Public catalog index is a **contents list**: credit sections, hairline-divided rows, optional preview at desktop right.
 
 ### Catalog index
 
-The public index is a publisher-style **contents list**, not a card grid.
-
 | Element | Treatment |
 | --- | --- |
-| Composer section | Newsreader `{typography.display-lg}`, grouped works underneath |
-| Row | Work title (Newsreader `{typography.display-sm}`), Geist Mono catalog line, Geist body for difficulty and musical tags |
+| Credit section | Geist `{typography.group-label}` — smaller than work titles |
+| Row | Work title (Geist `{typography.work-title}`), optional Geist Mono metadata line, Geist body for difficulty and tags |
 | Divider | `border-y` + `divide-y` on `{colors.hairline}`; no card boxes per row |
-| Incipit | Small page-1 preview thumbnail at row right on `sm+`; hidden on narrow mobile |
+| Preview | Page-1 thumbnail at row right on `sm+`; hidden on narrow mobile |
 | Filters | Quiet `filter-bar` above the list; not a heavy bordered panel |
 
-**Rejected for catalog index:** 2-up score plate grid, three equal marketplace cards, SaaS hero with gradient blobs, trust logo strips in the hero.
+**Rejected:** 2-up score plate grid, three equal marketplace cards, SaaS hero with gradient blobs.
 
 ## Elevation and depth
 
 | Level | Treatment | Use |
 | --- | --- | --- |
-| Flat canvas | `{colors.canvas}` | Body, nav, footer bands |
-| Card / plate | `{colors.surface-card}` + 1px `{colors.hairline}` | Viewer page, incipit thumbnail frame |
-| Row hover | Subtle background tint or ink text shift only | Contents list rows (no card shadow) |
+| Flat canvas | `{colors.canvas}` | Body, nav |
+| Elevated chrome | `{colors.surface-card}` + 1px `{colors.hairline}` | Form inputs, admin plate, theme menu |
+| Notation page | `{colors.surface-page}` #ffffff | Viewer inner page, preview thumbnail inner frame |
+| Row hover | `{colors.canvas-soft}` tint | Contents list rows (no card shadow) |
 
-No pastel gradient orbs. No neon glow. The engraved SVG provides atmospheric depth.
+No pastel gradient orbs. No neon glow.
 
 ## Shapes
 
 | Token | Value | Use |
 | --- | --- | --- |
 | `{rounded.md}` | 8px | Form inputs |
-| `{rounded.xl}` | 16px | Viewer shell, incipit frame |
-| `{rounded.pill}` | 9999px | CTAs, tag pills (musical tags only) |
+| `{rounded.xl}` | 16px | Viewer shell, preview frame |
+| `{rounded.pill}` | 9999px | CTAs, tag pills |
 
 ## Components
 
 ### `top-nav`
 
-Background `{colors.canvas}`, height 64px. Geist wordmark left; catalog label optional; Admin as text link right. No decorative clef in the header.
+Background `{colors.canvas}`, height 64px. Geist wordmark left; optional `Catalog` label; **Appearance** menu (Light / Dark / System) and Admin link right. No decorative clef.
 
 Maps to: [`components/site-header.tsx`](../components/site-header.tsx)
 
+### `theme-switch`
+
+Header text menu (not a sun/moon icon). Trigger shows current choice (`Light`, `Dark`, or `System`). Persists to `localStorage['clear-clef-theme']`. Also on admin protected header and auth shell.
+
+Maps to: [`components/theme-menu.tsx`](../components/theme-menu.tsx), [`lib/theme.ts`](../lib/theme.ts)
+
 ### `catalog-hero`
 
-Left-aligned Newsreader H1 ("Score catalog") + one Geist sentence (max ~20 words). No eyebrow, no CTA strip, no trust logos in the hero band.
+Left-aligned Geist H1 ("Score catalog") + one sentence (max ~20 words). No eyebrow, no CTA strip.
 
 ### `filter-bar`
 
-Quiet row: key, difficulty, license, tag. Labels above selects. No heavy bordered panel. Maps to: [`components/catalog/catalog-filters.tsx`](../components/catalog/catalog-filters.tsx)
+Quiet row: key, difficulty, license, tag. Labels above selects. No heavy bordered panel.
+
+Maps to: [`components/catalog/catalog-filters.tsx`](../components/catalog/catalog-filters.tsx)
 
 ### `contents-list`
 
-Composer-grouped catalog index. Section head in Newsreader `{typography.display-lg}`. Each row: Newsreader work title, Geist Mono catalog line, Geist body for difficulty and tags. Hairline dividers between rows. Small page-1 incipit thumbnail at desktop right (from R2 preview URL in production).
+Credit-grouped catalog index. Group head in Geist `{typography.group-label}`. Each row: work title, optional metadata line, difficulty and tags. Hairline dividers. Page-1 preview thumbnail at desktop right.
 
-Maps to: [`app/(site)/page.tsx`](../app/(site)/page.tsx) (restyle target)
+Maps to: [`app/(site)/page.tsx`](../app/(site)/page.tsx)
 
 ### `contents-row`
 
-Single row inside `contents-list`. No card wrapper. Clickable row spans title block and optional incipit.
+Single row inside `contents-list`. No card wrapper. Clickable row spans title block and optional preview.
 
-### `title-page` (detail)
+### `score-header` (detail)
 
-Composer line, Newsreader work title, metadata dl (key, time, difficulty) in Geist. Musical tag pills only. License **not** pill-styled here.
+Credit line, Geist work title, metadata dl (key, time, difficulty). Musical tag pills only. License **not** pill-styled here.
 
 Maps to: [`app/(site)/scores/[slug]/page.tsx`](../app/(site)/scores/[slug]/page.tsx)
 
-### `colophon`
+### `rights-line`
 
-Footer block on score detail. Geist Mono rights line: license (required), source URL if present. Reads like an ISMN / plate mark, not a badge cluster.
+Below the viewer on score detail. Geist Mono: license (required), source URL if present. Functional metadata, not a plate mark.
+
+Maps to: [`components/score/ScoreRights.tsx`](../components/score/ScoreRights.tsx)
 
 ### `viewer-stand`
 
-**Lamp model:** outer shell uses `{colors.canvas}` (dark stone in system dark mode); inner engraved page always `{colors.surface-card}` (#ffffff). Top bar: page index in Geist Mono (`3 / 12`). Previous / Next as outline pills. Loading: "Preparing the score." Skeleton matches page rectangle. Verovio `setOptions` stays default — never invert SVG.
+**Lamp model:** outer shell `{colors.canvas}`; inner page always `{colors.surface-page}` (#ffffff). Top bar: page index in Geist Mono (`3 / 12`). Previous / Next as outline pills. Loading: "Preparing the score." Skeleton matches page rectangle. Never invert SVG.
 
 Maps to: [`components/score/ScoreViewer.tsx`](../components/score/ScoreViewer.tsx)
 
 ### `button-primary`
 
-Ink pill. Background `{colors.primary}`, text `{colors.on-primary}`, `{rounded.pill}`, height 40px, padding 10px × 20px.
+Ink pill. Background `{colors.primary}` (light) or `{colors.primary-dark}` (dark), height 40px, `{rounded.pill}`.
 
 ### `button-outline`
 
@@ -213,74 +222,80 @@ Transparent pill, 1px `{colors.hairline-strong}` border, ink text.
 
 ### `admin-shell`
 
-Back-of-house. Clear forms, required license field. Do not apply display serif or edition ornament to admin upload surfaces.
+Back-of-house. Geist forms, required license field. No library ornament.
 
 ## Do's and don'ts
 
 ### Do
 
-- Reserve `{colors.primary}` for primary CTAs only.
-- Use Newsreader 300 for every display headline. Never bold display copy.
-- Use Geist Mono for catalog numbers, key, time signature, license colophon.
-- Group the catalog index by composer with hairline-divided contents rows.
-- Show page-1 preview as a small incipit thumbnail on catalog rows (desktop), in a white frame even in dark mode.
+- Reserve ink pill for primary CTAs only.
+- Use Geist for all public titles and group labels.
+- Use Geist Mono for catalog numbers, key, time, rights line.
+- Group the catalog index by credited name with hairline-divided rows.
+- Show page-1 preview in a white frame on catalog rows (desktop), even in dark mode.
 - Use pill shape for CTAs and musical tag pills.
-- Keep copy in edition voice: "Public catalog of licensed scores."
+- Keep copy neutral: "Public catalog of licensed scores."
 
 ### Don't
 
-- Don't add pastel gradient orbs, decorative clefs, or stave backgrounds in chrome.
-- Don't use card grids or score plate tiles on the catalog index.
+- Don't load display serifs on public catalog surfaces.
+- Don't use oversized group headings that read like collected-works chapter titles.
+- Don't use card grids on the catalog index.
 - Don't pill the license next to the work title.
-- Don't bold display headlines or mix a second serif for emphasis.
-- Don't use marketing filler ("discover", "elevate", "seamless").
-- Don't invert, grey-wash, or CSS-filter engraved SVG (viewer or R2 incipit thumbnails).
-- Don't load Verovio on catalog list pages (see [rendering.md](rendering.md)).
+- Don't use edition jargon in UI copy (colophon, incipit, title page, plate).
+- Don't invert or CSS-filter engraved SVG.
+- Don't load Verovio on catalog list pages ([rendering.md](rendering.md)).
 
 ## Responsive behavior
 
 | Breakpoint | Key changes |
 | --- | --- |
-| Mobile (< 640px) | Contents rows stack; incipit hidden; filters wrap |
-| Tablet (640-1024px) | Incipit visible; nav stays single line |
-| Desktop (> 1024px) | Full contents list with incipit column; max width 1200px |
+| Mobile (< 640px) | Contents rows stack; preview hidden; filters wrap |
+| Tablet (640-1024px) | Preview visible; nav stays single line |
+| Desktop (> 1024px) | Full contents list with preview column; max width 1200px |
 
 Touch targets: primary pill 40px height minimum.
 
 ## CSS variable mapping
 
-Edition tokens live in [`app/globals.css`](../app/globals.css) alongside shadcn internals. `--edition-surface-page` stays `#ffffff` in both modes.
+Edition tokens live in [`app/globals.css`](../app/globals.css). `--edition-surface-page` stays `#ffffff` in both modes (notation paper). `--edition-surface-card` is chrome in dark mode.
 
 ```css
 :root {
+  color-scheme: light;
   --edition-canvas: #f5f5f5;
+  --edition-canvas-soft: #fafafa;
   --edition-ink: #0c0a09;
-  --edition-hairline: #e7e5e4;
-  --edition-muted: #777169;
   --edition-surface-page: #ffffff;
+  --edition-surface-card: #ffffff;
+  --edition-primary: #292524;
+  --edition-on-primary: #ffffff;
 }
 
 .dark {
-  --edition-canvas: #0c0a09;
-  --edition-ink: #f5f5f5;
-  --edition-hairline: #292524;
-  --edition-muted: #a8a29e;
+  color-scheme: dark;
+  --edition-canvas: #171412;
+  --edition-canvas-soft: #1c1917;
+  --edition-ink: #f5f5f4;
+  --edition-surface-page: #ffffff;
+  --edition-surface-card: #1c1917;
+  --edition-primary: #e7e5e4;
+  --edition-on-primary: #1c1917;
 }
 ```
 
-Tailwind utilities: `bg-edition-canvas`, `bg-edition-surface-page`, `border-edition-hairline`, `text-edition-muted`, etc. Use these on public catalog and viewer surfaces during restyle. Do not rewrite shadcn `--primary` until a dedicated pass.
+Tailwind utilities: `bg-edition-canvas`, `bg-edition-surface-page`, `border-edition-hairline`, `text-edition-muted`, etc.
 
 ## Known gaps
 
-- Production `/` not yet restyled to contents list or edition tokens (viewer uses lamp model today).
-- Newsreader not yet loaded in root layout.
-- Motion timings (row hover, page turn) out of scope for v1 reference.
+- Motion timings (row hover, page turn) out of scope for v1.
 - SMuFL webfont on viewer route is optional later ([rendering.md](rendering.md)).
 - Form validation states beyond focus not fully specified.
+- Admin metadata edit is a follow-up.
 
 ## Provenance
 
-- Editorial token rhythm (ink pill, hairline cards, 96px sections) adapted from external editorial product references.
-- ClearClef-specific: Newsreader + Geist stack, no atmospheric orbs, contents-list catalog, engraved SVG as incipit thumbnail.
-- Layout decision: contents list chosen over score plate grid.
-- Dark mode: lamp on a stand (dark chrome, white engraved page); light-only and full inversion rejected.
+- Token rhythm (ink pill, hairline rows, stone canvas) adapted from quiet product library patterns.
+- ClearClef-specific: Geist-only public type, contents-list catalog, engraved SVG as row preview.
+- Layout: contents list over score plate grid.
+- Dark mode: lamp on a stand; full inversion rejected.

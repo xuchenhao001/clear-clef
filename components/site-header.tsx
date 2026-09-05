@@ -1,23 +1,25 @@
 import Link from "next/link";
+import { ThemeMenu } from "@/components/theme-menu";
 
 export function SiteHeader() {
   return (
-    <header className="border-b border-border bg-background">
-      <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-6 py-4">
+    <header className="border-b border-edition-hairline bg-edition-canvas">
+      <div className="mx-auto flex h-16 w-full max-w-[1200px] items-center justify-between gap-4 px-6">
         <div className="flex items-center gap-6">
-          <Link href="/" className="text-lg font-semibold tracking-tight">
+          <Link
+            href="/"
+            className="text-lg font-medium tracking-tight text-edition-ink"
+          >
             ClearClef
           </Link>
-          <p className="hidden text-sm text-zinc-500 sm:block">
-            Public MusicXML catalog
-          </p>
+          <p className="hidden type-nav-link sm:block">Catalog</p>
         </div>
-        <Link
-          href="/admin"
-          className="text-sm font-medium text-zinc-600 hover:text-foreground dark:text-zinc-400"
-        >
-          Admin
-        </Link>
+        <div className="flex items-center gap-4">
+          <ThemeMenu />
+          <Link href="/admin" className="type-nav-link hover:text-edition-ink">
+            Admin
+          </Link>
+        </div>
       </div>
     </header>
   );

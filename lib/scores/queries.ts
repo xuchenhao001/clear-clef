@@ -1,4 +1,4 @@
-import { and, desc, eq, type SQL } from "drizzle-orm";
+import { and, desc, eq, inArray, type SQL } from "drizzle-orm";
 import type { DrizzleD1Database } from "drizzle-orm/d1";
 import { getDbAsync } from "@/lib/db";
 import * as schema from "@/lib/db/schema";
@@ -12,10 +12,56 @@ export type CatalogFilters = {
   tag?: string;
 };
 
+export type PublicCatalogScore = {
+  id: string;
+  slug: string;
+  title: string;
+  composer: string | null;
+  catalogNumber: string | null;
+  key: string | null;
+  timeSignature: string | null;
+  difficulty: string | null;
+  previewR2Key: string | null;
+  createdAt: Date;
+  tags: { slug: string; label: string }[];
+};
+
+async function attachTagsToScores(
+  database: CatalogDb,
+  rows: Omit<PublicCatalogScore, "tags">[],
+): Promise<PublicCatalogScore[]> {
+  if (rows.length === 0) {
+    return [];
+  }
+
+  const scoreIds = rows.map((row) => row.id);
+  const tagRows = await database
+    .select({
+      scoreId: scoreTags.scoreId,
+      slug: tags.slug,
+      label: tags.label,
+    })
+    .from(scoreTags)
+    .innerJoin(tags, eq(tags.id, scoreTags.tagId))
+    .where(inArray(scoreTags.scoreId, scoreIds));
+
+  const tagsByScore = new Map<string, { slug: string; label: string }[]>();
+  for (const row of tagRows) {
+    const existing = tagsByScore.get(row.scoreId) ?? [];
+    existing.push({ slug: row.slug, label: row.label });
+    tagsByScore.set(row.scoreId, existing);
+  }
+
+  return rows.map((row) => ({
+    ...row,
+    tags: tagsByScore.get(row.id) ?? [],
+  }));
+}
+
 export async function listPublicScores(
   filters: CatalogFilters = {},
   db?: CatalogDb,
-) {
+): Promise<PublicCatalogScore[]> {
   const database = db ?? await getDbAsync();
   const conditions: SQL[] = [eq(scores.visibility, "public")];
 
@@ -29,43 +75,34 @@ export async function listPublicScores(
     conditions.push(eq(scores.license, filters.license));
   }
 
-  const baseQuery = database
-    .select({
-      id: scores.id,
-      slug: scores.slug,
-      title: scores.title,
-      composer: scores.composer,
-      license: scores.license,
-      key: scores.key,
-      difficulty: scores.difficulty,
-      previewR2Key: scores.previewR2Key,
-      createdAt: scores.createdAt,
-    })
-    .from(scores)
-    .where(and(...conditions))
-    .orderBy(desc(scores.createdAt));
+  const selectFields = {
+    id: scores.id,
+    slug: scores.slug,
+    title: scores.title,
+    composer: scores.composer,
+    catalogNumber: scores.catalogNumber,
+    key: scores.key,
+    timeSignature: scores.timeSignature,
+    difficulty: scores.difficulty,
+    previewR2Key: scores.previewR2Key,
+    createdAt: scores.createdAt,
+  };
 
-  if (!filters.tag) {
-    return baseQuery;
-  }
+  const rows = filters.tag
+    ? await database
+        .select(selectFields)
+        .from(scores)
+        .innerJoin(scoreTags, eq(scoreTags.scoreId, scores.id))
+        .innerJoin(tags, eq(tags.id, scoreTags.tagId))
+        .where(and(...conditions, eq(tags.slug, filters.tag)))
+        .orderBy(desc(scores.createdAt))
+    : await database
+        .select(selectFields)
+        .from(scores)
+        .where(and(...conditions))
+        .orderBy(desc(scores.createdAt));
 
-  return database
-    .select({
-      id: scores.id,
-      slug: scores.slug,
-      title: scores.title,
-      composer: scores.composer,
-      license: scores.license,
-      key: scores.key,
-      difficulty: scores.difficulty,
-      previewR2Key: scores.previewR2Key,
-      createdAt: scores.createdAt,
-    })
-    .from(scores)
-    .innerJoin(scoreTags, eq(scoreTags.scoreId, scores.id))
-    .innerJoin(tags, eq(tags.id, scoreTags.tagId))
-    .where(and(...conditions, eq(tags.slug, filters.tag)))
-    .orderBy(desc(scores.createdAt));
+  return attachTagsToScores(database, rows);
 }
 
 export async function getPublicScoreBySlug(slug: string, db?: CatalogDb) {

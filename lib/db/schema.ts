@@ -13,6 +13,7 @@ export const scores = sqliteTable(
     slug: text("slug").notNull().unique(),
     title: text("title").notNull(),
     composer: text("composer"),
+    catalogNumber: text("catalog_number"),
     lyricist: text("lyricist"),
     sourceUrl: text("source_url"),
     license: text("license").notNull(),

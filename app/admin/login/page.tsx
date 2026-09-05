@@ -16,7 +16,7 @@ export default async function AdminLoginPage() {
       title="Admin sign in"
       description="Sign in with your admin account to manage uploads."
     >
-      <Suspense fallback={<p className="text-sm text-zinc-500">Loading…</p>}>
+      <Suspense fallback={<p className="type-body-sm text-edition-muted">Loading…</p>}>
         <AdminLoginForm />
       </Suspense>
     </AdminAuthShell>

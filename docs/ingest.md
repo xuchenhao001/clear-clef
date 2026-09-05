@@ -41,12 +41,12 @@ Parse **metadata only** at upload time (server path; not shipped to public catal
 
 Typical MusicXML sources:
 
-- `<work>` — title
+- `<work>` — title, optional `work-number` (catalog number)
 - `<identification>` — creator / rights
 - `<credit>` — displayed credits
 - Part list, key, time signature from score header / first attributes
 
-Extract title, composer, lyricist, key, time, parts → D1. Do **not** import ingest parsers into list/detail RSC pages.
+Extract title, composer, optional catalog number (`work-number`), lyricist, key, time, parts → D1. Admin upload may override catalog number when the file is blank or wrong. Do **not** import ingest parsers into list/detail RSC pages.
 
 ## License (required)
 

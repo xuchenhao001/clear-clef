@@ -71,7 +71,9 @@ export function AdminLoginForm() {
       </div>
 
       {error ? (
-        <p className="text-sm text-destructive" role="alert">{error}</p>
+        <p className="text-sm text-edition-semantic-error" role="alert">
+          {error}
+        </p>
       ) : null}
 
       <Button type="submit" disabled={pending} className="w-full">

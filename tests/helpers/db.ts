@@ -6,6 +6,7 @@ import { drizzle } from "drizzle-orm/better-sqlite3";
 const migrations = [
   "0000_init.sql",
   "0001_auth.sql",
+  "0002_catalog_number.sql",
 ].map((file) =>
   readFileSync(resolve(process.cwd(), "drizzle", file), "utf8"),
 );

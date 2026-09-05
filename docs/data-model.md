@@ -12,6 +12,7 @@ Keep the D1 schema small. Prefer nullable columns now for membership and format 
 | `slug` | text unique | URL segment |
 | `title` | text | Required for catalog |
 | `composer` | text | Nullable if unknown |
+| `catalog_number` | text | Optional opus or thematic catalog (BWV, Op., etc.) |
 | `lyricist` | text | Nullable |
 | `source_url` | text | Provenance (IMSLP, MuseScore, etc.) |
 | `license` | text | **Required** — see [ingest.md](ingest.md) |
