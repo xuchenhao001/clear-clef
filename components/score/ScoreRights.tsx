@@ -12,7 +12,7 @@ export function ScoreRights({ license, sourceUrl }: ScoreRightsProps) {
           Source:{" "}
           <a
             href={sourceUrl}
-            className="text-edition-ink underline-offset-2 hover:underline"
+            className="break-all text-edition-ink underline-offset-2 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-edition-hairline-strong/50"
             rel="noopener noreferrer"
             target="_blank"
           >

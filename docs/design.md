@@ -2,7 +2,7 @@
 
 Visual reference for ClearClef's public catalog and viewer. A **score library with edition-quality work identity**: quiet stone canvas, Geist chrome, Newsreader 300 for work titles, engraved notation as row previews.
 
-**Dials:** `DESIGN_VARIANCE: 6` · `MOTION_INTENSITY: 3` · `VISUAL_DENSITY: 3`
+**Dials:** `DESIGN_VARIANCE: 6` · `MOTION_INTENSITY: 4` · `VISUAL_DENSITY: 3`
 
 **Canonical catalog layout:** credit-grouped **contents list** (see [Catalog index](#catalog-index)).
 
@@ -36,9 +36,9 @@ ClearClef reads like a small score library: stone paper, hairline rows, page-1 p
 | Token | Hex | Use |
 | --- | --- | --- |
 | `{colors.canvas}` | #f5f5f5 | Page floor. Public catalog default. |
-| `{colors.canvas-soft}` | #fafafa | Row hover, subtle band. |
+| `{colors.hover}` | `color-mix(ink 8%)` | Interactive hover and menu highlight on any surface. |
 | `{colors.surface-card}` | #ffffff | Viewer page, preview frame, form inputs. |
-| `{colors.surface-strong}` | #f0efed | Disabled plates, tag backgrounds. |
+| `{colors.surface-strong}` | #f0efed | Tag backgrounds, preview thumbnail matte. |
 
 ### Hairlines
 
@@ -75,8 +75,8 @@ Theme defaults to **System** (`prefers-color-scheme`). Users can override via th
 | Catalog chrome (nav, body, filters) | `{colors.canvas}` #f5f5f5 | Charcoal `{colors.canvas}` #171412 |
 | Form fields / admin plate | `{colors.surface-card}` #ffffff | Elevated `{colors.surface-card}` #1c1917 |
 | Catalog text | `{colors.ink}` | `{colors.ink}` #f5f5f4 |
-| Row hover | `{colors.canvas-soft}` #fafafa | `{colors.canvas-soft}` #1c1917 |
-| Preview thumbnail matte | `{colors.canvas-soft}` + white page | Charcoal matte + **white page unchanged** |
+| Row hover | `{colors.hover}` ink mix | `{colors.hover}` ink mix |
+| Preview thumbnail matte | `{colors.surface-strong}` + white page | Elevated matte + **white page unchanged** |
 | Viewer stand (outer shell, toolbar) | `{colors.canvas}` | Charcoal `{colors.canvas}` |
 | Viewer page (inner) | `{colors.surface-page}` #ffffff | **#ffffff unchanged** (`surface-page`, not `surface-card`) |
 | Verovio SVG | Black on white (default) | **Unchanged** — no `svgCss`, no CSS `filter: invert` |
@@ -138,11 +138,11 @@ Detail pages lead **credit then title**. Fallback group label: `Uncredited`.
 
 | Element | Treatment |
 | --- | --- |
-| Credit section | Geist `{typography.group-label}` — smaller than work titles |
+| Credit section | Geist `{typography.group-label}` — smaller than work titles; `px-4`, first group `pt-6` |
 | Row | Work title (Newsreader `{typography.work-title}`), optional Geist Mono metadata line, Geist body for difficulty and tags |
-| Divider | `border-y` + `divide-y` on `{colors.hairline}`; no card boxes per row |
-| Preview | Page-1 thumbnail at row right on `sm+`; white inner frame, flat outer matte |
-| Filters | Hairline-underline selects; mono uppercase labels; auto-submit on change; no boxed panel |
+| Divider | Hairlines on rows (`border-b` on `li`); group sections separated by hairline; no card boxes per row |
+| Preview | Page-1 thumbnail at row right on `sm+`; white inner frame on `surface-strong` matte |
+| Filters | `EditionSelect` hairline triggers; mono uppercase labels; auto-submit on change; no boxed panel |
 
 **Rejected:** 2-up score plate grid, three equal marketplace cards, SaaS hero with gradient blobs.
 
@@ -153,7 +153,7 @@ Detail pages lead **credit then title**. Fallback group label: `Uncredited`.
 | Flat canvas | `{colors.canvas}` | Body, nav |
 | Elevated chrome | `{colors.surface-card}` + 1px `{colors.hairline}` | Form inputs, admin plate, theme menu |
 | Notation page | `{colors.surface-page}` #ffffff | Viewer inner page, preview thumbnail inner frame |
-| Row hover | `{colors.canvas-soft}` tint | Contents list rows (no card shadow) |
+| Row hover | `{colors.hover}` ink mix | Contents list rows (no card shadow) |
 
 No pastel gradient orbs. No neon glow.
 
@@ -169,9 +169,9 @@ No pastel gradient orbs. No neon glow.
 
 ### `top-nav`
 
-Background `{colors.canvas}`, height 64px. Geist wordmark left; optional `Catalog` label; theme icon button and Admin link right. No decorative clef.
+Background `{colors.canvas}`, height 64px. Geist wordmark left; **Catalog** link with current-page style; theme icon button and Admin link right. Catalog and Admin links stay visible on mobile. No decorative clef.
 
-Maps to: [`components/site-header.tsx`](../components/site-header.tsx)
+Maps to: [`components/site-header.tsx`](../components/site-header.tsx), [`components/site-header-nav.tsx`](../components/site-header-nav.tsx)
 
 ### `theme-switch`
 
@@ -185,9 +185,15 @@ Left-aligned Newsreader H1 ("Score catalog") + one Geist sentence (max ~20 words
 
 ### `filter-bar`
 
-Quiet row: key, difficulty, license, tag. Mono uppercase labels above hairline-underline selects. **Auto-submit** on change (no Apply button). Clear link when filters are active.
+Quiet row: key, difficulty, license, tag. Mono uppercase labels above hairline-underline triggers. **Auto-submit** on change (no Apply button). Options open in an edition-styled popup (Base UI Select), not the OS native list. Clear link when filters are active.
 
-Maps to: [`components/catalog/catalog-filters.tsx`](../components/catalog/catalog-filters.tsx) (server), [`components/catalog/catalog-filters-bar.tsx`](../components/catalog/catalog-filters-bar.tsx) (client auto-submit)
+Maps to: [`components/catalog/catalog-filters.tsx`](../components/catalog/catalog-filters.tsx) (server), [`components/catalog/catalog-filters-bar.tsx`](../components/catalog/catalog-filters-bar.tsx) (client auto-submit), [`lib/catalog/filter-url.ts`](../lib/catalog/filter-url.ts) (query builder), [`lib/catalog/types.ts`](../lib/catalog/types.ts) (filter field shape)
+
+### `edition-select`
+
+Shared Base UI Select for catalog filters and admin form fields. Hairline trigger (`filter` label) or boxed trigger (`form` label). Controlled `value`; selected item `font-medium` in popup. Focus ring on trigger.
+
+Maps to: [`components/ui/edition-select.tsx`](../components/ui/edition-select.tsx)
 
 ### `contents-list`
 
@@ -197,7 +203,15 @@ Maps to: [`app/(site)/page.tsx`](../app/(site)/page.tsx)
 
 ### `contents-row`
 
-Single row inside `contents-list`. No card wrapper. Clickable row spans title block and optional preview.
+Single row inside `contents-list`. No card wrapper at rest. Inset rounded hover/focus wash (`{colors.hover}`) with `px-4`; row `li` drops bottom hairline on hover/focus-within so the wash is not bisected. Clickable row spans title block and optional preview.
+
+Maps to: [`components/catalog/contents-row.tsx`](../components/catalog/contents-row.tsx)
+
+### `back-to-catalog`
+
+Outline pill link to `/`. Score detail, score 404, and app 404. Geist only.
+
+Maps to: [`components/catalog/back-to-catalog.tsx`](../components/catalog/back-to-catalog.tsx)
 
 ### `score-header` (detail)
 
@@ -225,11 +239,17 @@ Ink pill. Background `{colors.primary}` (light) or `{colors.primary-dark}` (dark
 
 Transparent pill, 1px `{colors.hairline-strong}` border, ink text.
 
+### `public-shell`
+
+Shared public chrome: skip link, site header, and `#content` main landmark. Used by the site layout and app-level not-found.
+
+Maps to: [`components/public-shell.tsx`](../components/public-shell.tsx), [`components/skip-to-content.tsx`](../components/skip-to-content.tsx)
+
 ### `admin-shell`
 
-Back-of-house. Geist forms (`type-page-h1` headings, shared label/input classes), required license field. No library ornament.
+Back-of-house. Geist forms (`type-page-h1` headings, shared label/input classes), required license field. License and visibility use `EditionSelect` (boxed triggers). No library ornament.
 
-Maps to: [`components/admin/AdminAuthShell.tsx`](../components/admin/AdminAuthShell.tsx), [`components/admin/admin-form-styles.ts`](../components/admin/admin-form-styles.ts)
+Maps to: [`components/admin/AdminAuthShell.tsx`](../components/admin/AdminAuthShell.tsx), [`components/admin/admin-form-styles.ts`](../components/admin/admin-form-styles.ts), [`components/admin/admin-nav-links.tsx`](../components/admin/admin-nav-links.tsx)
 
 ## Do's and don'ts
 
@@ -258,7 +278,7 @@ Maps to: [`components/admin/AdminAuthShell.tsx`](../components/admin/AdminAuthSh
 
 | Breakpoint | Key changes |
 | --- | --- |
-| Mobile (< 640px) | Contents rows stack; preview hidden; filters wrap |
+| Mobile (< 640px) | Contents rows stack; preview hidden; filters wrap; Catalog link visible in header |
 | Tablet (640-1024px) | Preview visible; nav stays single line |
 | Desktop (> 1024px) | Full contents list with preview column; max width 1200px |
 
@@ -272,33 +292,38 @@ Edition tokens live in [`app/globals.css`](../app/globals.css). `--edition-surfa
 :root {
   color-scheme: light;
   --edition-canvas: #f5f5f5;
-  --edition-canvas-soft: #fafafa;
   --edition-ink: #0c0a09;
   --edition-surface-page: #ffffff;
   --edition-surface-card: #ffffff;
   --edition-primary: #292524;
   --edition-on-primary: #ffffff;
+  --edition-hover: color-mix(in srgb, var(--edition-ink) 8%, transparent);
 }
 
 .dark {
   color-scheme: dark;
   --edition-canvas: #171412;
-  --edition-canvas-soft: #1c1917;
   --edition-ink: #f5f5f4;
   --edition-surface-page: #ffffff;
   --edition-surface-card: #1c1917;
   --edition-primary: #e7e5e4;
   --edition-on-primary: #1c1917;
+  --edition-hover: color-mix(in srgb, var(--edition-ink) 8%, transparent);
 }
 ```
 
-Tailwind utilities: `bg-edition-canvas`, `font-display`, `type-catalog-h1`, `type-page-h1`, `type-work-title`, `border-edition-hairline`, `text-edition-muted`, etc.
+Tailwind utilities: `bg-edition-canvas`, `bg-edition-hover`, `font-display`, `type-catalog-h1`, `type-page-h1`, `type-work-title`, `border-edition-hairline`, `text-edition-muted`, etc.
 
 `--font-display` maps to `--font-newsreader` in `@theme inline`.
 
+## Motion
+
+Interactive hover and focus (catalog rows, outline buttons, theme menu): **200ms** `cubic-bezier(0.16, 1, 0.3, 1)` on `background-color`, `border-color`, and `color` only. Utility class: `edition-interactive-transition`. Under `prefers-reduced-motion: reduce`, duration is **0ms**.
+
+No scroll-driven or entry animation in v1.
+
 ## Known gaps
 
-- Motion timings (row hover, page turn) out of scope for v1.
 - SMuFL webfont on viewer route is optional later ([rendering.md](rendering.md)).
 - Form validation states beyond focus not fully specified.
 - Admin metadata edit is a follow-up.

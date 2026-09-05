@@ -9,9 +9,11 @@ alwaysApply: false
 Read [docs/design.md](../docs/design.md) before changing public catalog, viewer, or shared UI styling.
 
 - Canvas `#f5f5f5`, ink pill CTAs, no pastel orbs.
+- Interactive hover uses `--edition-hover` (ink `color-mix` overlay).
 - Newsreader 300 for catalog H1 and work titles only; Geist for nav, filters, group labels, body, and `type-page-h1` admin headings; Geist Mono for metadata and rights line.
 - Never Newsreader on nav, wordmark, buttons, filters, or admin.
-- Catalog index is a credit-grouped contents list with hairline rows and desktop preview thumbnails.
-- Catalog filters auto-submit on select change (no Apply button).
+- Catalog index is a credit-grouped contents list with hairline rows, inset rounded hover (`px-4`), and desktop preview thumbnails on `surface-strong` mattes.
+- Catalog filters use Base UI `EditionSelect` popups (edition chrome, not OS native lists); auto-submit on change (no Apply button).
+- `BackToCatalog` outline pill on score detail, score 404, and app 404. `PublicShell` + skip-to-content target `#content` main.
 - Page-1 preview SVG in a white frame. No Verovio on list pages.
 - Dark mode: lamp on a stand — charcoal chrome, white notation page; never invert SVG.

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AdminNavLink, CatalogNavLink } from "@/components/site-header-nav";
 import { ThemeMenu } from "@/components/theme-menu";
 
 export function SiteHeader() {
@@ -12,13 +13,11 @@ export function SiteHeader() {
           >
             ClearClef
           </Link>
-          <p className="hidden type-nav-link sm:block">Catalog</p>
+          <CatalogNavLink />
         </div>
         <div className="flex items-center gap-4">
           <ThemeMenu />
-          <Link href="/admin" className="type-nav-link hover:text-edition-ink">
-            Admin
-          </Link>
+          <AdminNavLink />
         </div>
       </div>
     </header>

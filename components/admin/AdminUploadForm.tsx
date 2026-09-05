@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { adminFormInputClassName, adminFormLabelClassName } from "@/components/admin/admin-form-styles";
 import { Button } from "@/components/ui/button";
+import { EditionSelect } from "@/components/ui/edition-select";
 import { LICENSE_OPTIONS } from "@/lib/ingest/constants";
 import { VEROVIO_DEFAULT_OPTIONS } from "@/lib/verovio/options";
 
@@ -34,6 +35,9 @@ export function AdminUploadForm() {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
+  const [license, setLicense] = useState("Public Domain");
+  const [visibility, setVisibility] = useState("public");
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -83,6 +87,9 @@ export function AdminUploadForm() {
 
       setMessage(`Uploaded "${uploadJson.title}" as /scores/${uploadJson.slug}`);
       form.reset();
+      setSelectedFileName(null);
+      setLicense("Public Domain");
+      setVisibility("public");
     } catch (submitError) {
       setError(
         submitError instanceof Error ? submitError.message : "Upload failed",
@@ -98,52 +105,59 @@ export function AdminUploadForm() {
         <label htmlFor="file" className={adminFormLabelClassName}>
           Score file
         </label>
-        <input
-          id="file"
-          name="file"
-          type="file"
-          required
-          accept=".mxl,.musicxml,.xml,application/vnd.recordare.musicxml+xml,application/xml,text/xml"
-          className="block w-full text-sm text-edition-body file:mr-4 file:rounded-full file:border-0 file:bg-edition-primary file:px-4 file:py-2 file:text-sm file:font-medium file:text-edition-on-primary"
-        />
+        <div className="rounded-xl border border-edition-hairline bg-edition-surface-card px-4 py-3">
+          <input
+            id="file"
+            name="file"
+            type="file"
+            required
+            accept=".mxl,.musicxml,.xml,application/vnd.recordare.musicxml+xml,application/xml,text/xml"
+            className="block w-full text-sm text-edition-body file:mr-4 file:rounded-full file:border-0 file:bg-edition-primary file:px-4 file:py-2 file:text-sm file:font-medium file:text-edition-on-primary"
+            onChange={(event) => {
+              const file = event.currentTarget.files?.[0];
+              setSelectedFileName(file?.name ?? null);
+            }}
+          />
+          {selectedFileName ? (
+            <p className="mt-2 type-body-sm text-edition-muted">{selectedFileName}</p>
+          ) : null}
+        </div>
         <p className="text-xs text-edition-muted">
           Accepts .mxl, .musicxml, or .xml up to 8 MB.
         </p>
       </div>
 
       <div className="space-y-2">
-        <label htmlFor="license" className={adminFormLabelClassName}>
-          License
-        </label>
-        <select
-          id="license"
+        <EditionSelect
           name="license"
+          label="License"
+          value={license}
           required
-          className={adminFormInputClassName}
-          defaultValue="Public Domain"
-        >
-          {LICENSE_OPTIONS.map((license) => (
-            <option key={license} value={license}>
-              {license}
-            </option>
-          ))}
-        </select>
+          triggerVariant="boxed"
+          labelVariant="form"
+          placeholder="Choose license"
+          items={LICENSE_OPTIONS.map((option) => ({
+            label: option,
+            value: option,
+          }))}
+          onValueChange={setLicense}
+        />
       </div>
 
       <div className="space-y-2">
-        <label htmlFor="visibility" className={adminFormLabelClassName}>
-          Visibility
-        </label>
-        <select
-          id="visibility"
+        <EditionSelect
           name="visibility"
-          className={adminFormInputClassName}
-          defaultValue="public"
-        >
-          <option value="public">Public</option>
-          <option value="unlisted">Unlisted</option>
-          <option value="private">Private</option>
-        </select>
+          label="Visibility"
+          value={visibility}
+          triggerVariant="boxed"
+          labelVariant="form"
+          items={[
+            { label: "Public", value: "public" },
+            { label: "Unlisted", value: "unlisted" },
+            { label: "Private", value: "private" },
+          ]}
+          onValueChange={setVisibility}
+        />
       </div>
 
       <div className="space-y-2">

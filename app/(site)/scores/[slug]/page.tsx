@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
+import { BackToCatalog } from "@/components/catalog/back-to-catalog";
+import { tagPillClassName } from "@/components/ui/tag-pill";
 import { ScoreRights } from "@/components/score/ScoreRights";
 import { ScoreViewerLoader } from "@/components/score/ScoreViewerLoader";
 import { formatCatalogLine } from "@/lib/scores/catalog-line";
@@ -46,12 +47,7 @@ export default async function ScoreDetailPage({ params }: ScorePageProps) {
   return (
     <div className="mx-auto flex w-full max-w-[1200px] flex-col px-6 py-10 md:py-16">
       <div className="space-y-4">
-        <Link
-          href="/"
-          className="type-body-sm text-edition-muted hover:text-edition-ink"
-        >
-          Back to catalog
-        </Link>
+        <BackToCatalog />
         <header className="space-y-2">
           {score.composer ? (
             <p className="type-body-sm text-edition-muted">{score.composer}</p>
@@ -74,10 +70,7 @@ export default async function ScoreDetailPage({ params }: ScorePageProps) {
         {score.tags.length > 0 ? (
           <ul className="flex flex-wrap gap-2">
             {score.tags.map((tag) => (
-              <li
-                key={tag.slug}
-                className="rounded-full bg-edition-surface-strong px-3 py-1 text-xs font-medium text-edition-body"
-              >
+              <li key={tag.slug} className={tagPillClassName}>
                 {tag.label}
               </li>
             ))}
@@ -85,7 +78,7 @@ export default async function ScoreDetailPage({ params }: ScorePageProps) {
         ) : null}
       </div>
 
-      <div className="pt-12 md:pt-16">
+      <div className="pt-8 md:pt-10">
         <ScoreViewerLoader
           fileUrl={`/api/scores/${score.id}/file`}
           compressed={compressed}

@@ -20,14 +20,14 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const catalog = await listPublicScores(filters);
 
   return (
-    <main className="mx-auto flex w-full max-w-[1200px] flex-1 flex-col px-6 py-10 md:py-16">
+    <div className="mx-auto flex w-full max-w-[1200px] flex-1 flex-col px-6 py-10 md:py-16">
       <div className="flex flex-col gap-8">
         <CatalogHero />
         <CatalogFilters current={filters} />
       </div>
 
       {catalog.length === 0 ? (
-        <div className="space-y-3 py-16 text-center">
+        <div className={`space-y-3 text-center ${filtered ? "py-10" : "py-16"}`}>
           <p className="type-page-h1">
             {filtered ? "No scores match these filters" : "No public scores yet"}
           </p>
@@ -39,17 +39,18 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           {filtered ? (
             <Link
               href="/"
-              className={cn(buttonVariants({ variant: "outline" }), "mt-4 inline-flex")}
+              className={cn(
+                buttonVariants({ variant: "outline", size: "sm" }),
+                "mt-4 inline-flex",
+              )}
             >
               Clear filters
             </Link>
           ) : null}
         </div>
       ) : (
-        <div className="pt-16 md:pt-24">
-          <ContentsList scores={catalog} />
-        </div>
+        <ContentsList scores={catalog} />
       )}
-    </main>
+    </div>
   );
 }

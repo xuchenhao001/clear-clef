@@ -1,7 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
+import { tagPillClassName } from "@/components/ui/tag-pill";
 import { formatCatalogLine } from "@/lib/scores/catalog-line";
 import type { PublicCatalogScore } from "@/lib/scores/queries";
+import { cn } from "cn";
 
 type ContentsRowProps = {
   score: PublicCatalogScore;
@@ -15,15 +17,20 @@ export function ContentsRow({ score }: ContentsRowProps) {
   });
 
   return (
-    <li>
+    <li
+      className="border-b border-edition-hairline last:border-b-0 hover:border-b-transparent focus-within:border-b-transparent"
+    >
       <Link
         href={`/scores/${score.slug}`}
-        className="group flex items-start justify-between gap-6 py-7 transition-colors hover:bg-edition-canvas-soft"
+        className={cn(
+          "group flex items-center justify-between gap-6 rounded-xl border border-transparent px-4 py-5",
+          "edition-interactive-transition",
+          "hover:border-edition-hairline hover:bg-edition-hover",
+          "focus-visible:border-edition-hairline focus-visible:bg-edition-hover focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-edition-hairline-strong/50",
+        )}
       >
         <div className="min-w-0 flex-1 space-y-2">
-          <h3 className="type-work-title">
-            {score.title}
-          </h3>
+          <h3 className="type-work-title">{score.title}</h3>
           {metadataLine ? (
             <p className="type-caption-mono">{metadataLine}</p>
           ) : null}
@@ -34,17 +41,19 @@ export function ContentsRow({ score }: ContentsRowProps) {
               </span>
             ) : null}
             {score.tags.map((tag) => (
-              <span
-                key={tag.slug}
-                className="rounded-full bg-edition-surface-strong px-3 py-1 text-xs font-medium text-edition-body"
-              >
+              <span key={tag.slug} className={tagPillClassName}>
                 {tag.label}
               </span>
             ))}
           </div>
         </div>
         {score.previewR2Key ? (
-          <div className="hidden shrink-0 rounded-md border border-edition-hairline bg-edition-canvas-soft p-1 sm:block">
+          <div
+            className={cn(
+              "hidden shrink-0 rounded-md border border-edition-hairline bg-edition-surface-strong p-1 sm:block",
+              "edition-interactive-transition group-hover:border-edition-hairline-strong",
+            )}
+          >
             <div className="relative h-20 w-28 overflow-hidden rounded-sm bg-edition-surface-page">
               <Image
                 src={`/api/scores/${score.id}/preview`}

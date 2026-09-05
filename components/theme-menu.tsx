@@ -78,7 +78,7 @@ export function ThemeMenu({ className, align = "end" }: ThemeMenuProps) {
       <Menu.Trigger
         type="button"
         className={cn(
-          "inline-flex size-9 items-center justify-center rounded-full text-edition-muted transition-colors hover:bg-edition-canvas-soft hover:text-edition-ink focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-edition-hairline-strong/50",
+          "inline-flex size-9 items-center justify-center rounded-full text-edition-muted edition-interactive-transition hover:bg-edition-hover hover:text-edition-ink focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-edition-hairline-strong/50",
           className,
         )}
         aria-label={triggerLabel}
@@ -98,7 +98,7 @@ export function ThemeMenu({ className, align = "end" }: ThemeMenuProps) {
                 <Menu.Item
                   key={option}
                   className={cn(
-                    "flex cursor-default items-center gap-2 rounded-lg px-3 py-2 text-[0.9375rem] outline-none select-none data-highlighted:bg-edition-canvas-soft",
+                    "flex cursor-default items-center gap-2 rounded-lg px-3 py-2 text-[0.9375rem] outline-none select-none data-highlighted:bg-edition-hover",
                     preference === option
                       ? "font-medium text-edition-ink"
                       : "font-normal text-edition-muted",

@@ -1,6 +1,4 @@
-import Link from "next/link";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "cn";
+import { BackToCatalog } from "@/components/catalog/back-to-catalog";
 
 export default function ScoreNotFound() {
   return (
@@ -9,9 +7,7 @@ export default function ScoreNotFound() {
       <p className="type-body-md text-edition-body">
         This score is private, unlisted, or does not exist.
       </p>
-      <Link href="/" className={cn(buttonVariants({ variant: "outline" }), "w-fit")}>
-        Back to catalog
-      </Link>
+      <BackToCatalog className="w-fit" />
     </div>
   );
 }
