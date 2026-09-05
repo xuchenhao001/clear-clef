@@ -10,32 +10,33 @@ Implementation order for ClearClef.
 - Drizzle ORM against D1 (`lib/db`, `drizzle/0000_init.sql`)
 - Tailwind + shadcn/ui baseline
 - `initOpenNextCloudflareForDev()` for local bindings
+- Better Auth on D1 (`drizzle/0001_auth.sql`), admin seed script, `/admin/login`
 
-## Phase 2 — Public catalog (metadata)
+## Phase 2 — Public catalog (done)
 
 - List + detail as Server Components querying D1
 - SEO-friendly HTML (title, composer, license)
 - No WASM on these pages
 - Filter `visibility = 'public'`
 
-## Phase 3 — Admin upload
+## Phase 3 — Admin upload (done)
 
-- Protected `/admin/upload`
+- Protected `/admin/upload` (Better Auth admin role)
 - Accept `.mxl` / `.musicxml` / `.xml`
 - Size cap, XXE-hardened parse path, required license
 - Extract metadata; store original + canonical in R2; insert D1 rows
 - See [ingest.md](ingest.md)
 
-## Phase 4 — Verovio viewer
+## Phase 4 — Verovio viewer (done)
 
 - Client-only dynamic import
 - Stream `.mxl` from R2 via route handler
 - Paginated SVG (`loadZipDataBuffer` / `loadData` → `renderToSVG`)
 - See [rendering.md](rendering.md)
 
-## Phase 5 — Previews and filters
+## Phase 5 — Previews and filters (done)
 
-- Page-1 SVG previews on cards
+- Page-1 SVG previews on cards (generated in admin browser at ingest)
 - Tags (many-to-many)
 - Piano-oriented filters: key, difficulty, license
 
@@ -51,7 +52,7 @@ Implementation order for ClearClef.
 
 | Hook | Direction |
 | --- | --- |
-| Auth / membership | Better Auth or Clerk + D1; use `owner_id` / `visibility` |
+| Membership / OAuth | Extend Better Auth (Google/GitHub); use `owner_id` / `visibility` |
 | MIDI playback | Verovio MIDI export + Tone.js |
 | ABC ingest | Convert once to MusicXML on upload |
 | MNX | Extend `ScoreFile.format`; do not rewrite catalog |

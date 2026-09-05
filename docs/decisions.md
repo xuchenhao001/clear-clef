@@ -27,7 +27,7 @@ Short architecture decision records. Update when a decision is reversed.
 
 - **Status:** Accepted
 - **Context:** Open upload invites spam and copyright infringement.
-- **Decision:** Public read; `/admin/upload` gated by env secret or Cloudflare Access until membership exists.
+- **Decision:** Public read; `/admin/*` gated by Better Auth admin role (email/password; no public sign-up).
 - **Consequences:** No community contributions in v1; seed with clearly licensed works. See [ingest.md](ingest.md).
 
 ## ADR-005: No per-request server engraving
@@ -50,3 +50,10 @@ Short architecture decision records. Update when a decision is reversed.
 - **Context:** Two empty R2 buckets add dashboard and Wrangler noise; OpenNext already namespaces ISR objects with `NEXT_INC_CACHE_R2_PREFIX` (default `incremental-cache`).
 - **Decision:** Use one bucket (`clear-clef`) with two bindings: `SCORES_BUCKET` (`scores/…`) and `NEXT_INC_CACHE_R2_BUCKET` (`incremental-cache/…`).
 - **Consequences:** Simpler ops. If cache eviction, jurisdiction, or IAM later need to differ from catalog files, split buckets again.
+
+## ADR-008: Better Auth for admin access
+
+- **Status:** Accepted
+- **Context:** Admin upload needs real sessions; env-secret headers are brittle and hard to rotate.
+- **Decision:** Use Better Auth with Drizzle adapter on the same D1 database; email/password only; `disableSignUp: true`; admin plugin with seeded admin user; `owner_id` set on ingest.
+- **Consequences:** Auth tables live in D1 (`user`, `session`, `account`, `verification`); `BETTER_AUTH_SECRET` and `BETTER_AUTH_URL` required; OAuth/membership can extend later without replacing the gate.

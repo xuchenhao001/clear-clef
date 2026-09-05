@@ -40,6 +40,17 @@ Keep the D1 schema small. Prefer nullable columns now for membership and format 
 
 Many-to-many join: `score_id`, `tag_id` (composite PK).
 
+### Better Auth tables
+
+Managed in [`lib/db/auth-schema.ts`](../lib/db/auth-schema.ts) and [`drizzle/0001_auth.sql`](../drizzle/0001_auth.sql):
+
+- `user` — includes `role`, ban fields (admin plugin)
+- `session`
+- `account` — credential/OAuth accounts; includes `issuer`
+- `verification`
+
+Public sign-up is disabled; seed the first admin with `pnpm auth:seed-admin`.
+
 ## Public queries
 
 Always constrain public list/detail:
@@ -48,7 +59,7 @@ Always constrain public list/detail:
 WHERE visibility = 'public'
 ```
 
-Unlisted may be reachable by slug later; private requires owner/auth (phase 2).
+Unlisted may be reachable by slug later; private requires owner/auth.
 
 ## R2 layout
 
@@ -63,24 +74,17 @@ incremental-cache/                # OpenNext ISR / data cache (NEXT_INC_CACHE_R2
 
 Do not write catalog objects under `incremental-cache/`. Do not write ISR cache under `scores/`.
 
-## TypeScript sketch (`ScoreFile`)
+## TypeScript (`ScoreFile`)
 
-Isolate format so MNX (or ABC-as-canonical) can land without rewriting D1:
+Isolate format so MNX (or ABC-as-canonical) can land without rewriting D1. The app boundary type lives in [`lib/score-file.ts`](../lib/score-file.ts):
 
 ```ts
-export type ScoreFormat = "musicxml" | "abc" | "mnx";
+import { toScoreFile } from "@/lib/score-file";
 
-export type ScoreFile = {
-  format: ScoreFormat;
-  /** R2 key for viewer / download preferred blob */
-  r2Key: string;
-  /** R2 key for MusicXML 4.x partwise when format === "musicxml" */
-  canonicalR2Key?: string;
-  previewR2Key?: string;
-};
+const scoreFile = toScoreFile(scoreRow);
 ```
 
-Map `scores.format` + R2 keys into this type at the app boundary.
+Map `scores.format` + R2 keys through `toScoreFile()` at upload and file-stream routes.
 
 ## Future columns (do not invent early)
 

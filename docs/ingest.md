@@ -4,11 +4,12 @@ Public catalog is **read-only** for visitors. Writes go through a protected admi
 
 ## Endpoint
 
-- Route: `/admin/upload` (UI) + corresponding route handler(s)
-- MVP auth: shared **env secret** (e.g. `ADMIN_UPLOAD_SECRET`) or Cloudflare Access
-- Phase 2: Better Auth / Clerk against D1; Turnstile optional on the form
+- UI: `/admin/upload`
+- API: `POST /api/admin/upload`
+- Auth: **Better Auth** on D1 (email/password; public sign-up disabled; admin plugin)
+- Optional later: Turnstile on the form
 
-Anyone can *read*. You (and later members) *write*.
+Anyone can *read*. Admins *write*.
 
 ## Accepted inputs
 
@@ -18,20 +19,22 @@ Anyone can *read*. You (and later members) *write*.
 | `.musicxml` / `.xml` | Accept; store original; write canonical MusicXML |
 | `.abc` | Optional later: convert once to MusicXML on ingest — not required for v1 |
 
-**Size cap:** 5–10 MB for `.mxl` (enforce in the route handler). Reject oversized uploads early.
+**Size cap:** 8 MB (enforced in [`lib/ingest/constants.ts`](../lib/ingest/constants.ts)). Reject oversized uploads early.
 
 ## Security: XXE and untrusted XML
 
 MusicXML files are XML. Treat uploads as hostile.
 
-- Reject or strip DTDs and external entities.
-- Parse with a **non-validating** XML approach that never resolves external entities.
-- Never use browser `DOMParser` (or equivalent) on untrusted XML with DTD resolution enabled.
-- **Do not assume** a convenience library is XXE-safe. Hardening must wrap or precede libraries such as `musicxml-io` — audit and constrain input (e.g. decompress `.mxl` carefully, then parse with a hardened path).
+- Reject DTDs and external entities before parsing.
+- Decompress `.mxl` with size/file-count limits and reject zip-slip paths.
+- Parse metadata with `fast-xml-parser` (`processEntities: false`) — no DTD resolution.
+- Never use browser `DOMParser` on untrusted uploads.
+
+Implementation: [`lib/ingest/mxl.ts`](../lib/ingest/mxl.ts), [`lib/ingest/metadata.ts`](../lib/ingest/metadata.ts).
 
 ## Metadata extraction
 
-Parse **metadata only** at upload time (server or admin client path that does not ship into every public page).
+Parse **metadata only** at upload time (server path; not shipped to public catalog pages).
 
 Typical MusicXML sources:
 
@@ -40,29 +43,27 @@ Typical MusicXML sources:
 - `<credit>` — displayed credits
 - Part list, key, time signature from score header / first attributes
 
-Suggested library for structure: [`musicxml-io`](https://www.npmjs.com/package/musicxml-io) (upload-time only). Alternatives for header-only parse (e.g. `musicxml-interfaces` `parseScoreHeader`) may be lighter — choose during implementation, keep the boundary the same:
-
-- Extract title, composer, lyricist, key, time, parts
-- Persist to D1
-- Do **not** import the parser into list/detail RSC pages
+Extract title, composer, lyricist, key, time, parts → D1. Do **not** import ingest parsers into list/detail RSC pages.
 
 ## License (required)
 
-A public catalog of copyrighted sheet music is a **legal** problem, not a tech one. The upload form **must** require a license field, for example:
+The upload form **must** require a license field, for example:
 
 - Public Domain
 - CC0
 - CC-BY
-- All rights reserved / do not redistribute (may still allow private/unlisted later; do not feature as redistributable public catalog content)
+- CC-BY-SA
+- All rights reserved
 
 Prefer IMSLP / MuseScore public-domain works for seed content. Do **not** scrape publisher PDFs.
 
 ## On successful ingest
 
-1. Write R2: original + `canonical.musicxml` (+ `preview.svg` when preview generation is wired)
-2. Insert D1 `scores` (+ tags)
-3. Set `format = 'musicxml'`, `visibility` (default `public` for admin catalog seeds), nullable `owner_id`
-4. Revalidate / short-cache bust catalog list pages
+1. Write R2: `scores/{id}/original.*` + `scores/{id}/canonical.musicxml`
+2. Insert D1 `scores` row (+ optional tags via `score_tags`)
+3. Set `format = 'musicxml'`, `visibility`, `owner_id` (admin user id)
+4. Admin browser generates page-1 SVG preview → `PUT /api/admin/scores/{id}/preview` → `scores/{id}/preview.svg`
+5. Revalidate catalog list/detail pages
 
 See [data-model.md](data-model.md) for keys and columns.
 

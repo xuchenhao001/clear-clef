@@ -15,9 +15,8 @@ Both are viewers, not editors. Full editing is a different product (Flat.io, Mus
 
 ## Client-only loading
 
-1. Implement `ScoreViewer` as a Client Component.
-2. Load it with `next/dynamic(..., { ssr: false })` from the score detail page.
-3. Prefer ESM + modular WASM:
+1. `ScoreViewer` is a Client Component loaded via `ScoreViewerLoader` (`next/dynamic` + `ssr: false`) from the score detail page.
+2. Prefer ESM + modular WASM:
 
 ```ts
 import createVerovioModule from "verovio/wasm";
@@ -27,32 +26,32 @@ const module = await createVerovioModule();
 const tk = new VerovioToolkit(module);
 ```
 
-4. For `.mxl`: `fetch` → `arrayBuffer` → `tk.loadZipDataBuffer(buffer)`.
-5. For uncompressed MusicXML: `tk.loadData(xmlString)`.
-6. Render **per page**: `tk.renderToSVG(pageNumber)`; lazy-load as the user scrolls.
-7. Pass options to honor `default_visible_parts` when files contain extra staves.
+3. For `.mxl`: `fetch` → `arrayBuffer` → `tk.loadZipDataBuffer(buffer)`.
+4. For uncompressed MusicXML: `tk.loadData(xmlString)`.
+5. Render **per page**: `tk.renderToSVG(pageNumber)`; v1 uses Previous/Next buttons (not scroll lazy-load).
+6. Pass options to honor `default_visible_parts` when files contain extra staves.
 
 **Do not** import Verovio on list pages or into shared Server Component trees.
 
 ## Serving score bytes
 
-App route streams the object from R2 (authenticated to the bucket; public read of the HTTP route is fine for public scores). Viewer never needs Worker-side WASM for full-score engraving.
+`GET /api/scores/{id}/file` streams the public score object from R2. Viewer never needs Worker-side WASM for full-score engraving.
 
 ## Previews (catalog cards)
 
-- Generate **page-1 SVG** once at ingest (admin browser with Verovio, or a one-off Worker job).
-- Store as `scores/{id}/preview.svg` in R2.
-- List cards use the static preview URL — **do not** engrave the full score on the server per request (WASM CPU + Worker limits).
+- Generate **page-1 SVG** once at ingest in the **admin browser** (Verovio after upload succeeds).
+- Store via `PUT /api/admin/scores/{id}/preview` as `scores/{id}/preview.svg` in R2.
+- List cards use `GET /api/scores/{id}/preview` — **do not** engrave on the server per request.
 
 ## Fonts
 
-Load one SMuFL webfont (e.g. Bravura) on the **viewer route only**, not globally.
+v1 uses Verovio default glyphs. A dedicated SMuFL webfont (e.g. Bravura) on the viewer route only is optional later.
 
 ## Accessibility
 
 - Expose title and composer as real HTML on the detail page.
-- Wrap the SVG viewer with appropriate `aria` (e.g. labeled region). Screen readers do **not** read Verovio SVG as music.
-- Paginate / virtualize; do not dump a giant single SVG into the DOM.
+- Wrap the SVG viewer with appropriate `aria` (labeled region). Screen readers do **not** read Verovio SVG as music.
+- Paginate with controls; do not dump a giant single SVG into the DOM.
 
 ## Caching engraved assets
 

@@ -8,4 +8,4 @@ const nextConfig: NextConfig = {
 
 export default nextConfig;
 
-initOpenNextCloudflareForDev();
+initOpenNextCloudflareForDev({ configPath: "./wrangler.dev.jsonc" });

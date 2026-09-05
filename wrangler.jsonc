@@ -20,6 +20,7 @@
   ],
   "vars": {
     "NEXT_INC_CACHE_R2_PREFIX": "incremental-cache",
+    "BETTER_AUTH_URL": "http://localhost:3000",
   },
   "d1_databases": [
     {

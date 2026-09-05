@@ -1,15 +1,15 @@
 ---
 description: Verovio score viewer — client-only, paginated SVG
-globs: components/score/**,app/scores/**,**/ScoreViewer*
+globs: components/score/**,app/**/scores/**,**/ScoreViewer*
 alwaysApply: false
 ---
 
 # Score viewer
 
-- Load Verovio only in Client Components via `next/dynamic(..., { ssr: false })`.
+- Load Verovio only in Client Components via `ScoreViewerLoader` (`next/dynamic` + `ssr: false`).
 - Prefer `verovio/wasm` + `VerovioToolkit`: `loadZipDataBuffer` / `loadData` → `renderToSVG` per page.
-- Lazy-load pages; do not SSR giant SVGs or import WASM on catalog list pages.
-- Fetch score bytes from an app route that streams R2; honor `default_visible_parts`.
-- Load SMuFL webfont on the viewer route only.
+- v1 pagination uses Previous/Next controls; do not SSR giant SVGs or import WASM on catalog list pages.
+- Fetch score bytes from `GET /api/scores/{id}/file`; honor `default_visible_parts`.
+- v1 uses Verovio default glyphs; SMuFL webfont on the viewer route is optional later.
 - Accessibility: real HTML title/composer; `aria` on the wrapper — SVG is not music for screen readers.
 - OSMD is fallback only if WASM bundling fails; do not switch without updating `docs/decisions.md`.

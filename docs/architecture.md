@@ -14,7 +14,7 @@ ClearClef is a greenfield Next.js App Router app deployed to Cloudflare Workers 
 | Score objects | Cloudflare **R2** (`clear-clef`) | Zero egress; immutable object caching |
 | Next ISR / incremental cache | Same R2 bucket, prefix `incremental-cache/` (`NEXT_INC_CACHE_R2_BUCKET`) | Separate *keys*, not a second bucket |
 | Metadata | Cloudflare **D1** + Drizzle ORM | SQLite at the edge |
-| Optional later | KV cache tags, Turnstile on upload, Better Auth / Clerk | Do not block MVP |
+| Optional later | KV cache tags, Turnstile on upload, OAuth providers | Do not block MVP |
 
 ## Data flow (canonical score)
 
@@ -67,19 +67,20 @@ flowchart TB
 
 ### Admin ingest (not public)
 
-1. Protected `/admin/upload` (env secret locally; Cloudflare Access later).
+1. Protected `/admin/upload` (Better Auth admin session).
 2. Route handler validates, extracts metadata, writes R2 objects, inserts D1 rows.
-3. Page-1 preview SVG is generated once at ingest (admin client or one-off Worker), not on every catalog request.
+3. Page-1 preview SVG is generated once at ingest in the admin browser, not on every catalog request.
 
 ## Cloudflare bindings (conceptual)
 
 When scaffolding, expect roughly:
 
-- `DB` — D1 database for catalog metadata
+- `DB` — D1 database for catalog metadata and Better Auth tables
 - `SCORES_BUCKET` — R2 `clear-clef` (originals, canonical MusicXML, previews under `scores/`)
 - `NEXT_INC_CACHE_R2_BUCKET` — same R2 bucket; OpenNext writes under `incremental-cache/` (`NEXT_INC_CACHE_R2_PREFIX`)
 - `ASSETS` / `WORKER_SELF_REFERENCE` — as required by OpenNext
-- `ADMIN_UPLOAD_SECRET` (or Access) — write gate for MVP
+- `BETTER_AUTH_SECRET` — Better Auth signing secret (Wrangler secret in production)
+- `BETTER_AUTH_URL` — app base URL for auth callbacks
 
 One physical bucket, two bindings. Isolate by prefix so ISR cache never shares keys with catalog files. Split into two buckets later only if lifecycle or IAM needs diverge.
 
