@@ -12,3 +12,4 @@ Read [docs/design.md](../docs/design.md) before changing public catalog, viewer,
 - Newsreader 300 for display (work titles); Geist for UI; Geist Mono for catalog metadata and colophon.
 - Catalog index is a composer-grouped contents list with hairline rows and desktop incipit thumbnails.
 - Engraved page-1 SVG is the incipit thumbnail. No Verovio on list pages.
+- Dark mode: lamp on a stand — system `prefers-color-scheme`; dark stone chrome, engraved page stays white; never invert SVG.

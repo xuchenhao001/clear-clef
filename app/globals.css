@@ -39,6 +39,11 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-edition-canvas: var(--edition-canvas);
+  --color-edition-ink: var(--edition-ink);
+  --color-edition-muted: var(--edition-muted);
+  --color-edition-hairline: var(--edition-hairline);
+  --color-edition-surface-page: var(--edition-surface-page);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -81,6 +86,11 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --edition-canvas: #f5f5f5;
+  --edition-ink: #0c0a09;
+  --edition-muted: #777169;
+  --edition-hairline: #e7e5e4;
+  --edition-surface-page: #ffffff;
 }
 
 .dark {
@@ -115,6 +125,10 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+  --edition-canvas: #0c0a09;
+  --edition-ink: #f5f5f5;
+  --edition-muted: #a8a29e;
+  --edition-hairline: #292524;
 }
 
 @layer base {

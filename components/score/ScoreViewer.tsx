@@ -99,8 +99,8 @@ export default function ScoreViewer({
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-border px-6 py-16 text-center text-sm text-zinc-500">
-        Preparing Verovio viewer…
+      <div className="rounded-2xl border border-edition-hairline bg-edition-canvas px-6 py-16 text-center text-sm text-edition-muted">
+        Preparing the score…
       </div>
     );
   }
@@ -116,10 +116,10 @@ export default function ScoreViewer({
   return (
     <section
       aria-label={`Engraved score for ${title}`}
-      className="overflow-hidden rounded-2xl border border-border bg-white dark:bg-zinc-950"
+      className="overflow-hidden rounded-2xl border border-edition-hairline bg-edition-canvas text-edition-ink"
     >
-      <div className="flex items-center justify-between gap-4 border-b border-border px-4 py-3">
-        <p className="text-sm text-zinc-500">{pageLabel}</p>
+      <div className="flex items-center justify-between gap-4 border-b border-edition-hairline px-4 py-3">
+        <p className="font-mono text-sm text-edition-muted">{pageLabel}</p>
         <div className="flex items-center gap-2">
           <Button
             type="button"
@@ -144,7 +144,7 @@ export default function ScoreViewer({
         </div>
       </div>
       <div
-        className="overflow-x-auto p-4 [&_svg]:mx-auto [&_svg]:max-w-full"
+        className="overflow-x-auto bg-edition-surface-page p-4 [&_svg]:mx-auto [&_svg]:max-w-full"
         dangerouslySetInnerHTML={{ __html: svg }}
       />
     </section>

@@ -64,9 +64,22 @@ ClearClef reads like a small music publisher's desk: warm stone paper, engraved 
 | `{colors.semantic-success}` | #16a34a | Confirmation. |
 | `{colors.semantic-error}` | #dc2626 | Validation errors. |
 
-### Dark mode (optional)
+### Dark mode — lamp on a stand (locked)
 
-Public catalog is **light-first** (print on paper). If dark mode is kept, treat it as a lamp on a music stand: deep ink canvas, but the **engraved page stays white**. Do not grey-wash or invert Verovio SVG fills.
+Public surfaces follow **system** `prefers-color-scheme` via `class="dark"` on `<html>` ([`components/theme-init.tsx`](../components/theme-init.tsx)). The catalog is light-first in spirit; when the OS is dark, chrome darkens like a room at night while **engraved notation stays ink on white paper**.
+
+| Surface | Light | Dark (lamp) |
+| --- | --- | --- |
+| Catalog chrome (nav, body, filters) | `{colors.canvas}` #f5f5f5 | Deep stone `{colors.ink}` #0c0a09 |
+| Catalog text | `{colors.ink}` | `{colors.on-primary}` / light ink |
+| Incipit thumbnail frame | White + hairline | **White frame unchanged** — do not invert R2 preview SVG |
+| Viewer stand (outer shell, toolbar) | `{colors.canvas}` | `{colors.ink}` stone |
+| Viewer page (inner) | `{colors.surface-card}` #ffffff | **#ffffff unchanged** |
+| Verovio SVG | Black on white (default) | **Unchanged** — no `svgCss`, no CSS `filter: invert` |
+
+**Rejected:** light-only public catalog (no system dark), full notation inversion (light glyphs on dark page).
+
+R2 page-1 previews are stored once at ingest as black-on-white SVG ([`ingest.md`](ingest.md)). Lamp model avoids dual assets and matches publisher engraving.
 
 ## Typography
 
@@ -186,7 +199,7 @@ Footer block on score detail. Geist Mono rights line: license (required), source
 
 ### `viewer-stand`
 
-Stone canvas around a white engraved page. Top bar: page index in Geist Mono (`3 / 12`). Previous / Next as outline pills. Loading: "Preparing the score." Skeleton matches page rectangle.
+**Lamp model:** outer shell uses `{colors.canvas}` (dark stone in system dark mode); inner engraved page always `{colors.surface-card}` (#ffffff). Top bar: page index in Geist Mono (`3 / 12`). Previous / Next as outline pills. Loading: "Preparing the score." Skeleton matches page rectangle. Verovio `setOptions` stays default — never invert SVG.
 
 Maps to: [`components/score/ScoreViewer.tsx`](../components/score/ScoreViewer.tsx)
 
@@ -210,7 +223,7 @@ Back-of-house. Clear forms, required license field. Do not apply display serif o
 - Use Newsreader 300 for every display headline. Never bold display copy.
 - Use Geist Mono for catalog numbers, key, time signature, license colophon.
 - Group the catalog index by composer with hairline-divided contents rows.
-- Show page-1 preview as a small incipit thumbnail on catalog rows (desktop).
+- Show page-1 preview as a small incipit thumbnail on catalog rows (desktop), in a white frame even in dark mode.
 - Use pill shape for CTAs and musical tag pills.
 - Keep copy in edition voice: "Public catalog of licensed scores."
 
@@ -221,7 +234,7 @@ Back-of-house. Clear forms, required license field. Do not apply display serif o
 - Don't pill the license next to the work title.
 - Don't bold display headlines or mix a second serif for emphasis.
 - Don't use marketing filler ("discover", "elevate", "seamless").
-- Don't invert or grey-wash engraved SVG in dark mode.
+- Don't invert, grey-wash, or CSS-filter engraved SVG (viewer or R2 incipit thumbnails).
 - Don't load Verovio on catalog list pages (see [rendering.md](rendering.md)).
 
 ## Responsive behavior
@@ -234,24 +247,32 @@ Back-of-house. Clear forms, required license field. Do not apply display serif o
 
 Touch targets: primary pill 40px height minimum.
 
-## CSS variable mapping (future restyle)
+## CSS variable mapping
 
-When applying tokens to [`app/globals.css`](../app/globals.css), prefer semantic names alongside shadcn internals:
+Edition tokens live in [`app/globals.css`](../app/globals.css) alongside shadcn internals. `--edition-surface-page` stays `#ffffff` in both modes.
 
 ```css
 :root {
-  --color-canvas: #f5f5f5;
-  --color-ink: #0c0a09;
-  --color-hairline: #e7e5e4;
-  --font-display: var(--font-newsreader);
+  --edition-canvas: #f5f5f5;
+  --edition-ink: #0c0a09;
+  --edition-hairline: #e7e5e4;
+  --edition-muted: #777169;
+  --edition-surface-page: #ffffff;
+}
+
+.dark {
+  --edition-canvas: #0c0a09;
+  --edition-ink: #f5f5f5;
+  --edition-hairline: #292524;
+  --edition-muted: #a8a29e;
 }
 ```
 
-Do not rewrite shadcn `--primary` until a dedicated restyle PR. Map edition tokens in a separate layer first.
+Tailwind utilities: `bg-edition-canvas`, `bg-edition-surface-page`, `border-edition-hairline`, `text-edition-muted`, etc. Use these on public catalog and viewer surfaces during restyle. Do not rewrite shadcn `--primary` until a dedicated pass.
 
 ## Known gaps
 
-- Production `/` not yet restyled to contents list.
+- Production `/` not yet restyled to contents list or edition tokens (viewer uses lamp model today).
 - Newsreader not yet loaded in root layout.
 - Motion timings (row hover, page turn) out of scope for v1 reference.
 - SMuFL webfont on viewer route is optional later ([rendering.md](rendering.md)).
@@ -262,3 +283,4 @@ Do not rewrite shadcn `--primary` until a dedicated restyle PR. Map edition toke
 - Editorial token rhythm (ink pill, hairline cards, 96px sections) adapted from external editorial product references.
 - ClearClef-specific: Newsreader + Geist stack, no atmospheric orbs, contents-list catalog, engraved SVG as incipit thumbnail.
 - Layout decision: contents list chosen over score plate grid.
+- Dark mode: lamp on a stand (dark chrome, white engraved page); light-only and full inversion rejected.

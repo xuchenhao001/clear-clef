@@ -53,6 +53,10 @@ v1 uses Verovio default glyphs. A dedicated SMuFL webfont (e.g. Bravura) on the 
 - Wrap the SVG viewer with appropriate `aria` (labeled region). Screen readers do **not** read Verovio SVG as music.
 - Paginate with controls; do not dump a giant single SVG into the DOM.
 
+## Dark mode (viewer)
+
+Follow [design.md](design.md): **lamp on a stand**. The viewer outer shell uses edition canvas tokens; the inner page stays white. Verovio output is never inverted or re-engraved for dark mode. R2 ingest previews remain black-on-white SVG.
+
 ## Caching engraved assets
 
 Preview and immutable score objects: long-lived `Cache-Control` (see [architecture.md](architecture.md)). HTML detail pages remain short-cached so metadata updates show up after revalidation.
