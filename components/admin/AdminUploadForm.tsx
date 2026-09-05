@@ -5,7 +5,7 @@ import { adminFormInputClassName, adminFormLabelClassName } from "@/components/a
 import { Button } from "@/components/ui/button";
 import { EditionSelect } from "@/components/ui/edition-select";
 import { LICENSE_OPTIONS } from "@/lib/ingest/constants";
-import { VEROVIO_DEFAULT_OPTIONS } from "@/lib/verovio/options";
+import { VEROVIO_PREVIEW_OPTIONS } from "@/lib/verovio/options";
 
 async function generatePreviewSvg(file: File): Promise<string> {
   const [{ default: createVerovioModule }, { VerovioToolkit }] = await Promise.all([
@@ -15,20 +15,24 @@ async function generatePreviewSvg(file: File): Promise<string> {
 
   const verovioModule = await createVerovioModule();
   const toolkit = new VerovioToolkit(verovioModule);
-  toolkit.setOptions(VEROVIO_DEFAULT_OPTIONS);
+  try {
+    toolkit.setOptions(VEROVIO_PREVIEW_OPTIONS);
 
-  const buffer = await file.arrayBuffer();
-  const extension = file.name.toLowerCase().split(".").pop();
-  const loaded =
-    extension === "mxl"
-      ? toolkit.loadZipDataBuffer(buffer)
-      : toolkit.loadData(new TextDecoder().decode(buffer));
+    const buffer = await file.arrayBuffer();
+    const extension = file.name.toLowerCase().split(".").pop();
+    const loaded =
+      extension === "mxl"
+        ? toolkit.loadZipDataBuffer(buffer)
+        : toolkit.loadData(new TextDecoder().decode(buffer));
 
-  if (!loaded) {
-    throw new Error("Could not render preview from uploaded file");
+    if (!loaded) {
+      throw new Error("Could not render preview from uploaded file");
+    }
+
+    return toolkit.renderToSVG(1);
+  } finally {
+    toolkit.destroy();
   }
-
-  return toolkit.renderToSVG(1);
 }
 
 export function AdminUploadForm() {

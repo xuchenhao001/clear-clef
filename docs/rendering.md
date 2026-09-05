@@ -28,11 +28,27 @@ const tk = new VerovioToolkit(module);
 
 3. For `.mxl`: `fetch` → `arrayBuffer` → `tk.loadZipDataBuffer(buffer)`. Use `compressed` from `r2Key.endsWith(".mxl")` and/or ZIP magic (`PK`) — the `/api/scores/{id}/file` URL does not end in `.mxl`.
 4. For uncompressed MusicXML: `tk.loadData(xmlString)`.
-5. Render **per page**: `tk.renderToSVG(pageNumber)`; v1 uses Previous/Next buttons (not scroll lazy-load).
-6. Shared toolkit options (`scale`, `footer`, `header`) live in [`lib/verovio/options.ts`](../lib/verovio/options.ts) for viewer and admin ingest preview.
+5. Render **per page**: `tk.renderToSVG(pageNumber)`; paginate with Previous/Next (embedded) or practice overlay controls.
+6. **Preview options** (`VEROVIO_PREVIEW_OPTIONS`) are fixed for ingest page-1 thumbnails. **Embedded viewer** uses `embeddedLayoutOptions` (width only, `adjustPageHeight: true`). **Practice overlay** uses `practiceLayoutOptions` (width + viewport height). Both call `redoLayout()` via [`lib/viewer/layout.ts`](../lib/viewer/layout.ts). SVG is sanitized once at the cache boundary before `innerHTML`.
 7. `default_visible_parts` is stored in D1 for future part filtering. v1 renders all staves; Verovio has no `partNames` option.
+8. Call `destroy()` on the toolkit when `ScoreViewer` unmounts.
+9. Sanitize Verovio SVG (`script`, `foreignObject`, `on*`) before `innerHTML`. See [`lib/viewer/sanitize-svg.ts`](../lib/viewer/sanitize-svg.ts).
 
 **Do not** import Verovio on list pages or into shared Server Component trees.
+
+## Practice overlay
+
+`PracticeStage` is a fixed full-screen overlay on the score detail page. It reuses the same `VerovioToolkit` instance (no second WASM load).
+
+| Concern | Implementation |
+| --- | --- |
+| Layout | One page when stage width `< 1280px`; two-page spread at `>= 1280px` ([`lib/viewer/spreads.ts`](../lib/viewer/spreads.ts)) |
+| Reflow | Viewport slot width + height via `practiceLayoutOptions`; debounced on resize; skip when dimensions unchanged |
+| Position | Restore via first `xml:id` on the current page and `getPageWithElement` — **do not** copy raw page numbers between embedded and practice (page counts differ after reflow) |
+| Turn | Tap zones (left / center chrome / right), swipe, keyboard (Arrow, PageUp/Down, Space, Home/End) |
+| Wake lock | `navigator.wakeLock.request("screen")` while practice is open |
+| History | `pushState` on open; device Back closes practice |
+| Safe area | Root layout exports `viewportFit: "cover"` |
 
 ## Serving score bytes
 
@@ -53,6 +69,8 @@ v1 uses Verovio default glyphs. A dedicated SMuFL webfont (e.g. Bravura) on the 
 - Expose title and composer as real HTML on the detail page.
 - Wrap the SVG viewer with appropriate `aria` (labeled region). Screen readers do **not** read Verovio SVG as music.
 - Paginate with controls; do not dump a giant single SVG into the DOM.
+- Announce page changes with a polite `aria-live` region on embedded and practice viewers.
+- Embedded viewer accepts keyboard / pedal turns when focused.
 
 ## Dark mode (viewer)
 
@@ -61,6 +79,8 @@ Follow [design.md](design.md): **lamp on a stand**. The viewer outer shell uses 
 ## Caching engraved assets
 
 Preview and immutable score objects: long-lived `Cache-Control` (see [architecture.md](architecture.md)). HTML detail pages remain short-cached so metadata updates show up after revalidation.
+
+Client-side: cache `renderToSVG` strings per page until the next `redoLayout()`.
 
 ## Related docs
 

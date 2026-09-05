@@ -10,5 +10,8 @@ declare module "verovio/esm" {
     loadData(xml: string): boolean;
     getPageCount(): number;
     renderToSVG(page: number): string;
+    redoLayout(): void;
+    getPageWithElement(xmlId: string): number;
+    destroy(): void;
   }
 }

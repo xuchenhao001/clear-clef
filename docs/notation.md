@@ -16,7 +16,7 @@
 | `.musicxml` / `.xml` | Uncompressed XML | Accept on upload; good for canonical interchange |
 | `.mxl` | ZIP-compressed MusicXML | Prefer for originals on R2 (~20× smaller typical) |
 
-**Canonical store = MusicXML** (target 4.x partwise; v1 keeps a sanitized copy at ingest). Keep the original upload too. Layout hints in MusicXML are advisory; let Verovio reflow for phone vs desktop.
+**Canonical store = MusicXML** (target 4.x partwise; v1 keeps a sanitized copy at ingest). Keep the original upload too. Layout hints in MusicXML are advisory; the embedded viewer and practice overlay reflow via Verovio `redoLayout()` to the current slot size (see [rendering.md](rendering.md)).
 
 ## Do not use as the catalog source of truth
 

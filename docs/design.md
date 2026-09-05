@@ -227,9 +227,29 @@ Maps to: [`components/score/ScoreRights.tsx`](../components/score/ScoreRights.ts
 
 ### `viewer-stand`
 
-**Lamp model:** outer shell `{colors.canvas}`; inner page always `{colors.surface-page}` (#ffffff). Top bar: page index in Geist Mono (`3 / 12`). Previous / Next as outline pills. Loading: "Preparing the score." Skeleton matches page rectangle. Never invert SVG.
+**Lamp model:** outer shell `{colors.canvas}`; inner page always `{colors.surface-page}` (#ffffff). Top bar: page index in Geist Mono (`3 / 12`). Previous / Next as outline pills; **Practice** ink pill opens full-screen practice. Loading: "Preparing the score." Skeleton matches page rectangle. Never invert SVG.
+
+Verovio **reflows on container width only** (`embeddedLayoutOptions` + `adjustPageHeight: true`); page height follows engraved content. `redoLayout()` runs on width change only (not height). Position is restored across reflow via the first `xml:id` on the current page.
 
 Maps to: [`components/score/ScoreViewer.tsx`](../components/score/ScoreViewer.tsx), [`components/score/ScoreViewerLoader.tsx`](../components/score/ScoreViewerLoader.tsx), [`components/score/viewer-skeleton.tsx`](../components/score/viewer-skeleton.tsx)
+
+### `practice-stage`
+
+Full-screen practice overlay (`z-index: 50`) portaled to `document.body`. Same Verovio toolkit instance as `viewer-stand` (no second WASM load).
+
+| Surface | Behavior |
+| --- | --- |
+| Floor | `{colors.canvas}` with `100dvh` and safe-area insets (`viewport-fit: cover` in root layout) |
+| Pages | White `{colors.surface-page}` sheets; 8px canvas gutter in two-page spread |
+| Width | `< 1280px`: one page; `>= 1280px`: consecutive two-page spread (`1-2`, `3-4`, …) |
+| Reflow | `pageWidth` + viewport `pageHeight` from slot; `breaks: "auto"`; `redoLayout()` on width/height change |
+| Chrome | Geist Mono page label (`3-4 / 12` in spread); Previous / Next / Close outline pills; auto-hide after ~2s (center tap toggles; sides do not) |
+| Turn | Left third tap / right third tap; swipe; Arrow / PageUp / PageDown / Space / Home / End; Bluetooth pedal keys |
+| Sleep | Screen Wake Lock while open |
+| Back | `history.pushState` on open; device Back or Close exits practice and restores embedded layout |
+| Position | Do not share raw page index between embedded and practice; restore via `getPageWithElement(xml:id)` |
+
+Maps to: [`components/score/PracticeStage.tsx`](../components/score/PracticeStage.tsx), [`components/score/PracticeSpread.tsx`](../components/score/PracticeSpread.tsx)
 
 ### `button-primary`
 
@@ -324,6 +344,8 @@ No scroll-driven or entry animation in v1.
 
 ## Known gaps
 
+- Pinch-zoom / pan in practice (after reflow fills the glass).
+- Encoded-breaks toggle (“match the edition”) for print comparison.
 - SMuFL webfont on viewer route is optional later ([rendering.md](rendering.md)).
 - Form validation states beyond focus not fully specified.
 - Admin metadata edit is a follow-up.

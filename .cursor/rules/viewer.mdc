@@ -8,10 +8,13 @@ alwaysApply: false
 
 - Load Verovio only in Client Components via `ScoreViewerLoader` (`next/dynamic` + `ssr: false`).
 - Prefer `verovio/wasm` + `VerovioToolkit`: `loadZipDataBuffer` / `loadData` → `renderToSVG` per page.
-- v1 pagination uses Previous/Next controls; do not SSR giant SVGs or import WASM on catalog list pages.
+- Embedded reflow: `embeddedLayoutOptions(width)` only (width-only, `adjustPageHeight: true`). Practice reflow: `practiceLayoutOptions(width, height)`. Ingest previews use fixed `VEROVIO_PREVIEW_OPTIONS` only. Guard with `shouldReflowLayout` before `redoLayout()`.
+- Do not share raw page numbers between embedded viewer and practice overlay; restore position with `getPageWithElement(xml:id)`.
+- Practice overlay: full-screen portal, one page `< 1280px` / two-page spread `>= 1280px`, tap zones, swipe, keyboard/pedal, wake lock, `history.pushState`.
+- Sanitize SVG once at cache boundary; `SafeSvg` accepts `preSanitized`. Call `destroy()` on unmount.
 - Fetch score bytes from `GET /api/scores/{id}/file`; pass `compressed` from `r2Key.endsWith(".mxl")` and/or ZIP magic — do not rely on the API URL suffix.
 - Dark mode: lamp on a stand — charcoal viewer shell, white inner notation page; never invert or CSS-filter SVG.
 - `default_visible_parts` is stored for later; v1 renders all staves (no Verovio `partNames` option).
 - v1 uses Verovio default glyphs; SMuFL webfont on the viewer route is optional later.
-- Accessibility: real HTML title/composer; `aria` on the wrapper — SVG is not music for screen readers.
+- Accessibility: real HTML title/composer; `aria` on the wrapper; `aria-live` page label — SVG is not music for screen readers.
 - OSMD is fallback only if WASM bundling fails; do not switch without updating `docs/decisions.md`.

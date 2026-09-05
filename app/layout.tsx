@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { Geist, Geist_Mono, Newsreader } from "next/font/google";
 import { ThemeInit } from "@/components/theme-init";
@@ -28,6 +28,12 @@ export const metadata: Metadata = {
   },
   description:
     "Public catalog of Common Western Musical Notation scores. MusicXML on Cloudflare.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
