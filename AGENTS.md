@@ -2,6 +2,8 @@
 
 ClearClef is a **public MusicXML score catalog** on Next.js + Cloudflare (D1 metadata, R2 files, Verovio in the browser). Prefer [docs/](docs/) over inventing new architecture.
 
+Use **pnpm** only (`packageManager` in `package.json`). Do not add `package-lock.json`.
+
 ## Non-negotiables
 
 1. **Canonical format = MusicXML 4.x partwise.** Prefer `.mxl` for originals on R2. Keep original + canonical. MIDI / MEI / ABC / MNX / PDF are not the store format (ABC may convert once on ingest later).
@@ -10,7 +12,7 @@ ClearClef is a **public MusicXML score catalog** on Next.js + Cloudflare (D1 met
 4. **Writes are admin-only in v1.** Public read; protected `/admin/upload`. Require a **license** on every score.
 5. **XXE:** Treat uploads as hostile. Non-validating parse; no DTD/external entity resolution. Harden before/around any MusicXML library.
 6. **No per-request server engraving.** Page-1 preview SVG is generated at ingest and stored in R2.
-7. **R2 buckets:** score files ≠ OpenNext incremental cache. Separate buckets.
+7. **R2:** one bucket (`clear-clef`). Scores under `scores/`; OpenNext ISR under `incremental-cache/` (two bindings, same bucket).
 8. Public queries use `visibility = 'public'`. Keep nullable `owner_id` / `visibility` / `format` for later auth and MNX.
 
 ## Do not build in v1

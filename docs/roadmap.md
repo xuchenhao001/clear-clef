@@ -1,13 +1,13 @@
 # Roadmap
 
-Implementation order for ClearClef. Docs-only phase is complete when this file and siblings exist; code follows below.
+Implementation order for ClearClef.
 
-## Phase 1 — Scaffold
+## Phase 1 — Scaffold (done)
 
 - Next.js App Router + TypeScript
 - OpenNext Cloudflare (`@opennextjs/cloudflare`)
-- Wrangler: D1 + R2 (scores) + separate R2 for OpenNext incremental cache as needed
-- Drizzle ORM against D1
+- Wrangler: D1 `clear-clef` + one R2 bucket `clear-clef` (scores + OpenNext ISR prefixes)
+- Drizzle ORM against D1 (`lib/db`, `drizzle/0000_init.sql`)
 - Tailwind + shadcn/ui baseline
 - `initOpenNextCloudflareForDev()` for local bindings
 

@@ -20,7 +20,7 @@ Short architecture decision records. Update when a decision is reversed.
 
 - **Status:** Accepted
 - **Context:** Greenfield app; zero egress R2 fits score/SVG delivery; D1 fits small catalog metadata.
-- **Decision:** Next.js via OpenNext Cloudflare; D1 + Drizzle; dedicated R2 for scores separate from OpenNext cache R2.
+- **Decision:** Next.js via OpenNext Cloudflare; D1 + Drizzle; one R2 bucket for scores and OpenNext incremental cache, isolated by key prefix (see ADR-007).
 - **Consequences:** Node runtime (not Edge export); Worker CPU limits — no per-request full-score server engraving. See [architecture.md](architecture.md).
 
 ## ADR-004: Admin-only writes for MVP
@@ -43,3 +43,10 @@ Short architecture decision records. Update when a decision is reversed.
 - **Context:** Redistributing sheet music without rights is a legal risk.
 - **Decision:** Require an explicit license on every score; prefer public-domain / Creative Commons seed content; do not scrape publisher PDFs.
 - **Consequences:** Upload UX must block submit without license; filters can include license. See [ingest.md](ingest.md).
+
+## ADR-007: Single R2 bucket with key prefixes
+
+- **Status:** Accepted (supersedes the two-bucket split in the original ADR-003 wording)
+- **Context:** Two empty R2 buckets add dashboard and Wrangler noise; OpenNext already namespaces ISR objects with `NEXT_INC_CACHE_R2_PREFIX` (default `incremental-cache`).
+- **Decision:** Use one bucket (`clear-clef`) with two bindings: `SCORES_BUCKET` (`scores/…`) and `NEXT_INC_CACHE_R2_BUCKET` (`incremental-cache/…`).
+- **Consequences:** Simpler ops. If cache eviction, jurisdiction, or IAM later need to differ from catalog files, split buckets again.

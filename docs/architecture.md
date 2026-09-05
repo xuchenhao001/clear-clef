@@ -6,12 +6,13 @@ ClearClef is a greenfield Next.js App Router app deployed to Cloudflare Workers 
 
 | Concern | Technology | Notes |
 | --- | --- | --- |
+| Package manager | pnpm 11 (Corepack; `packageManager` in `package.json`) | Do not use npm or yarn |
 | App | Next.js App Router + TypeScript | Node.js runtime only — **do not** set `export const runtime = "edge"` |
 | Deploy | OpenNext Cloudflare adapter | `opennextjs-cloudflare` for build / preview / deploy |
-| Local bindings | `initOpenNextCloudflareForDev()` in `next.config` | Use `next dev` for day-to-day; `npm run preview` for Workers runtime |
+| Local bindings | `initOpenNextCloudflareForDev()` in `next.config` | Use `next dev` for day-to-day; `pnpm preview` for Workers runtime |
 | UI | Tailwind + shadcn/ui | Keep catalog HTML light |
-| Score objects | Cloudflare **R2** (scores bucket) | Zero egress; immutable object caching |
-| Next ISR / incremental cache | Separate **R2** bucket (OpenNext `NEXT_INC_CACHE_R2_BUCKET`) | Do **not** mix with score files |
+| Score objects | Cloudflare **R2** (`clear-clef`) | Zero egress; immutable object caching |
+| Next ISR / incremental cache | Same R2 bucket, prefix `incremental-cache/` (`NEXT_INC_CACHE_R2_BUCKET`) | Separate *keys*, not a second bucket |
 | Metadata | Cloudflare **D1** + Drizzle ORM | SQLite at the edge |
 | Optional later | KV cache tags, Turnstile on upload, Better Auth / Clerk | Do not block MVP |
 
@@ -75,12 +76,12 @@ flowchart TB
 When scaffolding, expect roughly:
 
 - `DB` — D1 database for catalog metadata
-- `SCORES_BUCKET` — R2 for score originals, canonical MusicXML, previews
-- `NEXT_INC_CACHE_R2_BUCKET` — R2 for OpenNext incremental cache only
+- `SCORES_BUCKET` — R2 `clear-clef` (originals, canonical MusicXML, previews under `scores/`)
+- `NEXT_INC_CACHE_R2_BUCKET` — same R2 bucket; OpenNext writes under `incremental-cache/` (`NEXT_INC_CACHE_R2_PREFIX`)
 - `ASSETS` / `WORKER_SELF_REFERENCE` — as required by OpenNext
 - `ADMIN_UPLOAD_SECRET` (or Access) — write gate for MVP
 
-Keep score storage and OpenNext cache in **separate** R2 buckets so lifecycle, IAM, and key prefixes stay clear.
+One physical bucket, two bindings. Isolate by prefix so ISR cache never shares keys with catalog files. Split into two buckets later only if lifecycle or IAM needs diverge.
 
 ## Caching
 

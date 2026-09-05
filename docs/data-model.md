@@ -58,9 +58,10 @@ Prefer `.mxl` for the original upload when the client sent compressed MusicXML. 
 scores/{id}/original.mxl          # or original.musicxml / original.abc if that was uploaded
 scores/{id}/canonical.musicxml    # MusicXML 4.x partwise preferred
 scores/{id}/preview.svg           # page 1 only, generated at ingest
+incremental-cache/                # OpenNext ISR / data cache (NEXT_INC_CACHE_R2_PREFIX)
 ```
 
-Separate OpenNext ISR cache bucket — do not place keys under `scores/`.
+Do not write catalog objects under `incremental-cache/`. Do not write ISR cache under `scores/`.
 
 ## TypeScript sketch (`ScoreFile`)
 
