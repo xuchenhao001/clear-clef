@@ -1,0 +1,15 @@
+---
+description: ClearClef product constraints for all work
+alwaysApply: true
+---
+
+# ClearClef product
+
+- Public **catalog**: anyone reads; **admin-only writes** in v1 (`/admin/upload`).
+- Canonical score format: **MusicXML 4.x partwise**; prefer `.mxl` on R2; keep original + canonical.
+- List/detail = Server Components + D1 (`visibility = 'public'`). No Verovio/WASM on index.
+- Viewer = client-only (`next/dynamic` + `ssr: false`); paginate SVG; no SSR of engraved scores.
+- **License required** on every score. Prefer PD/CC seed content; do not scrape publisher PDFs.
+- Separate R2 buckets: score files vs OpenNext ISR cache.
+- Not in v1: in-browser editor, MIDI playback, MEI-as-store, open public uploads, per-request server engraving.
+- Read `docs/` and `AGENTS.md` before changing architecture.

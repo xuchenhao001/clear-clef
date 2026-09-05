@@ -1,0 +1,14 @@
+---
+description: MusicXML ingest, upload security, and metadata extraction
+globs: app/admin/**,lib/ingest/**,lib/musicxml/**,app/api/**/upload/**
+alwaysApply: false
+---
+
+# Ingest / upload
+
+- Accept `.mxl`, `.musicxml`, `.xml` (ABC convert-once is later). Enforce size cap (5–10 MB).
+- **XXE:** non-validating parse; reject DTDs / external entities; do not assume `musicxml-io` is safe alone.
+- Require **license** before persist. Extract title/composer/key/time/parts from MusicXML header only at upload time.
+- Store `scores/{id}/original.*` + `canonical.musicxml`; set `format`, `visibility`, nullable `owner_id`.
+- Never ship MusicXML parsers into public list/detail RSC pages.
+- Preview SVG (page 1) is generated at ingest, not on every catalog request.
