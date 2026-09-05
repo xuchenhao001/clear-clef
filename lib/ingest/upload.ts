@@ -6,16 +6,15 @@ import {
   MAX_MXL_FILES,
   MAX_MXL_UNCOMPRESSED_BYTES,
   MAX_UPLOAD_BYTES,
+  MUSICXML_COMPRESSED_MIME,
+  MUSICXML_UNCOMPRESSED_MIME,
 } from "@/lib/ingest/constants";
 import {
   IngestValidationError,
   readMusicXmlInput,
 } from "@/lib/ingest/mxl";
-import {
-  extractScoreMetadata,
-  normalizeCanonicalMusicXml,
-  XmlSecurityError,
-} from "@/lib/ingest/metadata";
+import { extractScoreMetadata } from "@/lib/ingest/metadata";
+import { sanitizeMusicXml, XmlSecurityError } from "@/lib/ingest/xml";
 import { attachTagsToScore } from "@/lib/scores/tags";
 import { createUniqueSlug } from "@/lib/scores/slug";
 import { slugExists } from "@/lib/scores/queries";
@@ -53,7 +52,7 @@ export async function uploadScore(
   });
 
   const metadata = extractScoreMetadata(xml);
-  const canonicalXml = normalizeCanonicalMusicXml(xml);
+  const canonicalXml = sanitizeMusicXml(xml);
   const id = crypto.randomUUID();
   const slug = await createUniqueSlug(metadata.title, slugExists);
   const originalKey =
@@ -67,14 +66,14 @@ export async function uploadScore(
     httpMetadata: {
       contentType:
         originalExtension === "mxl"
-          ? "application/vnd.recordare.musicxml+xml"
-          : "application/vnd.recordare.musicxml",
+          ? MUSICXML_COMPRESSED_MIME
+          : MUSICXML_UNCOMPRESSED_MIME,
     },
   });
 
   await bucket.put(canonicalKey, canonicalXml, {
     httpMetadata: {
-      contentType: "application/vnd.recordare.musicxml",
+      contentType: MUSICXML_UNCOMPRESSED_MIME,
     },
   });
 
@@ -112,7 +111,10 @@ export async function uploadScore(
 }
 
 export function mapIngestError(error: unknown): { status: number; message: string } {
-  if (error instanceof IngestValidationError || error instanceof XmlSecurityError) {
+  if (
+    error instanceof IngestValidationError ||
+    error instanceof XmlSecurityError
+  ) {
     return { status: 400, message: error.message };
   }
   return { status: 500, message: "Upload failed" };

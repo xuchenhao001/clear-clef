@@ -16,7 +16,7 @@
 | `.musicxml` / `.xml` | Uncompressed XML | Accept on upload; good for canonical interchange |
 | `.mxl` | ZIP-compressed MusicXML | Prefer for originals on R2 (~20× smaller typical) |
 
-**Canonical store = MusicXML 4.x partwise.** Keep the original upload too. Layout hints in MusicXML are advisory; let Verovio reflow for phone vs desktop.
+**Canonical store = MusicXML** (target 4.x partwise; v1 keeps a sanitized copy at ingest). Keep the original upload too. Layout hints in MusicXML are advisory; let Verovio reflow for phone vs desktop.
 
 ## Do not use as the catalog source of truth
 
@@ -34,7 +34,7 @@
 
 ## Parts vs full score
 
-Piano learning usually wants the grand staff. If a file has extra parts, store `default_visible_parts` and pass Verovio options to hide the rest. See [rendering.md](rendering.md).
+Piano learning usually wants the grand staff. If a file has extra parts, store `default_visible_parts` at ingest for future filtering. v1 renders all staves in Verovio. See [rendering.md](rendering.md).
 
 ## Related docs
 

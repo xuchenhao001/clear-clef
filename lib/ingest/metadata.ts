@@ -1,26 +1,6 @@
 import { XMLParser } from "fast-xml-parser";
-
-const DTD_PATTERN = /<!DOCTYPE[\s\S]*?>/i;
-const ENTITY_PATTERN = /<!ENTITY[\s\S]*?>/i;
-
-export class XmlSecurityError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "XmlSecurityError";
-  }
-}
-
-export function assertSafeXml(xml: string): void {
-  if (DTD_PATTERN.test(xml)) {
-    throw new XmlSecurityError("DTD declarations are not allowed");
-  }
-  if (ENTITY_PATTERN.test(xml)) {
-    throw new XmlSecurityError("ENTITY declarations are not allowed");
-  }
-  if (/&\w+;/.test(xml) && /<!ENTITY/i.test(xml)) {
-    throw new XmlSecurityError("External entities are not allowed");
-  }
-}
+import { IngestValidationError } from "@/lib/ingest/errors";
+import { sanitizeMusicXml } from "@/lib/ingest/xml";
 
 const parser = new XMLParser({
   ignoreAttributes: false,
@@ -38,6 +18,13 @@ export type ExtractedScoreMetadata = {
   timeSignature: string | null;
   defaultVisibleParts: string | null;
 };
+
+function asArray<T>(value: T | T[] | null | undefined): T[] {
+  if (!value) {
+    return [];
+  }
+  return Array.isArray(value) ? value : [value];
+}
 
 function firstString(value: unknown): string | null {
   if (typeof value === "string") {
@@ -63,6 +50,25 @@ function firstString(value: unknown): string | null {
   return null;
 }
 
+function extractTitleFromCredits(scorePartwise: Record<string, unknown>): string | null {
+  for (const credit of asArray(scorePartwise.credit)) {
+    if (!credit || typeof credit !== "object") {
+      continue;
+    }
+    const record = credit as Record<string, unknown>;
+    const type = String(record["credit-type"] ?? "").toLowerCase();
+    if (type && type !== "title") {
+      continue;
+    }
+    const words = firstString(record["credit-words"]);
+    if (words) {
+      return words;
+    }
+  }
+
+  return null;
+}
+
 function formatKey(fifths: unknown, mode: unknown): string | null {
   const fifthsNumber =
     typeof fifths === "number"
@@ -70,38 +76,77 @@ function formatKey(fifths: unknown, mode: unknown): string | null {
       : typeof fifths === "string"
         ? Number.parseInt(fifths, 10)
         : null;
-  const modeValue = typeof mode === "string" ? mode.toLowerCase() : null;
-  if (fifthsNumber === null || Number.isNaN(fifthsNumber) || !modeValue) {
+  if (fifthsNumber === null || Number.isNaN(fifthsNumber)) {
     return null;
   }
 
-  const majorKeys = ["C", "G", "D", "A", "E", "B", "F#", "C#"];
-  const minorKeys = ["a", "e", "b", "f#", "c#", "g#", "d#", "a#"];
-  const index = fifthsNumber + (modeValue === "minor" ? 3 : 0);
-  if (modeValue === "minor") {
-    return `${minorKeys[index] ?? `fifths:${fifthsNumber}`} minor`;
+  const modeValue =
+    typeof mode === "string" && mode.trim()
+      ? mode.toLowerCase()
+      : "major";
+
+  const majorKeys = [
+    "Cb",
+    "Gb",
+    "Db",
+    "Ab",
+    "Eb",
+    "Bb",
+    "F",
+    "C",
+    "G",
+    "D",
+    "A",
+    "E",
+    "B",
+    "F#",
+    "C#",
+  ];
+  const minorKeys = [
+    "ab",
+    "eb",
+    "bb",
+    "f",
+    "c",
+    "g",
+    "d",
+    "a",
+    "e",
+    "b",
+    "f#",
+    "c#",
+    "g#",
+    "d#",
+    "a#",
+  ];
+  const index = fifthsNumber + 7;
+  if (index < 0 || index >= majorKeys.length) {
+    return `fifths:${fifthsNumber} ${modeValue}`;
   }
-  return `${majorKeys[index] ?? `fifths:${fifthsNumber}`} major`;
+
+  if (modeValue === "minor") {
+    return `${minorKeys[index]} minor`;
+  }
+  return `${majorKeys[index]} major`;
 }
 
 export function extractScoreMetadata(xml: string): ExtractedScoreMetadata {
-  assertSafeXml(xml);
-  const parsed = parser.parse(xml);
+  const sanitized = sanitizeMusicXml(xml);
+  const parsed = parser.parse(sanitized);
   const scorePartwise = parsed["score-partwise"] ?? parsed["score-timewise"];
   if (!scorePartwise) {
-    throw new XmlSecurityError("Not a MusicXML partwise/timewise document");
+    throw new IngestValidationError("Not a MusicXML partwise/timewise document");
   }
 
   const workTitle = firstString(scorePartwise.work?.["work-title"]);
-  const movementTitle = firstString(scorePartwise.movementTitle);
-  const title = workTitle ?? movementTitle ?? "Untitled";
+  const movementTitle = firstString(scorePartwise["movement-title"]);
+  const creditTitle = extractTitleFromCredits(scorePartwise);
+  const title = workTitle ?? movementTitle ?? creditTitle ?? "Untitled";
 
-  const creators = scorePartwise.identification?.creator;
-  const creatorList = Array.isArray(creators) ? creators : creators ? [creators] : [];
   let composer: string | null = null;
   let lyricist: string | null = null;
 
-  for (const creator of creatorList) {
+  for (const creator of asArray(scorePartwise.identification?.creator)) {
     if (typeof creator === "string") {
       composer ??= creator;
       continue;
@@ -121,9 +166,7 @@ export function extractScoreMetadata(xml: string): ExtractedScoreMetadata {
     }
   }
 
-  const partList = scorePartwise.partList?.scorePart;
-  const parts = Array.isArray(partList) ? partList : partList ? [partList] : [];
-  const partIds = parts
+  const partIds = asArray(scorePartwise["part-list"]?.["score-part"])
     .map((part) => {
       if (typeof part === "object" && part && "id" in part) {
         return String(part.id);
@@ -132,23 +175,16 @@ export function extractScoreMetadata(xml: string): ExtractedScoreMetadata {
     })
     .filter(Boolean) as string[];
 
-  const firstPart = scorePartwise.part;
-  const partArray = Array.isArray(firstPart) ? firstPart : firstPart ? [firstPart] : [];
-  const firstMeasure = partArray[0]?.measure;
-  const measureArray = Array.isArray(firstMeasure)
-    ? firstMeasure
-    : firstMeasure
-      ? [firstMeasure]
-      : [];
-  const attributesRaw = measureArray[0]?.attributes;
+  const firstPart = asArray(scorePartwise.part)[0];
+  const firstMeasure = asArray(firstPart?.measure)[0];
+  const attributesRaw = firstMeasure?.attributes;
   const attributes = Array.isArray(attributesRaw)
     ? attributesRaw[0]
     : attributesRaw;
   const fifths = attributes?.key?.fifths;
   const mode = attributes?.key?.mode;
   const beats = attributes?.time?.beats;
-  const beatType =
-    attributes?.time?.beatType ?? attributes?.time?.["beat-type"];
+  const beatType = attributes?.time?.["beat-type"];
   const timeSignature =
     beats != null && beatType != null
       ? `${beats}/${beatType}`
@@ -162,9 +198,4 @@ export function extractScoreMetadata(xml: string): ExtractedScoreMetadata {
     timeSignature,
     defaultVisibleParts: partIds.length > 0 ? JSON.stringify(partIds) : null,
   };
-}
-
-export function normalizeCanonicalMusicXml(xml: string): string {
-  assertSafeXml(xml);
-  return xml.trim();
 }

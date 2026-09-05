@@ -21,9 +21,9 @@ Keep the D1 schema small. Prefer nullable columns now for membership and format 
 | `instrument` | text | Default `piano` |
 | `format` | text | `musicxml` \| `abc` \| `mnx` — store format of canonical file; v1 is always `musicxml` |
 | `r2_key` | text | Path to preferred download / viewer source (usually original `.mxl`) |
-| `canonical_r2_key` | text | Path to canonical MusicXML |
+| `canonical_r2_key` | text | Sanitized uncompressed MusicXML (DOCTYPE stripped; not a 4.x rewrite) |
 | `preview_r2_key` | text | Path to page-1 SVG |
-| `default_visible_parts` | text / JSON | Part IDs shown by default (grand staff for piano) |
+| `default_visible_parts` | text / JSON | Part IDs extracted at ingest; stored for future viewer filtering (v1 renders all staves) |
 | `visibility` | text | `public` \| `unlisted` \| `private`; public catalog filters `public` |
 | `owner_id` | text | Nullable until auth; future member ownership |
 | `created_at` | integer / text | ISO or unix |
@@ -67,7 +67,7 @@ Prefer `.mxl` for the original upload when the client sent compressed MusicXML. 
 
 ```text
 scores/{id}/original.mxl          # or original.musicxml / original.abc if that was uploaded
-scores/{id}/canonical.musicxml    # MusicXML 4.x partwise preferred
+scores/{id}/canonical.musicxml    # Sanitized MusicXML (DOCTYPE stripped; not a 4.x rewrite)
 scores/{id}/preview.svg           # page 1 only, generated at ingest
 incremental-cache/                # OpenNext ISR / data cache (NEXT_INC_CACHE_R2_PREFIX)
 ```

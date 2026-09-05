@@ -25,12 +25,15 @@ Anyone can *read*. Admins *write*.
 
 MusicXML files are XML. Treat uploads as hostile.
 
-- Reject DTDs and external entities before parsing.
+- Strip external MusicXML `<!DOCTYPE>` declarations; never resolve DTDs or external entities.
+- Reject `<!ENTITY>` declarations and DOCTYPE internal subsets before parsing.
 - Decompress `.mxl` with size/file-count limits and reject zip-slip paths.
 - Parse metadata with `fast-xml-parser` (`processEntities: false`) — no DTD resolution.
 - Never use browser `DOMParser` on untrusted uploads.
 
-Implementation: [`lib/ingest/mxl.ts`](../lib/ingest/mxl.ts), [`lib/ingest/metadata.ts`](../lib/ingest/metadata.ts).
+Canonical MusicXML stored at ingest is the sanitized original (DOCTYPE stripped, BOM removed) — not a full rewrite to MusicXML 4.x partwise.
+
+Implementation: [`lib/ingest/mxl.ts`](../lib/ingest/mxl.ts), [`lib/ingest/xml.ts`](../lib/ingest/xml.ts), [`lib/ingest/metadata.ts`](../lib/ingest/metadata.ts).
 
 ## Metadata extraction
 

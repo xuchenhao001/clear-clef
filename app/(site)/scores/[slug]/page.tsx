@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ScoreViewerLoader } from "@/components/score/ScoreViewerLoader";
+import { isMxlR2Key } from "@/lib/score-file";
 import { getPublicScoreBySlug } from "@/lib/scores/queries";
 
 export const dynamic = "force-dynamic";
@@ -33,9 +34,7 @@ export default async function ScoreDetailPage({ params }: ScorePageProps) {
     notFound();
   }
 
-  const visibleParts = score.defaultVisibleParts
-    ? (JSON.parse(score.defaultVisibleParts) as string[])
-    : undefined;
+  const compressed = score.r2Key ? isMxlR2Key(score.r2Key) : false;
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-6 py-10">
@@ -88,7 +87,7 @@ export default async function ScoreDetailPage({ params }: ScorePageProps) {
 
       <ScoreViewerLoader
         fileUrl={`/api/scores/${score.id}/file`}
-        visibleParts={visibleParts}
+        compressed={compressed}
         title={score.title}
       />
     </div>

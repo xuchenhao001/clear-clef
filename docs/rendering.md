@@ -26,10 +26,10 @@ const module = await createVerovioModule();
 const tk = new VerovioToolkit(module);
 ```
 
-3. For `.mxl`: `fetch` → `arrayBuffer` → `tk.loadZipDataBuffer(buffer)`.
+3. For `.mxl`: `fetch` → `arrayBuffer` → `tk.loadZipDataBuffer(buffer)`. Use `compressed` from `r2Key.endsWith(".mxl")` and/or ZIP magic (`PK`) — the `/api/scores/{id}/file` URL does not end in `.mxl`.
 4. For uncompressed MusicXML: `tk.loadData(xmlString)`.
 5. Render **per page**: `tk.renderToSVG(pageNumber)`; v1 uses Previous/Next buttons (not scroll lazy-load).
-6. Pass options to honor `default_visible_parts` when files contain extra staves.
+6. `default_visible_parts` is stored in D1 for future part filtering. v1 renders all staves; Verovio has no `partNames` option.
 
 **Do not** import Verovio on list pages or into shared Server Component trees.
 

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { listPublicScores } from "@/lib/scores/queries";
 import { CatalogFilters } from "@/components/catalog/catalog-filters";
@@ -55,12 +56,14 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                   href={`/scores/${score.slug}`}
                   className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-background transition hover:border-zinc-400"
                 >
-                  <div className="aspect-[4/3] bg-zinc-50 dark:bg-zinc-900">
+                  <div className="relative aspect-[4/3] bg-zinc-50 dark:bg-zinc-900">
                     {score.previewR2Key ? (
-                      <img
+                      <Image
                         src={`/api/scores/${score.id}/preview`}
                         alt={`Preview of ${score.title}`}
-                        className="h-full w-full object-contain p-3"
+                        fill
+                        unoptimized
+                        className="object-contain p-3"
                       />
                     ) : (
                       <div className="flex h-full items-center justify-center text-sm text-zinc-400">

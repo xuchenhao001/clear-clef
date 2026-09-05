@@ -13,7 +13,7 @@ const ScoreViewer = dynamic(() => import("@/components/score/ScoreViewer"), {
 
 type ScoreViewerLoaderProps = {
   fileUrl: string;
-  visibleParts?: string[];
+  compressed?: boolean;
   title: string;
 };
 

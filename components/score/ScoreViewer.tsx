@@ -2,10 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { shouldLoadMxlBuffer } from "@/lib/score-file";
 
 type ScoreViewerProps = {
   fileUrl: string;
-  visibleParts?: string[];
+  compressed?: boolean;
   title: string;
 };
 
@@ -19,7 +20,7 @@ type VerovioToolkitLike = {
 
 export default function ScoreViewer({
   fileUrl,
-  visibleParts,
+  compressed = false,
   title,
 }: ScoreViewerProps) {
   const [toolkit, setToolkit] = useState<VerovioToolkitLike | null>(null);
@@ -51,21 +52,15 @@ export default function ScoreViewer({
           header: "none",
         });
 
-        if (visibleParts?.length) {
-          tk.setOptions({ partNames: visibleParts });
-        }
-
         const response = await fetch(fileUrl);
         if (!response.ok) {
           throw new Error("Failed to load score file");
         }
 
         const buffer = await response.arrayBuffer();
-        const contentType = response.headers.get("content-type") ?? "";
-        const loaded =
-          contentType.includes("zip") || fileUrl.endsWith(".mxl")
-            ? tk.loadZipDataBuffer(buffer)
-            : tk.loadData(new TextDecoder().decode(buffer));
+        const loaded = shouldLoadMxlBuffer(compressed, buffer)
+          ? tk.loadZipDataBuffer(buffer)
+          : tk.loadData(new TextDecoder().decode(buffer));
 
         if (!loaded) {
           throw new Error("Verovio could not parse the score");
@@ -88,7 +83,7 @@ export default function ScoreViewer({
     return () => {
       cancelled = true;
     };
-  }, [fileUrl, visibleParts]);
+  }, [fileUrl, compressed]);
 
   const svg = useMemo(() => {
     if (!toolkit || currentPage < 1) {
