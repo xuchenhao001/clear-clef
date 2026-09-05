@@ -67,9 +67,10 @@ flowchart TB
 
 ### Admin ingest (not public)
 
-1. Protected `/admin/upload` (Better Auth admin session).
-2. Route handler validates, extracts metadata, writes R2 objects, inserts D1 rows.
-3. Page-1 preview SVG is generated once at ingest in the admin browser, not on every catalog request.
+1. First boot: create the admin at `/admin/setup` (one-time; public sign-up remains disabled).
+2. Protected `/admin/upload` (Better Auth admin session).
+3. Route handler validates, extracts metadata, writes R2 objects, inserts D1 rows.
+4. Page-1 preview SVG is generated once at ingest in the admin browser, not on every catalog request.
 
 ## Cloudflare bindings (conceptual)
 

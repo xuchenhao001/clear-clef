@@ -1,0 +1,137 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { adminFormInputClassName } from "@/components/admin/admin-form-styles";
+import { authClient } from "@/lib/auth-client";
+import { Button } from "@/components/ui/button";
+
+export function AdminSetupForm() {
+  const router = useRouter();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+
+  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setPending(true);
+    setError(null);
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      setPending(false);
+      return;
+    }
+
+    const setupResponse = await fetch("/api/admin/setup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, password }),
+    });
+
+    if (!setupResponse.ok) {
+      const payload = (await setupResponse.json().catch(() => null)) as
+        | { error?: string }
+        | null;
+      setError(payload?.error ?? "Failed to create admin account");
+      setPending(false);
+      return;
+    }
+
+    const signInResult = await authClient.signIn.email({
+      email,
+      password,
+    });
+
+    setPending(false);
+
+    if (signInResult.error) {
+      setError(signInResult.error.message ?? "Account created but sign-in failed");
+      return;
+    }
+
+    router.push("/admin");
+    router.refresh();
+  }
+
+  return (
+    <form onSubmit={onSubmit} className="space-y-4">
+      <div className="space-y-2">
+        <label htmlFor="name" className="text-sm font-medium">
+          Name
+        </label>
+        <input
+          id="name"
+          name="name"
+          type="text"
+          autoComplete="name"
+          required
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+          className={adminFormInputClassName}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <label htmlFor="email" className="text-sm font-medium">
+          Email
+        </label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          autoComplete="email"
+          required
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          className={adminFormInputClassName}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <label htmlFor="password" className="text-sm font-medium">
+          Password
+        </label>
+        <input
+          id="password"
+          name="password"
+          type="password"
+          autoComplete="new-password"
+          minLength={8}
+          required
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          className={adminFormInputClassName}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <label htmlFor="confirmPassword" className="text-sm font-medium">
+          Confirm password
+        </label>
+        <input
+          id="confirmPassword"
+          name="confirmPassword"
+          type="password"
+          autoComplete="new-password"
+          minLength={8}
+          required
+          value={confirmPassword}
+          onChange={(event) => setConfirmPassword(event.target.value)}
+          className={adminFormInputClassName}
+        />
+      </div>
+
+      {error ? (
+        <p className="text-sm text-destructive" role="alert">{error}</p>
+      ) : null}
+
+      <Button type="submit" disabled={pending} className="w-full">
+        {pending ? "Creating admin…" : "Create admin account"}
+      </Button>
+    </form>
+  );
+}

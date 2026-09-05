@@ -6,7 +6,7 @@ Public catalog is **read-only** for visitors. Writes go through a protected admi
 
 - UI: `/admin/upload`
 - API: `POST /api/admin/upload`
-- Auth: **Better Auth** on D1 (email/password; public sign-up disabled; admin plugin)
+- Auth: **Better Auth** on D1 (email/password; public sign-up disabled; first admin via `/admin/setup`)
 - Optional later: Turnstile on the form
 
 Anyone can *read*. Admins *write*.

@@ -49,7 +49,7 @@ Managed in [`lib/db/auth-schema.ts`](../lib/db/auth-schema.ts) and [`drizzle/000
 - `account` — credential/OAuth accounts; includes `issuer`
 - `verification`
 
-Public sign-up is disabled; seed the first admin with `pnpm auth:seed-admin`.
+Public sign-up is disabled. On first boot, create the admin at `/admin/setup`.
 
 ## Public queries
 

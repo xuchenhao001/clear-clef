@@ -31,10 +31,11 @@ corepack enable
 cp .dev.vars.example .dev.vars
 pnpm install
 pnpm db:migrate:local
-pnpm auth:seed-admin
 pnpm cf-typegen                  # after wrangler.jsonc changes; Env types are committed
 pnpm dev
 ```
+
+On first run, open `/admin/setup` to create the admin account.
 
 - `pnpm dev` — Next.js + local Cloudflare bindings via `initOpenNextCloudflareForDev()` (`wrangler.dev.jsonc` omits `WORKER_SELF_REFERENCE`, which is only needed in the Workers runtime)
 - `pnpm test` — Vitest unit tests (in-memory SQLite; no remote D1)

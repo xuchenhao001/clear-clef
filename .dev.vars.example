@@ -4,6 +4,3 @@ BETTER_AUTH_URL=http://localhost:3000
 # Wrangler secret for local Workers runtime (.dev.vars). Generate with:
 # openssl rand -base64 32
 BETTER_AUTH_SECRET=replace-me-run-openssl-rand-base64-32
-
-ADMIN_EMAIL=admin@clearclef.local
-ADMIN_PASSWORD=replace-with-a-strong-password

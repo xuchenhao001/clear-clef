@@ -10,7 +10,7 @@ Implementation order for ClearClef.
 - Drizzle ORM against D1 (`lib/db`, `drizzle/0000_init.sql`)
 - Tailwind + shadcn/ui baseline
 - `initOpenNextCloudflareForDev()` for local bindings
-- Better Auth on D1 (`drizzle/0001_auth.sql`), admin seed script, `/admin/login`
+- Better Auth on D1 (`drizzle/0001_auth.sql`), first-boot `/admin/setup`, `/admin/login`
 
 ## Phase 2 — Public catalog (done)
 

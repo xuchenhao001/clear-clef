@@ -13,7 +13,7 @@ export function SiteHeader() {
           </p>
         </div>
         <Link
-          href="/admin/login"
+          href="/admin"
           className="text-sm font-medium text-zinc-600 hover:text-foreground dark:text-zinc-400"
         >
           Admin
