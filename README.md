@@ -30,7 +30,7 @@ corepack enable
 cp .dev.vars.example .dev.vars   # already gitignored; set ADMIN_UPLOAD_SECRET
 pnpm install
 pnpm db:migrate:local
-pnpm cf-typegen                  # after wrangler.jsonc changes
+pnpm cf-typegen                  # after wrangler.jsonc changes; Env types are committed
 pnpm dev
 ```
 

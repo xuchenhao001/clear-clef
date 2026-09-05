@@ -12,13 +12,12 @@ bun.lockb
 out/
 next-env.d.ts
 
-# Cloudflare / Wrangler (local state + generated types)
+# Cloudflare / Wrangler (local state only)
 .wrangler/
 .mf/
 .dev.vars
 .dev.vars.*
 !.dev.vars.example
-cloudflare-env.d.ts
 
 # Env / secrets
 .env
