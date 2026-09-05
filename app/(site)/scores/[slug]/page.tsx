@@ -44,7 +44,7 @@ export default async function ScoreDetailPage({ params }: ScorePageProps) {
   });
 
   return (
-    <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-10 px-6 py-10 md:gap-12 md:py-16">
+    <div className="mx-auto flex w-full max-w-[1200px] flex-col px-6 py-10 md:py-16">
       <div className="space-y-4">
         <Link
           href="/"
@@ -56,7 +56,7 @@ export default async function ScoreDetailPage({ params }: ScorePageProps) {
           {score.composer ? (
             <p className="type-body-sm text-edition-muted">{score.composer}</p>
           ) : null}
-          <h1 className="type-work-title text-xl md:text-2xl">{score.title}</h1>
+          <h1 className="type-work-title-detail">{score.title}</h1>
           {score.lyricist ? (
             <p className="type-body-sm text-edition-muted">
               Lyrics by {score.lyricist}
@@ -66,26 +66,11 @@ export default async function ScoreDetailPage({ params }: ScorePageProps) {
             <p className="type-caption-mono">{metadataLine}</p>
           ) : null}
         </header>
-        <dl className="grid gap-3 text-sm sm:grid-cols-2">
-          {score.key ? (
-            <div>
-              <dt className="font-medium text-edition-ink">Key</dt>
-              <dd className="text-edition-body">{score.key}</dd>
-            </div>
-          ) : null}
-          {score.timeSignature ? (
-            <div>
-              <dt className="font-medium text-edition-ink">Time</dt>
-              <dd className="text-edition-body">{score.timeSignature}</dd>
-            </div>
-          ) : null}
-          {score.difficulty ? (
-            <div>
-              <dt className="font-medium text-edition-ink">Difficulty</dt>
-              <dd className="text-edition-body">{score.difficulty}</dd>
-            </div>
-          ) : null}
-        </dl>
+        {score.difficulty ? (
+          <p className="type-body-sm text-edition-muted">
+            Difficulty: {score.difficulty}
+          </p>
+        ) : null}
         {score.tags.length > 0 ? (
           <ul className="flex flex-wrap gap-2">
             {score.tags.map((tag) => (
@@ -100,13 +85,17 @@ export default async function ScoreDetailPage({ params }: ScorePageProps) {
         ) : null}
       </div>
 
-      <ScoreViewerLoader
-        fileUrl={`/api/scores/${score.id}/file`}
-        compressed={compressed}
-        title={score.title}
-      />
+      <div className="pt-12 md:pt-16">
+        <ScoreViewerLoader
+          fileUrl={`/api/scores/${score.id}/file`}
+          compressed={compressed}
+          title={score.title}
+        />
+      </div>
 
-      <ScoreRights license={score.license} sourceUrl={score.sourceUrl} />
+      <div className="pt-8 md:pt-12">
+        <ScoreRights license={score.license} sourceUrl={score.sourceUrl} />
+      </div>
     </div>
   );
 }

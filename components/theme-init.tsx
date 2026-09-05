@@ -1,4 +1,3 @@
-import Script from "next/script";
 import { THEME_STORAGE_KEY } from "@/lib/theme";
 
 const themeInitScript = `
@@ -40,10 +39,12 @@ const themeInitScript = `
 })();
 `;
 
+/** Inline script to apply theme class before first paint (no flash). */
 export function ThemeInit() {
   return (
-    <Script id="theme-init" strategy="beforeInteractive">
-      {themeInitScript}
-    </Script>
+    <script
+      id="theme-init"
+      dangerouslySetInnerHTML={{ __html: themeInitScript }}
+    />
   );
 }

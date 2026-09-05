@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ViewerSkeleton } from "@/components/score/viewer-skeleton";
 import { shouldLoadMxlBuffer } from "@/lib/score-file";
+import { VEROVIO_DEFAULT_OPTIONS } from "@/lib/verovio/options";
 
 type ScoreViewerProps = {
   fileUrl: string;
@@ -47,11 +48,7 @@ export default function ScoreViewer({
         }
 
         const tk = new VerovioToolkit(verovioModule) as VerovioToolkitLike;
-        tk.setOptions({
-          scale: 40,
-          footer: "none",
-          header: "none",
-        });
+        tk.setOptions(VEROVIO_DEFAULT_OPTIONS);
 
         const response = await fetch(fileUrl);
         if (!response.ok) {

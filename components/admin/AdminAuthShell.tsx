@@ -22,7 +22,7 @@ export function AdminAuthShell({
           <Link href="/" className="type-nav-link hover:text-edition-ink">
             ClearClef
           </Link>
-          <h1 className="text-2xl font-medium tracking-tight">{title}</h1>
+          <h1 className="type-page-h1">{title}</h1>
           <p className="type-body-sm text-edition-muted">{description}</p>
         </div>
 

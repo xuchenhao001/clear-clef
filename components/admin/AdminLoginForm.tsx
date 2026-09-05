@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { adminFormInputClassName } from "@/components/admin/admin-form-styles";
+import { adminFormInputClassName, adminFormLabelClassName } from "@/components/admin/admin-form-styles";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 
@@ -39,7 +39,7 @@ export function AdminLoginForm() {
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <div className="space-y-2">
-        <label htmlFor="email" className="text-sm font-medium">
+        <label htmlFor="email" className={adminFormLabelClassName}>
           Email
         </label>
         <input
@@ -55,7 +55,7 @@ export function AdminLoginForm() {
       </div>
 
       <div className="space-y-2">
-        <label htmlFor="password" className="text-sm font-medium">
+        <label htmlFor="password" className={adminFormLabelClassName}>
           Password
         </label>
         <input

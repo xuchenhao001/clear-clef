@@ -18,10 +18,10 @@ export function ContentsRow({ score }: ContentsRowProps) {
     <li>
       <Link
         href={`/scores/${score.slug}`}
-        className="group flex items-start justify-between gap-6 py-5 transition-colors hover:bg-edition-canvas-soft"
+        className="group flex items-start justify-between gap-6 py-7 transition-colors hover:bg-edition-canvas-soft"
       >
         <div className="min-w-0 flex-1 space-y-2">
-          <h3 className="type-work-title group-hover:text-edition-ink">
+          <h3 className="type-work-title">
             {score.title}
           </h3>
           {metadataLine ? (
@@ -44,8 +44,8 @@ export function ContentsRow({ score }: ContentsRowProps) {
           </div>
         </div>
         {score.previewR2Key ? (
-          <div className="hidden shrink-0 rounded-xl border border-edition-hairline bg-edition-canvas-soft p-1 sm:block">
-            <div className="relative h-20 w-28 overflow-hidden rounded-lg bg-edition-surface-page">
+          <div className="hidden shrink-0 rounded-md border border-edition-hairline bg-edition-canvas-soft p-1 sm:block">
+            <div className="relative h-20 w-28 overflow-hidden rounded-sm bg-edition-surface-page">
               <Image
                 src={`/api/scores/${score.id}/preview`}
                 alt={`First page of ${score.title}`}

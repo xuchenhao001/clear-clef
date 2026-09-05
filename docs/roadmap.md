@@ -40,12 +40,14 @@ Implementation order for ClearClef.
 - Tags (many-to-many)
 - Piano-oriented filters: key, difficulty, license
 
-## Phase 6 — Genre-neutral catalog UI (done)
+## Phase 6 — Contents-list catalog UI (done)
 
 - Credit-grouped contents list (replaces card grid)
-- Geist-only edition tokens; lamp-model viewer chrome
+- Newsreader 300 for catalog H1 and work titles; Geist chrome; Geist Mono metadata
+- Lamp-model viewer chrome; theme menu (Light / Dark / System)
 - Optional `catalog_number` (thematic/opus from MusicXML `<work-number>` or admin override)
 - Sparse metadata line (`catalog_number · key · time`) on list and detail
+- Auto-submit catalog filters (no Apply button)
 - See [design.md](design.md)
 
 ## Out of scope for v1

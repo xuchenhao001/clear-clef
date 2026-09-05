@@ -62,7 +62,7 @@ flowchart TB
 
 1. Detail page mounts a Client Component via `next/dynamic(..., { ssr: false })`.
 2. The client fetches `.mxl` / MusicXML from an app route that streams from R2.
-3. Verovio loads the buffer and renders SVG **per page**; pages lazy-load on scroll.
+3. Verovio loads the buffer and renders SVG **per page**; v1 uses Previous/Next pagination (not scroll lazy-load).
 4. Engraved SVGs are huge DOMs — never SSR them.
 
 ### Admin ingest (not public)

@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { adminFormInputClassName } from "@/components/admin/admin-form-styles";
+import { adminFormInputClassName, adminFormLabelClassName } from "@/components/admin/admin-form-styles";
 import { Button } from "@/components/ui/button";
 import { LICENSE_OPTIONS } from "@/lib/ingest/constants";
+import { VEROVIO_DEFAULT_OPTIONS } from "@/lib/verovio/options";
 
 async function generatePreviewSvg(file: File): Promise<string> {
   const [{ default: createVerovioModule }, { VerovioToolkit }] = await Promise.all([
@@ -13,11 +14,7 @@ async function generatePreviewSvg(file: File): Promise<string> {
 
   const verovioModule = await createVerovioModule();
   const toolkit = new VerovioToolkit(verovioModule);
-  toolkit.setOptions({
-    scale: 40,
-    footer: "none",
-    header: "none",
-  });
+  toolkit.setOptions(VEROVIO_DEFAULT_OPTIONS);
 
   const buffer = await file.arrayBuffer();
   const extension = file.name.toLowerCase().split(".").pop();
@@ -98,7 +95,7 @@ export function AdminUploadForm() {
   return (
     <form onSubmit={onSubmit} className="flex max-w-2xl flex-col gap-5">
       <div className="space-y-2">
-        <label htmlFor="file" className="text-sm font-medium">
+        <label htmlFor="file" className={adminFormLabelClassName}>
           Score file
         </label>
         <input
@@ -115,7 +112,7 @@ export function AdminUploadForm() {
       </div>
 
       <div className="space-y-2">
-        <label htmlFor="license" className="text-sm font-medium">
+        <label htmlFor="license" className={adminFormLabelClassName}>
           License
         </label>
         <select
@@ -134,7 +131,7 @@ export function AdminUploadForm() {
       </div>
 
       <div className="space-y-2">
-        <label htmlFor="visibility" className="text-sm font-medium">
+        <label htmlFor="visibility" className={adminFormLabelClassName}>
           Visibility
         </label>
         <select
@@ -150,7 +147,7 @@ export function AdminUploadForm() {
       </div>
 
       <div className="space-y-2">
-        <label htmlFor="catalogNumber" className="text-sm font-medium">
+        <label htmlFor="catalogNumber" className={adminFormLabelClassName}>
           Catalog number
         </label>
         <input
@@ -166,7 +163,7 @@ export function AdminUploadForm() {
       </div>
 
       <div className="space-y-2">
-        <label htmlFor="tags" className="text-sm font-medium">
+        <label htmlFor="tags" className={adminFormLabelClassName}>
           Tags
         </label>
         <input
@@ -179,7 +176,7 @@ export function AdminUploadForm() {
       </div>
 
       <div className="space-y-2">
-        <label htmlFor="sourceUrl" className="text-sm font-medium">
+        <label htmlFor="sourceUrl" className={adminFormLabelClassName}>
           Source URL
         </label>
         <input

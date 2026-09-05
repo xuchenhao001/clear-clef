@@ -6,7 +6,7 @@ Anyone can browse. Uploads are admin-only in v1 (Better Auth email/password; pub
 
 ## Status
 
-**Phases 1–5 are implemented.** Public catalog, admin upload, Verovio viewer, page-1 previews, tags, and filters are in place. See [docs/roadmap.md](docs/roadmap.md).
+**Phases 1–6 are implemented.** Public catalog (contents list), admin upload, Verovio viewer, page-1 previews, tags, filters, and edition UI are in place. See [docs/roadmap.md](docs/roadmap.md).
 
 ## Stack
 

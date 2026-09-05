@@ -1,6 +1,6 @@
 # ClearClef design system
 
-Visual reference for ClearClef's public catalog and viewer. A **genre-neutral score library**: quiet stone canvas, Geist typography, engraved notation as row previews. Not a classical publisher edition and not a generic SaaS marketing site.
+Visual reference for ClearClef's public catalog and viewer. A **score library with edition-quality work identity**: quiet stone canvas, Geist chrome, Newsreader 300 for work titles, engraved notation as row previews.
 
 **Dials:** `DESIGN_VARIANCE: 6` · `MOTION_INTENSITY: 3` · `VISUAL_DENSITY: 3`
 
@@ -8,14 +8,14 @@ Visual reference for ClearClef's public catalog and viewer. A **genre-neutral sc
 
 ## Overview
 
-ClearClef reads like a small score library: stone paper, hairline rows, page-1 preview thumbnails on desktop, and Geist throughout.
+ClearClef reads like a small score library: stone paper, hairline rows, page-1 preview thumbnails on desktop, Newsreader for work names, Geist for chrome.
 
 **Key characteristics:**
 
 - Off-white stone canvas `{colors.canvas}` (#f5f5f5), warm near-black ink `{colors.ink}` (#0c0a09).
 - No saturated CTA color. Primary action is an ink pill at `{rounded.pill}`.
-- **Geist** 400/500 for chrome, titles, and group labels. **Geist Mono** for metadata (key, time, optional catalog number, page index, rights line).
-- No display serif. Genre-neutral means the same chrome for any credited name or work title.
+- **Newsreader 300** for catalog H1 and work titles (display only). **Geist** 400/500 for nav, filters, group labels, body. **Geist Mono** for metadata.
+- Never set nav, buttons, filters, or admin forms in Newsreader.
 - Page-1 preview SVG at row right on desktop. No decorative stave backgrounds in chrome.
 - Soft pill geometry for CTAs; hairline dividers for catalog rows.
 - Generous section rhythm (~96px between major bands).
@@ -92,18 +92,23 @@ R2 page-1 previews are stored once at ingest as black-on-white SVG ([`ingest.md`
 
 | Role | Family | License | Load |
 | --- | --- | --- | --- |
-| UI / titles | Geist 400/500 | OFL | Root layout |
+| Display | Newsreader 300 | SIL OFL | `next/font/google` in root layout |
+| UI / chrome | Geist 400/500 | OFL | Root layout |
 | Metadata | Geist Mono 400 | OFL | Root layout |
 
-**Do not** load Newsreader or other display serifs for public catalog surfaces. **Never** mix a second serif for emphasis.
+**Newsreader only** on catalog H1, catalog row work titles, and score-detail work title. **Never** on nav, wordmark, filters, buttons, group labels, or admin.
+
+Use `font-variation-settings: "opsz" 72, "wght" 300` on large display sizes. Never bold display headlines.
 
 ### Hierarchy
 
 | Token | Size | Weight | Line height | Font | Use |
 | --- | --- | --- | --- | --- | --- |
-| `{typography.catalog-h1}` | 32-40px | 500 | 1.15 | Geist | Catalog H1 |
-| `{typography.work-title}` | 18-20px | 500 | 1.35 | Geist | Row and detail work title |
-| `{typography.group-label}` | 15px | 500 | 1.4 | Geist | Credit group heading (smaller than work title) |
+| `{typography.catalog-h1}` | 44-48px | 300 | 1.08 | Newsreader | Catalog H1 |
+| `{typography.work-title}` | 24px | 300 | 1.2 | Newsreader | Row work title |
+| `{typography.work-title-detail}` | 32px | 300 | 1.13 | Newsreader | Detail work title |
+| `{typography.page-h1}` | 32-36px | 500 | 1.15 | Geist | Admin headings, empty states, not-found |
+| `{typography.group-label}` | 15px | 500 | 1.4 | Geist | Credit group heading |
 | `{typography.body-md}` | 16px | 400 | 1.5 | Geist | Body |
 | `{typography.body-sm}` | 15px | 400 | 1.47 | Geist | Captions, difficulty |
 | `{typography.caption-mono}` | 12px | 400 | 1.5 | Geist Mono | Metadata line, rights line |
@@ -115,8 +120,8 @@ R2 page-1 previews are stored once at ingest as black-on-white SVG ([`ingest.md`
 Score identity on catalog rows and detail pages:
 
 1. **Credit** (composer column) - Geist, `{typography.body-sm}`, `{colors.muted}` — group label on index only
-2. **Work title** - Geist `{typography.work-title}`
-3. **Metadata line** - Geist Mono, `{typography.caption-mono}` — optional; catalog number, key, time (omit when empty)
+2. **Work title** - Newsreader 300 `{typography.work-title}` or `{typography.work-title-detail}` on detail
+3. **Metadata line** - Geist Mono, `{typography.caption-mono}` — catalog number, key, time (omit when empty; do not duplicate in a definition list)
 
 Detail pages lead **credit then title**. Fallback group label: `Uncredited`.
 
@@ -134,10 +139,10 @@ Detail pages lead **credit then title**. Fallback group label: `Uncredited`.
 | Element | Treatment |
 | --- | --- |
 | Credit section | Geist `{typography.group-label}` — smaller than work titles |
-| Row | Work title (Geist `{typography.work-title}`), optional Geist Mono metadata line, Geist body for difficulty and tags |
+| Row | Work title (Newsreader `{typography.work-title}`), optional Geist Mono metadata line, Geist body for difficulty and tags |
 | Divider | `border-y` + `divide-y` on `{colors.hairline}`; no card boxes per row |
-| Preview | Page-1 thumbnail at row right on `sm+`; hidden on narrow mobile |
-| Filters | Quiet `filter-bar` above the list; not a heavy bordered panel |
+| Preview | Page-1 thumbnail at row right on `sm+`; white inner frame, flat outer matte |
+| Filters | Hairline-underline selects; mono uppercase labels; auto-submit on change; no boxed panel |
 
 **Rejected:** 2-up score plate grid, three equal marketplace cards, SaaS hero with gradient blobs.
 
@@ -164,29 +169,29 @@ No pastel gradient orbs. No neon glow.
 
 ### `top-nav`
 
-Background `{colors.canvas}`, height 64px. Geist wordmark left; optional `Catalog` label; **Appearance** menu (Light / Dark / System) and Admin link right. No decorative clef.
+Background `{colors.canvas}`, height 64px. Geist wordmark left; optional `Catalog` label; theme icon button and Admin link right. No decorative clef.
 
 Maps to: [`components/site-header.tsx`](../components/site-header.tsx)
 
 ### `theme-switch`
 
-Header text menu (not a sun/moon icon). Trigger shows current choice (`Light`, `Dark`, or `System`). Persists to `localStorage['clear-clef-theme']`. Also on admin protected header and auth shell.
+Header icon button (sun / moon / monitor for Light / Dark / System). Opens a menu with matching icons and labels. Persists to `localStorage['clear-clef-theme']`. Also on admin protected header and auth shell.
 
-Maps to: [`components/theme-menu.tsx`](../components/theme-menu.tsx), [`lib/theme.ts`](../lib/theme.ts)
+Maps to: [`components/theme-menu.tsx`](../components/theme-menu.tsx), [`components/theme-icons.tsx`](../components/theme-icons.tsx), [`lib/theme.ts`](../lib/theme.ts)
 
 ### `catalog-hero`
 
-Left-aligned Geist H1 ("Score catalog") + one sentence (max ~20 words). No eyebrow, no CTA strip.
+Left-aligned Newsreader H1 ("Score catalog") + one Geist sentence (max ~20 words). No eyebrow, no CTA strip.
 
 ### `filter-bar`
 
-Quiet row: key, difficulty, license, tag. Labels above selects. No heavy bordered panel.
+Quiet row: key, difficulty, license, tag. Mono uppercase labels above hairline-underline selects. **Auto-submit** on change (no Apply button). Clear link when filters are active.
 
-Maps to: [`components/catalog/catalog-filters.tsx`](../components/catalog/catalog-filters.tsx)
+Maps to: [`components/catalog/catalog-filters.tsx`](../components/catalog/catalog-filters.tsx) (server), [`components/catalog/catalog-filters-bar.tsx`](../components/catalog/catalog-filters-bar.tsx) (client auto-submit)
 
 ### `contents-list`
 
-Credit-grouped catalog index. Group head in Geist `{typography.group-label}`. Each row: work title, optional metadata line, difficulty and tags. Hairline dividers. Page-1 preview thumbnail at desktop right.
+Credit-grouped catalog index. Group head in Geist `{typography.group-label}`. Each row: Newsreader work title, optional metadata line, difficulty and tags. Hairline dividers. Page-1 preview thumbnail at desktop right.
 
 Maps to: [`app/(site)/page.tsx`](../app/(site)/page.tsx)
 
@@ -196,7 +201,7 @@ Single row inside `contents-list`. No card wrapper. Clickable row spans title bl
 
 ### `score-header` (detail)
 
-Credit line, Geist work title, metadata dl (key, time, difficulty). Musical tag pills only. License **not** pill-styled here.
+Credit line, Newsreader work title (`{typography.work-title-detail}`), Geist Mono metadata line. Difficulty as body text if present. Musical tag pills only. License **not** pill-styled here. Do not duplicate key/time in a definition list when they appear on the metadata line.
 
 Maps to: [`app/(site)/scores/[slug]/page.tsx`](../app/(site)/scores/[slug]/page.tsx)
 
@@ -210,7 +215,7 @@ Maps to: [`components/score/ScoreRights.tsx`](../components/score/ScoreRights.ts
 
 **Lamp model:** outer shell `{colors.canvas}`; inner page always `{colors.surface-page}` (#ffffff). Top bar: page index in Geist Mono (`3 / 12`). Previous / Next as outline pills. Loading: "Preparing the score." Skeleton matches page rectangle. Never invert SVG.
 
-Maps to: [`components/score/ScoreViewer.tsx`](../components/score/ScoreViewer.tsx)
+Maps to: [`components/score/ScoreViewer.tsx`](../components/score/ScoreViewer.tsx), [`components/score/ScoreViewerLoader.tsx`](../components/score/ScoreViewerLoader.tsx), [`components/score/viewer-skeleton.tsx`](../components/score/viewer-skeleton.tsx)
 
 ### `button-primary`
 
@@ -222,14 +227,17 @@ Transparent pill, 1px `{colors.hairline-strong}` border, ink text.
 
 ### `admin-shell`
 
-Back-of-house. Geist forms, required license field. No library ornament.
+Back-of-house. Geist forms (`type-page-h1` headings, shared label/input classes), required license field. No library ornament.
+
+Maps to: [`components/admin/AdminAuthShell.tsx`](../components/admin/AdminAuthShell.tsx), [`components/admin/admin-form-styles.ts`](../components/admin/admin-form-styles.ts)
 
 ## Do's and don'ts
 
 ### Do
 
 - Reserve ink pill for primary CTAs only.
-- Use Geist for all public titles and group labels.
+- Use Newsreader 300 for catalog H1 and work titles only.
+- Use Geist for nav, filters, group labels, and body.
 - Use Geist Mono for catalog numbers, key, time, rights line.
 - Group the catalog index by credited name with hairline-divided rows.
 - Show page-1 preview in a white frame on catalog rows (desktop), even in dark mode.
@@ -238,8 +246,8 @@ Back-of-house. Geist forms, required license field. No library ornament.
 
 ### Don't
 
-- Don't load display serifs on public catalog surfaces.
-- Don't use oversized group headings that read like collected-works chapter titles.
+- Don't set Newsreader on nav, wordmark, filters, buttons, admin, or system error pages.
+- Don't bold display headlines or mix a second serif for emphasis.
 - Don't use card grids on the catalog index.
 - Don't pill the license next to the work title.
 - Don't use edition jargon in UI copy (colophon, incipit, title page, plate).
@@ -284,7 +292,9 @@ Edition tokens live in [`app/globals.css`](../app/globals.css). `--edition-surfa
 }
 ```
 
-Tailwind utilities: `bg-edition-canvas`, `bg-edition-surface-page`, `border-edition-hairline`, `text-edition-muted`, etc.
+Tailwind utilities: `bg-edition-canvas`, `font-display`, `type-catalog-h1`, `type-page-h1`, `type-work-title`, `border-edition-hairline`, `text-edition-muted`, etc.
+
+`--font-display` maps to `--font-newsreader` in `@theme inline`.
 
 ## Known gaps
 
@@ -296,6 +306,6 @@ Tailwind utilities: `bg-edition-canvas`, `bg-edition-surface-page`, `border-edit
 ## Provenance
 
 - Token rhythm (ink pill, hairline rows, stone canvas) adapted from quiet product library patterns.
-- ClearClef-specific: Geist-only public type, contents-list catalog, engraved SVG as row preview.
+- ClearClef-specific: Newsreader display + Geist chrome, contents-list catalog, engraved SVG as row preview.
 - Layout: contents list over score plate grid.
 - Dark mode: lamp on a stand; full inversion rejected.

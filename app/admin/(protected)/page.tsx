@@ -6,7 +6,7 @@ export default function AdminDashboardPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="type-catalog-h1 text-[2rem]">Admin</h1>
+        <h1 className="type-page-h1">Admin</h1>
         <p className="mt-2 type-body-md text-edition-body">
           Upload scores and manage the public catalog.
         </p>
