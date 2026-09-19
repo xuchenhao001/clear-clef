@@ -53,3 +53,9 @@ Thumbs.db
 # Test / coverage
 coverage/
 .nyc_output/
+
+# SheetSage2 local trial lab (weights, venv, outputs)
+tools/sheetsage2-lab/.venv/
+tools/sheetsage2-lab/models/
+tools/sheetsage2-lab/runs/
+tools/sheetsage2-lab/**/__pycache__/
