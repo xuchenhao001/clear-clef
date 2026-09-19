@@ -68,7 +68,7 @@ flowchart TB
 ### Admin catalog writes (not public)
 
 1. First boot: create the admin at `/admin/setup` (one-time; public sign-up remains disabled).
-2. Protected `/admin/upload`, `/admin/scores`, `/admin/scores/{id}` (Better Auth admin session).
+2. Protected `/admin` (overview), `/admin/upload`, `/admin/scores`, `/admin/scores/{id}` (Better Auth admin session).
 3. Create: route handler validates, extracts metadata, writes R2 objects, inserts D1 rows.
 4. Update: `PATCH` metadata and optional file replace; delete: D1 row + R2 prefix; download original via admin-only file route.
 5. Page-1 preview SVG is generated at ingest or file replace in the admin browser, not on every catalog request.

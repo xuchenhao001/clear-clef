@@ -1,28 +1,40 @@
 import Link from "next/link";
 import { ThemeMenu } from "@/components/theme-menu";
 import { SkipToContent } from "@/components/skip-to-content";
+import { cn } from "cn";
 
 type AdminAuthShellProps = {
   title: string;
   description: string;
   children: React.ReactNode;
+  className?: string;
 };
 
 export function AdminAuthShell({
   title,
   description,
   children,
+  className,
 }: AdminAuthShellProps) {
   return (
     <div className="relative flex min-h-full flex-col items-center justify-center bg-edition-canvas px-6 py-16 text-edition-ink">
       <SkipToContent />
-      <div className="absolute top-6 right-6">
+      <div className="absolute top-6 right-6 flex items-center gap-4">
+        <Link
+          href="/"
+          className="type-nav-link hidden hover:text-edition-ink sm:inline"
+        >
+          Public catalog
+        </Link>
         <ThemeMenu />
       </div>
       <main
         id="content"
         tabIndex={-1}
-        className="w-full max-w-md outline-none focus-visible:ring-3 focus-visible:ring-edition-hairline-strong/50"
+        className={cn(
+          "w-full max-w-md outline-none focus-visible:ring-3 focus-visible:ring-edition-hairline-strong/50",
+          className,
+        )}
       >
         <div className="rounded-xl border border-edition-hairline bg-edition-surface-card p-8">
           <div className="mb-8 space-y-2">
@@ -32,8 +44,11 @@ export function AdminAuthShell({
             >
               ClearClef
             </Link>
+            <p className="type-caption-mono uppercase tracking-wide text-edition-muted">
+              Admin
+            </p>
             <h1 className="type-page-h1">{title}</h1>
-            <p className="type-body-sm text-edition-muted">{description}</p>
+            <p className="type-body-sm text-edition-muted text-pretty">{description}</p>
           </div>
 
           {children}

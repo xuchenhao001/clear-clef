@@ -2,15 +2,20 @@
 
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
+import { AdminDangerZone } from "@/components/admin/admin-danger-zone";
+import {
+  AdminCatalogFields,
+  AdminRightsFields,
+  AdminScoreFileInput,
+} from "@/components/admin/admin-form-fields";
 import {
   adminFormInputClassName,
   adminFormLabelClassName,
 } from "@/components/admin/admin-form-styles";
-import { Button } from "@/components/ui/button";
-import { EditionSelect } from "@/components/ui/edition-select";
-import { LICENSE_OPTIONS } from "@/lib/ingest/constants";
+import { AdminSection } from "@/components/admin/admin-section";
+import { AdminScoreEditSidebar } from "@/components/admin/admin-score-edit-sidebar";
+import { AdminStickyActions } from "@/components/admin/admin-sticky-actions";
 import { generatePreviewSvg } from "@/lib/verovio/generate-preview-svg";
-import { cn } from "cn";
 
 type ScoreFormState = {
   title: string;
@@ -21,7 +26,6 @@ type ScoreFormState = {
   key: string;
   timeSignature: string;
   difficulty: string;
-  visibility: "public" | "unlisted" | "private";
   sourceUrl: string;
   tags: string;
 };
@@ -30,13 +34,16 @@ type AdminScoreEditFormProps = {
   scoreId: string;
   slug: string;
   initial: ScoreFormState;
+  initialVisibility: "public" | "unlisted" | "private";
   hasPreview: boolean;
 };
+
+type ScoreVisibility = "public" | "unlisted" | "private";
 
 function buildPatchFormData(
   form: ScoreFormState,
   license: string,
-  visibility: ScoreFormState["visibility"],
+  visibility: ScoreVisibility,
   file: File | null,
 ): FormData {
   const formData = new FormData();
@@ -61,13 +68,14 @@ export function AdminScoreEditForm({
   scoreId,
   slug,
   initial,
+  initialVisibility,
   hasPreview,
 }: AdminScoreEditFormProps) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState(initial);
   const [license, setLicense] = useState(initial.license);
-  const [visibility, setVisibility] = useState(initial.visibility);
+  const [formVisibility, setFormVisibility] = useState(initialVisibility);
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [deletePending, setDeletePending] = useState(false);
@@ -86,7 +94,7 @@ export function AdminScoreEditForm({
     setError(null);
 
     const file = fileInputRef.current?.files?.[0] ?? null;
-    const formData = buildPatchFormData(form, license, visibility, file);
+    const formData = buildPatchFormData(form, license, formVisibility, file);
 
     try {
       const patchResponse = await fetch(`/api/admin/scores/${scoreId}`, {
@@ -158,267 +166,118 @@ export function AdminScoreEditForm({
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex max-w-2xl flex-col gap-5">
-      {hasPreview ? (
-        <div className="space-y-2">
-          <p className={adminFormLabelClassName}>Current preview</p>
-          <div className="overflow-hidden rounded-xl border border-edition-hairline bg-white p-2">
-            {/* eslint-disable-next-line @next/next/no-img-element -- admin-only SVG from session-gated API */}
-            <img
-              src={`/api/admin/scores/${scoreId}/preview`}
-              alt="Page 1 preview"
-              className="mx-auto max-h-48 w-full object-contain"
+    <form onSubmit={onSubmit} className="lg:grid lg:grid-cols-[minmax(0,1fr)_280px] lg:gap-10">
+      <div className="flex flex-col gap-6">
+        <AdminSection legend="Work" description="Displayed title and credits on the public catalog.">
+          <div className="space-y-2">
+            <label htmlFor="title" className={adminFormLabelClassName}>
+              Title
+            </label>
+            <input
+              id="title"
+              type="text"
+              required
+              value={form.title}
+              onChange={(event) => updateField("title", event.target.value)}
+              className={adminFormInputClassName}
             />
           </div>
-        </div>
-      ) : null}
+          <div className="space-y-2">
+            <label htmlFor="composer" className={adminFormLabelClassName}>
+              Composer
+            </label>
+            <input
+              id="composer"
+              type="text"
+              value={form.composer}
+              onChange={(event) => updateField("composer", event.target.value)}
+              className={adminFormInputClassName}
+            />
+          </div>
+          <div className="space-y-2">
+            <label htmlFor="lyricist" className={adminFormLabelClassName}>
+              Lyricist
+            </label>
+            <input
+              id="lyricist"
+              type="text"
+              value={form.lyricist}
+              onChange={(event) => updateField("lyricist", event.target.value)}
+              className={adminFormInputClassName}
+            />
+          </div>
+        </AdminSection>
 
-      <div className="space-y-2">
-        <label htmlFor="title" className={adminFormLabelClassName}>
-          Title
-        </label>
-        <input
-          id="title"
-          type="text"
-          required
-          value={form.title}
-          onChange={(event) => updateField("title", event.target.value)}
-          className={adminFormInputClassName}
-        />
-      </div>
-
-      <div className="space-y-2">
-        <label htmlFor="slug-display" className={adminFormLabelClassName}>
-          Slug
-        </label>
-        <input
-          id="slug-display"
-          type="text"
-          readOnly
-          value={slug}
-          className={cn(adminFormInputClassName, "text-edition-muted")}
-        />
-        <p className="text-xs text-edition-muted">
-          Public URL stays /scores/{slug} when the title changes.
-        </p>
-      </div>
-
-      <div className="space-y-2">
-        <label htmlFor="composer" className={adminFormLabelClassName}>
-          Composer
-        </label>
-        <input
-          id="composer"
-          type="text"
-          value={form.composer}
-          onChange={(event) => updateField("composer", event.target.value)}
-          className={adminFormInputClassName}
-        />
-      </div>
-
-      <div className="space-y-2">
-        <label htmlFor="lyricist" className={adminFormLabelClassName}>
-          Lyricist
-        </label>
-        <input
-          id="lyricist"
-          type="text"
-          value={form.lyricist}
-          onChange={(event) => updateField("lyricist", event.target.value)}
-          className={adminFormInputClassName}
-        />
-      </div>
-
-      <EditionSelect
-        name="license"
-        label="License"
-        value={license}
-        required
-        triggerVariant="boxed"
-        labelVariant="form"
-        placeholder="Choose license"
-        items={LICENSE_OPTIONS.map((option) => ({
-          label: option,
-          value: option,
-        }))}
-        onValueChange={setLicense}
-      />
-
-      <EditionSelect
-        name="visibility"
-        label="Visibility"
-        value={visibility}
-        triggerVariant="boxed"
-        labelVariant="form"
-        items={[
-          { label: "Public", value: "public" },
-          { label: "Unlisted", value: "unlisted" },
-          { label: "Private", value: "private" },
-        ]}
-        onValueChange={(value) =>
-          setVisibility(value as "public" | "unlisted" | "private")
-        }
-      />
-
-      <div className="space-y-2">
-        <label htmlFor="catalogNumber" className={adminFormLabelClassName}>
-          Catalog number
-        </label>
-        <input
-          id="catalogNumber"
-          type="text"
-          value={form.catalogNumber}
-          onChange={(event) => updateField("catalogNumber", event.target.value)}
-          className={adminFormInputClassName}
-        />
-      </div>
-
-      <div className="grid gap-5 sm:grid-cols-2">
-        <div className="space-y-2">
-          <label htmlFor="key" className={adminFormLabelClassName}>
-            Key
-          </label>
-          <input
-            id="key"
-            type="text"
-            value={form.key}
-            onChange={(event) => updateField("key", event.target.value)}
-            className={adminFormInputClassName}
+        <AdminSection legend="Catalog metadata" description="Filters and list display on the public index.">
+          <AdminCatalogFields
+            visibility={formVisibility}
+            onVisibilityChange={setFormVisibility}
+            tags={form.tags}
+            onTagsChange={(value) => updateField("tags", value)}
+            catalogNumber={form.catalogNumber}
+            onCatalogNumberChange={(value) => updateField("catalogNumber", value)}
+            showExtendedMetadata
+            scoreKey={form.key}
+            onScoreKeyChange={(value) => updateField("key", value)}
+            timeSignature={form.timeSignature}
+            onTimeSignatureChange={(value) => updateField("timeSignature", value)}
+            difficulty={form.difficulty}
+            onDifficultyChange={(value) => updateField("difficulty", value)}
           />
-        </div>
-        <div className="space-y-2">
-          <label htmlFor="timeSignature" className={adminFormLabelClassName}>
-            Time signature
-          </label>
-          <input
-            id="timeSignature"
-            type="text"
-            value={form.timeSignature}
-            onChange={(event) => updateField("timeSignature", event.target.value)}
-            className={adminFormInputClassName}
+        </AdminSection>
+
+        <AdminSection legend="Rights" description="License and source link shown on the score detail page.">
+          <AdminRightsFields
+            license={license}
+            onLicenseChange={setLicense}
+            sourceUrl={form.sourceUrl}
+            onSourceUrlChange={(value) => updateField("sourceUrl", value)}
           />
-        </div>
-      </div>
+        </AdminSection>
 
-      <div className="space-y-2">
-        <label htmlFor="difficulty" className={adminFormLabelClassName}>
-          Difficulty
-        </label>
-        <input
-          id="difficulty"
-          type="text"
-          value={form.difficulty}
-          onChange={(event) => updateField("difficulty", event.target.value)}
-          className={adminFormInputClassName}
-        />
-      </div>
-
-      <div className="space-y-2">
-        <label htmlFor="tags" className={adminFormLabelClassName}>
-          Tags
-        </label>
-        <input
-          id="tags"
-          type="text"
-          value={form.tags}
-          onChange={(event) => updateField("tags", event.target.value)}
-          placeholder="bach, etude, sight-reading"
-          className={adminFormInputClassName}
-        />
-      </div>
-
-      <div className="space-y-2">
-        <label htmlFor="sourceUrl" className={adminFormLabelClassName}>
-          Source URL
-        </label>
-        <input
-          id="sourceUrl"
-          type="url"
-          value={form.sourceUrl}
-          onChange={(event) => updateField("sourceUrl", event.target.value)}
-          className={adminFormInputClassName}
-        />
-      </div>
-
-      <div className="space-y-2">
-        <label htmlFor="file" className={adminFormLabelClassName}>
-          Replace score file
-        </label>
-        <div className="rounded-xl border border-edition-hairline bg-edition-surface-card px-4 py-3">
-          <input
-            ref={fileInputRef}
+        <AdminSection
+          legend="Replace score file"
+          description="Optional. Metadata above is kept; only storage and part defaults change."
+        >
+          <AdminScoreFileInput
             id="file"
-            type="file"
-            accept=".mxl,.musicxml,.xml,application/vnd.recordare.musicxml+xml,application/xml,text/xml"
-            className="block w-full text-sm text-edition-body file:mr-4 file:rounded-full file:border-0 file:bg-edition-primary file:px-4 file:py-2 file:text-sm file:font-medium file:text-edition-on-primary"
-            onChange={(event) => {
-              const nextFile = event.currentTarget.files?.[0];
-              setSelectedFileName(nextFile?.name ?? null);
-            }}
+            label="MusicXML file"
+            helperText="Uploading a new file regenerates the page-1 preview after save."
+            fileInputRef={fileInputRef}
+            selectedFileName={selectedFileName}
+            onFileChange={setSelectedFileName}
           />
-          {selectedFileName ? (
-            <p className="mt-2 type-body-sm text-edition-muted">{selectedFileName}</p>
-          ) : null}
-        </div>
-        <p className="text-xs text-edition-muted">
-          Optional. Catalog fields above stay as edited; a new file only replaces R2
-          storage and part defaults.
-        </p>
-      </div>
+        </AdminSection>
 
-      <div className="flex flex-wrap gap-3">
-        <a
-          href={`/api/admin/scores/${scoreId}/file`}
-          className={cn(
-            "inline-flex h-10 items-center justify-center rounded-full border border-edition-hairline-strong px-4 text-sm font-medium text-edition-ink",
-          )}
-        >
-          Download original
-        </a>
-      </div>
+        <AdminDangerZone
+          title={form.title}
+          description="Permanently remove this score from the catalog and delete all stored files."
+          confirmDelete={confirmDelete}
+          deletePending={deletePending}
+          onDelete={onDelete}
+          onCancelConfirm={() => setConfirmDelete(false)}
+        />
 
-      {message ? (
-        <p className="text-sm text-edition-semantic-success" role="status">
-          {message}
-        </p>
-      ) : null}
-      {error ? (
-        <p className="text-sm text-edition-semantic-error" role="alert">
-          {error}
-        </p>
-      ) : null}
-
-      <div className="flex flex-wrap items-center gap-3">
-        <Button type="submit" disabled={pending}>
-          {pending ? "Saving…" : "Save changes"}
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          disabled={deletePending}
-          onClick={onDelete}
-        >
-          {confirmDelete
-            ? deletePending
-              ? "Deleting…"
-              : `Confirm delete “${form.title}”`
-            : "Delete score"}
-        </Button>
-        {confirmDelete && !deletePending ? (
-          <button
-            type="button"
-            className="text-sm text-edition-muted underline-offset-2 hover:underline"
-            onClick={() => setConfirmDelete(false)}
-          >
-            Cancel
-          </button>
+        {message ? (
+          <p className="text-sm text-edition-semantic-success" role="status">
+            {message}
+          </p>
         ) : null}
+        {error ? (
+          <p className="text-sm text-edition-semantic-error" role="alert">
+            {error}
+          </p>
+        ) : null}
+
+        <AdminStickyActions pending={pending} backHref="/admin/scores" />
       </div>
-      {confirmDelete ? (
-        <p className="text-sm text-edition-muted">
-          This permanently removes the score and all files in R2. This cannot be undone.
-        </p>
-      ) : null}
+
+      <AdminScoreEditSidebar
+        scoreId={scoreId}
+        slug={slug}
+        visibility={formVisibility}
+        hasPreview={hasPreview}
+      />
     </form>
   );
 }

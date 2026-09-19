@@ -6,6 +6,7 @@ Public catalog is **read-only** for visitors. Writes go through a protected admi
 
 | Action | UI | API |
 | --- | --- | --- |
+| Overview | `/admin` | — |
 | Create | `/admin/upload` | `POST /api/admin/upload` |
 | List / edit | `/admin/scores`, `/admin/scores/{id}` | `PATCH /api/admin/scores/{id}` |
 | Delete | edit form | `DELETE /api/admin/scores/{id}` |
@@ -17,6 +18,8 @@ Auth: **Better Auth** on D1 (email/password; public sign-up disabled; first admi
 Anyone can *read* the public catalog. Admins *write*.
 
 **Edit:** metadata (title, composer, license, visibility, tags, etc.) is saved via `PATCH`. Slug is stable after create. Optional file replace re-ingests MusicXML into the same `scores/{id}/` prefix (XXE-hardened path) and regenerates page-1 preview in the admin browser. **Delete** removes the D1 row (cascade `score_tags`) and all R2 objects under `scores/{id}/`.
+
+After a successful **upload** (and client-side page-1 preview), the admin UI redirects to `/admin/scores/{id}?uploaded=1` so metadata can be reviewed before publishing.
 
 ## Accepted inputs
 

@@ -1,28 +1,35 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { adminFormInputClassName, adminFormLabelClassName } from "@/components/admin/admin-form-styles";
-import { Button } from "@/components/ui/button";
-import { EditionSelect } from "@/components/ui/edition-select";
-import { LICENSE_OPTIONS } from "@/lib/ingest/constants";
+import { AdminCatalogFields, AdminRightsFields, AdminScoreFileInput } from "@/components/admin/admin-form-fields";
+import { AdminSection } from "@/components/admin/admin-section";
+import { AdminStickyActions } from "@/components/admin/admin-sticky-actions";
 import { generatePreviewSvg } from "@/lib/verovio/generate-preview-svg";
 
 export function AdminUploadForm() {
-  const [message, setMessage] = useState<string | null>(null);
+  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
   const [license, setLicense] = useState("Public Domain");
-  const [visibility, setVisibility] = useState("public");
+  const [visibility, setVisibility] = useState<"public" | "unlisted" | "private">("public");
+  const [tags, setTags] = useState("");
+  const [catalogNumber, setCatalogNumber] = useState("");
+  const [sourceUrl, setSourceUrl] = useState("");
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setPending(true);
-    setMessage(null);
     setError(null);
 
     const form = event.currentTarget;
     const formData = new FormData(form);
+    formData.set("license", license);
+    formData.set("visibility", visibility);
+    formData.set("tags", tags);
+    formData.set("catalogNumber", catalogNumber);
+    formData.set("sourceUrl", sourceUrl);
     const file = formData.get("file");
 
     if (!(file instanceof File)) {
@@ -39,11 +46,9 @@ export function AdminUploadForm() {
       const uploadJson = (await uploadResponse.json()) as {
         error?: string;
         id?: string;
-        slug?: string;
-        title?: string;
       };
 
-      if (!uploadResponse.ok) {
+      if (!uploadResponse.ok || !uploadJson.id) {
         throw new Error(uploadJson.error ?? "Upload failed");
       }
 
@@ -61,11 +66,8 @@ export function AdminUploadForm() {
         throw new Error("Score uploaded, but preview generation failed");
       }
 
-      setMessage(`Uploaded "${uploadJson.title}" as /scores/${uploadJson.slug}`);
-      form.reset();
-      setSelectedFileName(null);
-      setLicense("Public Domain");
-      setVisibility("public");
+      router.push(`/admin/scores/${uploadJson.id}?uploaded=1`);
+      router.refresh();
     } catch (submitError) {
       setError(
         submitError instanceof Error ? submitError.message : "Upload failed",
@@ -76,125 +78,59 @@ export function AdminUploadForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex max-w-2xl flex-col gap-5">
-      <div className="space-y-2">
-        <label htmlFor="file" className={adminFormLabelClassName}>
-          Score file
-        </label>
-        <div className="rounded-xl border border-edition-hairline bg-edition-surface-card px-4 py-3">
-          <input
-            id="file"
-            name="file"
-            type="file"
-            required
-            accept=".mxl,.musicxml,.xml,application/vnd.recordare.musicxml+xml,application/xml,text/xml"
-            className="block w-full text-sm text-edition-body file:mr-4 file:rounded-full file:border-0 file:bg-edition-primary file:px-4 file:py-2 file:text-sm file:font-medium file:text-edition-on-primary"
-            onChange={(event) => {
-              const file = event.currentTarget.files?.[0];
-              setSelectedFileName(file?.name ?? null);
-            }}
-          />
-          {selectedFileName ? (
-            <p className="mt-2 type-body-sm text-edition-muted">{selectedFileName}</p>
-          ) : null}
-        </div>
-        <p className="text-xs text-edition-muted">
-          Accepts .mxl, .musicxml, or .xml up to 8 MB.
-        </p>
-      </div>
-
-      <div className="space-y-2">
-        <EditionSelect
-          name="license"
-          label="License"
-          value={license}
+    <form onSubmit={onSubmit} className="flex max-w-2xl flex-col gap-6">
+      <AdminSection
+        legend="Score file"
+        description="We accept .mxl, .musicxml, or .xml up to 8 MB."
+      >
+        <AdminScoreFileInput
+          id="file"
           required
-          triggerVariant="boxed"
-          labelVariant="form"
-          placeholder="Choose license"
-          items={LICENSE_OPTIONS.map((option) => ({
-            label: option,
-            value: option,
-          }))}
-          onValueChange={setLicense}
+          label="MusicXML file"
+          helperText="After upload you can review metadata on the edit screen."
+          selectedFileName={selectedFileName}
+          onFileChange={setSelectedFileName}
         />
-      </div>
+      </AdminSection>
 
-      <div className="space-y-2">
-        <EditionSelect
-          name="visibility"
-          label="Visibility"
-          value={visibility}
-          triggerVariant="boxed"
-          labelVariant="form"
-          items={[
-            { label: "Public", value: "public" },
-            { label: "Unlisted", value: "unlisted" },
-            { label: "Private", value: "private" },
-          ]}
-          onValueChange={setVisibility}
+      <AdminSection
+        legend="Rights"
+        description="License and provenance are required for every catalog entry."
+      >
+        <AdminRightsFields
+          license={license}
+          onLicenseChange={setLicense}
+          sourceUrl={sourceUrl}
+          onSourceUrlChange={setSourceUrl}
         />
-      </div>
+      </AdminSection>
 
-      <div className="space-y-2">
-        <label htmlFor="catalogNumber" className={adminFormLabelClassName}>
-          Catalog number
-        </label>
-        <input
-          id="catalogNumber"
-          name="catalogNumber"
-          type="text"
-          placeholder="BWV 846, Op. 27 No. 2"
-          className={adminFormInputClassName}
+      <AdminSection
+        legend="Catalog"
+        description="Visibility controls whether the work appears on the public index."
+      >
+        <AdminCatalogFields
+          visibility={visibility}
+          onVisibilityChange={setVisibility}
+          tags={tags}
+          onTagsChange={setTags}
+          catalogNumber={catalogNumber}
+          onCatalogNumberChange={setCatalogNumber}
         />
-        <p className="text-xs text-edition-muted">
-          Optional. Opus or thematic catalog if the work has one.
-        </p>
-      </div>
+      </AdminSection>
 
-      <div className="space-y-2">
-        <label htmlFor="tags" className={adminFormLabelClassName}>
-          Tags
-        </label>
-        <input
-          id="tags"
-          name="tags"
-          type="text"
-          placeholder="bach, etude, sight-reading"
-          className={adminFormInputClassName}
-        />
-      </div>
-
-      <div className="space-y-2">
-        <label htmlFor="sourceUrl" className={adminFormLabelClassName}>
-          Source URL
-        </label>
-        <input
-          id="sourceUrl"
-          name="sourceUrl"
-          type="url"
-          placeholder="https://imslp.org/..."
-          className={adminFormInputClassName}
-        />
-      </div>
-
-      {message ? (
-        <p
-          className="text-sm text-edition-semantic-success"
-          role="status"
-        >
-          {message}
-        </p>
-      ) : null}
       {error ? (
         <p className="text-sm text-edition-semantic-error" role="alert">
           {error}
         </p>
       ) : null}
 
-      <Button type="submit" disabled={pending}>
-        {pending ? "Uploading…" : "Upload score"}
-      </Button>
+      <AdminStickyActions
+        pending={pending}
+        backHref="/admin/scores"
+        submitLabel="Upload score"
+        pendingLabel="Uploading…"
+      />
     </form>
   );
 }

@@ -267,9 +267,20 @@ Maps to: [`components/public-shell.tsx`](../components/public-shell.tsx), [`comp
 
 ### `admin-shell`
 
-Back-of-house. Geist forms (`type-page-h1` headings, shared label/input classes), required license field. License and visibility use `EditionSelect` (boxed triggers). No library ornament.
+Back-of-house only — **Geist for all admin typography** (`type-page-h1` page titles, semibold section legends, body copy). Never Newsreader on admin routes.
 
-Maps to: [`components/admin/AdminAuthShell.tsx`](../components/admin/AdminAuthShell.tsx), [`components/admin/admin-form-styles.ts`](../components/admin/admin-form-styles.ts), [`components/admin/admin-nav-links.tsx`](../components/admin/admin-nav-links.tsx)
+**Chrome:** top nav (`Overview`, `Scores`, `Upload`) via [`admin-shell.tsx`](../components/admin/admin-shell.tsx) + [`admin-nav-links.tsx`](../components/admin/admin-nav-links.tsx). Breadcrumbs on nested pages ([`admin-page-header.tsx`](../components/admin/admin-page-header.tsx)).
+
+**Patterns:**
+
+- **Overview** (`/admin`): stat cards (tabular nums) + compact recent score list.
+- **Scores index** (`/admin/scores`): URL filters (`q`, `visibility`), hairline list rows ([`admin-score-list.tsx`](../components/admin/admin-score-list.tsx)) with Geist titles — not catalog Newsreader work titles. Preview thumbs in white frames when available.
+- **Upload** (`/admin/upload`): grouped `AdminSection` cards (file → rights → catalog). Success redirects to edit with `?uploaded=1`.
+- **Edit** (`/admin/scores/{id}`): two-column layout — sectioned form left, sticky sidebar (preview, download, public link) right; danger zone for delete; sticky save bar.
+
+License and visibility use `EditionSelect` (boxed triggers). Required license on every score.
+
+Maps to: [`AdminAuthShell.tsx`](../components/admin/AdminAuthShell.tsx) (login/setup), [`admin-form-styles.ts`](../components/admin/admin-form-styles.ts), [`admin-form-fields.tsx`](../components/admin/admin-form-fields.tsx).
 
 ## Do's and don'ts
 

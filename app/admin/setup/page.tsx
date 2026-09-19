@@ -12,6 +12,7 @@ export default async function AdminSetupPage() {
 
   return (
     <AdminAuthShell
+      className="max-w-lg"
       title="Create admin account"
       description="This instance has no admin yet. Create the first account to manage the catalog."
     >

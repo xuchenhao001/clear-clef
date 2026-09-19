@@ -13,18 +13,19 @@ function navLinkClassName(active: boolean) {
 
 export function AdminNavLinks() {
   const pathname = usePathname();
-  const onDashboard = pathname === "/admin";
-  const onScores = pathname.startsWith("/admin/scores");
+  const onOverview = pathname === "/admin";
+  const onScores =
+    pathname === "/admin/scores" || pathname.startsWith("/admin/scores/");
   const onUpload = pathname.startsWith("/admin/upload");
 
   return (
     <nav className="flex items-center gap-4" aria-label="Admin">
       <Link
         href="/admin"
-        className={navLinkClassName(onDashboard)}
-        aria-current={onDashboard ? "page" : undefined}
+        className={navLinkClassName(onOverview)}
+        aria-current={onOverview ? "page" : undefined}
       >
-        Dashboard
+        Overview
       </Link>
       <Link
         href="/admin/scores"
