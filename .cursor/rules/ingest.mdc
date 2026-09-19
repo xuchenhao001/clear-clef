@@ -1,6 +1,6 @@
 ---
 description: MusicXML ingest, upload security, and metadata extraction
-globs: app/admin/**,lib/ingest/**,app/api/**/upload/**
+globs: app/admin/**,lib/ingest/**,app/api/admin/**
 alwaysApply: false
 ---
 

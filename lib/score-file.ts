@@ -54,3 +54,7 @@ export function scoreFileContentType(scoreFile: ScoreFile): string {
     ? MUSICXML_COMPRESSED_MIME
     : MUSICXML_UNCOMPRESSED_MIME;
 }
+
+export function originalDownloadFilename(slug: string, r2Key: string): string {
+  return isMxlR2Key(r2Key) ? `${slug}.mxl` : `${slug}.musicxml`;
+}

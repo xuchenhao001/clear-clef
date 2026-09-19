@@ -1,8 +1,12 @@
-import { and, desc, eq, inArray, type SQL } from "drizzle-orm";
+import { and, desc, eq, type SQL } from "drizzle-orm";
 import type { DrizzleD1Database } from "drizzle-orm/d1";
 import { getDbAsync } from "@/lib/db";
 import * as schema from "@/lib/db/schema";
 import { scoreTags, scores, tags } from "@/lib/db/schema";
+import {
+  attachTagsToRows,
+  fetchTagsForScore,
+} from "@/lib/scores/tag-attachments";
 
 export type CatalogDb = DrizzleD1Database<typeof schema>;
 export type CatalogFilters = {
@@ -25,38 +29,6 @@ export type PublicCatalogScore = {
   createdAt: Date;
   tags: { slug: string; label: string }[];
 };
-
-async function attachTagsToScores(
-  database: CatalogDb,
-  rows: Omit<PublicCatalogScore, "tags">[],
-): Promise<PublicCatalogScore[]> {
-  if (rows.length === 0) {
-    return [];
-  }
-
-  const scoreIds = rows.map((row) => row.id);
-  const tagRows = await database
-    .select({
-      scoreId: scoreTags.scoreId,
-      slug: tags.slug,
-      label: tags.label,
-    })
-    .from(scoreTags)
-    .innerJoin(tags, eq(tags.id, scoreTags.tagId))
-    .where(inArray(scoreTags.scoreId, scoreIds));
-
-  const tagsByScore = new Map<string, { slug: string; label: string }[]>();
-  for (const row of tagRows) {
-    const existing = tagsByScore.get(row.scoreId) ?? [];
-    existing.push({ slug: row.slug, label: row.label });
-    tagsByScore.set(row.scoreId, existing);
-  }
-
-  return rows.map((row) => ({
-    ...row,
-    tags: tagsByScore.get(row.id) ?? [],
-  }));
-}
 
 export async function listPublicScores(
   filters: CatalogFilters = {},
@@ -102,7 +74,7 @@ export async function listPublicScores(
         .where(and(...conditions))
         .orderBy(desc(scores.createdAt));
 
-  return attachTagsToScores(database, rows);
+  return attachTagsToRows(database, rows);
 }
 
 export async function getPublicScoreBySlug(slug: string, db?: CatalogDb) {
@@ -117,14 +89,7 @@ export async function getPublicScoreBySlug(slug: string, db?: CatalogDb) {
     return null;
   }
 
-  const scoreTagRows = await database
-    .select({
-      slug: tags.slug,
-      label: tags.label,
-    })
-    .from(scoreTags)
-    .innerJoin(tags, eq(tags.id, scoreTags.tagId))
-    .where(eq(scoreTags.scoreId, score.id));
+  const scoreTagRows = await fetchTagsForScore(database, score.id);
 
   return { ...score, tags: scoreTagRows };
 }

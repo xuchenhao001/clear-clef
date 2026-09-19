@@ -7,6 +7,7 @@ import {
 import {
   isMxlBuffer,
   isMxlR2Key,
+  originalDownloadFilename,
   scoreFileContentType,
   shouldLoadMxlBuffer,
   toScoreFile,
@@ -66,6 +67,15 @@ describe("toScoreFile", () => {
         new Uint8Array([0x3c, 0x3f, 0x78, 0x6d]).buffer,
       ),
     ).toBe(true);
+  });
+
+  it("builds attachment filenames from slug and original key", () => {
+    expect(
+      originalDownloadFilename("my-work", "scores/id/original.mxl"),
+    ).toBe("my-work.mxl");
+    expect(
+      originalDownloadFilename("my-work", "scores/id/original.musicxml"),
+    ).toBe("my-work.musicxml");
   });
 
   it("returns null when r2Key is missing", () => {

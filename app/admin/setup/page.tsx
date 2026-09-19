@@ -13,7 +13,7 @@ export default async function AdminSetupPage() {
   return (
     <AdminAuthShell
       title="Create admin account"
-      description="This instance has no admin yet. Create the first account to manage uploads."
+      description="This instance has no admin yet. Create the first account to manage the catalog."
     >
       <AdminSetupForm />
     </AdminAuthShell>

@@ -40,6 +40,13 @@ Implementation order for ClearClef.
 - Tags (many-to-many)
 - Piano-oriented filters: key, difficulty, license
 
+## Phase 7 — Admin score CRUD (done)
+
+- `/admin/scores` list (all visibilities) and `/admin/scores/{id}` edit
+- `PATCH` / `DELETE` / admin download original / admin preview GET
+- Hard delete (D1 + R2); metadata edit; optional MusicXML file replace with preview regen
+- See [ingest.md](ingest.md)
+
 ## Phase 6 — Contents-list catalog UI (done)
 
 - Credit-grouped contents list (replaces card grid)

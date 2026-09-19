@@ -11,12 +11,17 @@ export default function AdminDashboardPage() {
           Upload scores and manage the public catalog.
         </p>
       </div>
-      <Link
-        href="/admin/upload"
-        className={cn(buttonVariants(), "w-fit")}
-      >
-        Upload a score
-      </Link>
+      <div className="flex flex-wrap gap-3">
+        <Link href="/admin/scores" className={cn(buttonVariants(), "w-fit")}>
+          Manage scores
+        </Link>
+        <Link
+          href="/admin/upload"
+          className={cn(buttonVariants({ variant: "outline" }), "w-fit")}
+        >
+          Upload a score
+        </Link>
+      </div>
     </div>
   );
 }

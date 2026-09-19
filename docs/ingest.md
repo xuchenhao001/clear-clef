@@ -2,14 +2,21 @@
 
 Public catalog is **read-only** for visitors. Writes go through a protected admin upload path so the catalog is not an open spam or copyright dump.
 
-## Endpoint
+## Endpoints
 
-- UI: `/admin/upload`
-- API: `POST /api/admin/upload`
-- Auth: **Better Auth** on D1 (email/password; public sign-up disabled; first admin via `/admin/setup`)
-- Optional later: Turnstile on the form
+| Action | UI | API |
+| --- | --- | --- |
+| Create | `/admin/upload` | `POST /api/admin/upload` |
+| List / edit | `/admin/scores`, `/admin/scores/{id}` | `PATCH /api/admin/scores/{id}` |
+| Delete | edit form | `DELETE /api/admin/scores/{id}` |
+| Download original | list / edit | `GET /api/admin/scores/{id}/file` (`Content-Disposition: attachment`) |
+| Preview (ingest / replace) | browser after upload or file replace | `PUT /api/admin/scores/{id}/preview` |
 
-Anyone can *read*. Admins *write*.
+Auth: **Better Auth** on D1 (email/password; public sign-up disabled; first admin via `/admin/setup`). Optional later: Turnstile on upload.
+
+Anyone can *read* the public catalog. Admins *write*.
+
+**Edit:** metadata (title, composer, license, visibility, tags, etc.) is saved via `PATCH`. Slug is stable after create. Optional file replace re-ingests MusicXML into the same `scores/{id}/` prefix (XXE-hardened path) and regenerates page-1 preview in the admin browser. **Delete** removes the D1 row (cascade `score_tags`) and all R2 objects under `scores/{id}/`.
 
 ## Accepted inputs
 

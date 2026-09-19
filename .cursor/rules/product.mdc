@@ -6,7 +6,7 @@ alwaysApply: true
 # ClearClef product
 
 - Use **pnpm** only (`packageManager` in `package.json`). Do not add `package-lock.json`.
-- Public **catalog**: anyone reads; **admin-only writes** in v1 (`/admin/upload`, Better Auth admin role).
+- Public **catalog**: anyone reads; **admin-only writes** in v1 (`/admin/scores`, `/admin/upload`, Better Auth admin role).
 - Canonical score format: **MusicXML** (target 4.x partwise; v1 stores sanitized original at ingest); prefer `.mxl` on R2; keep original + canonical.
 - List/detail = Server Components + D1 (`visibility = 'public'`). No Verovio/WASM on index.
 - Viewer = client-only (`next/dynamic` + `ssr: false`); paginate SVG; no SSR of engraved scores.

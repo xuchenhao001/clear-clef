@@ -348,7 +348,6 @@ No scroll-driven or entry animation in v1.
 - Encoded-breaks toggle (“match the edition”) for print comparison.
 - SMuFL webfont on viewer route is optional later ([rendering.md](rendering.md)).
 - Form validation states beyond focus not fully specified.
-- Admin metadata edit is a follow-up.
 
 ## Provenance
 

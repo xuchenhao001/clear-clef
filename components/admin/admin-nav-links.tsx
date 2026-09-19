@@ -14,6 +14,7 @@ function navLinkClassName(active: boolean) {
 export function AdminNavLinks() {
   const pathname = usePathname();
   const onDashboard = pathname === "/admin";
+  const onScores = pathname.startsWith("/admin/scores");
   const onUpload = pathname.startsWith("/admin/upload");
 
   return (
@@ -24,6 +25,13 @@ export function AdminNavLinks() {
         aria-current={onDashboard ? "page" : undefined}
       >
         Dashboard
+      </Link>
+      <Link
+        href="/admin/scores"
+        className={navLinkClassName(onScores)}
+        aria-current={onScores ? "page" : undefined}
+      >
+        Scores
       </Link>
       <Link
         href="/admin/upload"

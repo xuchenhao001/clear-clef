@@ -14,7 +14,7 @@ export default async function AdminLoginPage() {
   return (
     <AdminAuthShell
       title="Admin sign in"
-      description="Sign in with your admin account to manage uploads."
+      description="Sign in with your admin account to manage the catalog."
     >
       <Suspense fallback={<p className="type-body-sm text-edition-muted">Loading…</p>}>
         <AdminLoginForm />
