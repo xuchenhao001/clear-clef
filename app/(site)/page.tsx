@@ -4,10 +4,12 @@ import { CatalogHero } from "@/components/catalog/catalog-hero";
 import { ContentsList } from "@/components/catalog/contents-list";
 import { buttonVariants } from "@/components/ui/button";
 import { hasCatalogFilters, readCatalogFilters } from "@/lib/catalog/search-params";
+import { PUBLIC_PAGE_REVALIDATE_SECONDS } from "@/lib/cache/public-pages";
 import { listPublicScores } from "@/lib/scores/queries";
 import { cn } from "cn";
 
-export const dynamic = "force-dynamic";
+// Filtered views pass searchParams → dynamic render; ISR still bounds unfiltered catalog.
+export const revalidate = PUBLIC_PAGE_REVALIDATE_SECONDS;
 
 type HomePageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;

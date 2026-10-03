@@ -78,7 +78,7 @@ export function ThemeMenu({ className, align = "end" }: ThemeMenuProps) {
       <Menu.Trigger
         type="button"
         className={cn(
-          "inline-flex size-9 items-center justify-center rounded-full text-edition-muted edition-interactive-transition hover:bg-edition-hover hover:text-edition-ink focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-edition-hairline-strong/50",
+          "inline-flex size-10 items-center justify-center rounded-full text-edition-muted edition-interactive-transition hover:bg-edition-hover hover:text-edition-ink focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-edition-focus-ring coarse:min-h-11 coarse:min-w-11",
           className,
         )}
         aria-label={triggerLabel}

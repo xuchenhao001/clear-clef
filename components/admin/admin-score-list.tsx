@@ -44,12 +44,12 @@ export function AdminScoreList({ scores, compact = false }: AdminScoreListProps)
                   "min-w-0 flex-1 rounded-lg border border-transparent px-2 py-1 -mx-2",
                   "edition-interactive-transition",
                   "hover:border-edition-hairline hover:bg-edition-hover",
-                  "focus-visible:border-edition-hairline focus-visible:bg-edition-hover focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-edition-hairline-strong/50",
+                  "focus-visible:border-edition-hairline focus-visible:bg-edition-hover focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-edition-focus-ring",
                 )}
               >
                 <div className="flex items-center gap-4">
                   {score.previewR2Key && !compact ? (
-                    <div className="hidden h-16 w-24 shrink-0 overflow-hidden rounded-lg border border-edition-hairline bg-white p-1 sm:block">
+                    <div className="hidden h-16 w-24 shrink-0 overflow-hidden rounded-lg border border-edition-hairline bg-edition-surface-page p-1 sm:block">
                       {/* eslint-disable-next-line @next/next/no-img-element -- admin preview API */}
                       <img
                         src={`/api/admin/scores/${score.id}/preview`}

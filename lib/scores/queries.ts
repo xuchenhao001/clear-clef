@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { and, desc, eq, type SQL } from "drizzle-orm";
 import type { DrizzleD1Database } from "drizzle-orm/d1";
 import { getDbAsync } from "@/lib/db";
@@ -16,6 +17,15 @@ export type CatalogFilters = {
   tag?: string;
 };
 
+function catalogFiltersCacheKey(filters: CatalogFilters): string {
+  return JSON.stringify({
+    key: filters.key ?? null,
+    difficulty: filters.difficulty ?? null,
+    license: filters.license ?? null,
+    tag: filters.tag ?? null,
+  });
+}
+
 export type PublicCatalogScore = {
   id: string;
   slug: string;
@@ -30,10 +40,11 @@ export type PublicCatalogScore = {
   tags: { slug: string; label: string }[];
 };
 
-export async function listPublicScores(
-  filters: CatalogFilters = {},
+const listPublicScoresCached = cache(async function listPublicScoresCached(
+  filtersKey: string,
   db?: CatalogDb,
 ): Promise<PublicCatalogScore[]> {
+  const filters = JSON.parse(filtersKey) as CatalogFilters;
   const database = db ?? await getDbAsync();
   const conditions: SQL[] = [eq(scores.visibility, "public")];
 
@@ -75,9 +86,19 @@ export async function listPublicScores(
         .orderBy(desc(scores.createdAt));
 
   return attachTagsToRows(database, rows);
+});
+
+export async function listPublicScores(
+  filters: CatalogFilters = {},
+  db?: CatalogDb,
+): Promise<PublicCatalogScore[]> {
+  return listPublicScoresCached(catalogFiltersCacheKey(filters), db);
 }
 
-export async function getPublicScoreBySlug(slug: string, db?: CatalogDb) {
+export const getPublicScoreBySlug = cache(async function getPublicScoreBySlug(
+  slug: string,
+  db?: CatalogDb,
+) {
   const database = db ?? await getDbAsync();
   const score = await database
     .select()
@@ -92,14 +113,16 @@ export async function getPublicScoreBySlug(slug: string, db?: CatalogDb) {
   const scoreTagRows = await fetchTagsForScore(database, score.id);
 
   return { ...score, tags: scoreTagRows };
-}
+});
 
 export async function getScoreById(id: string, db?: CatalogDb) {
   const database = db ?? await getDbAsync();
   return database.select().from(scores).where(eq(scores.id, id)).get();
 }
 
-export async function listFilterOptions(db?: CatalogDb) {
+export const listFilterOptions = cache(async function listFilterOptions(
+  db?: CatalogDb,
+) {
   const database = db ?? await getDbAsync();
   const publicScores = await database
     .select({
@@ -127,7 +150,7 @@ export async function listFilterOptions(db?: CatalogDb) {
   ].sort();
 
   return { keys, difficulties, licenses, tags: allTags };
-}
+});
 
 export async function slugExists(slug: string, db?: CatalogDb) {
   const database = db ?? await getDbAsync();

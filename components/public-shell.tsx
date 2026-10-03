@@ -8,7 +8,7 @@ type PublicShellProps = {
 };
 
 const mainFocusClassName =
-  "outline-none focus-visible:ring-3 focus-visible:ring-edition-hairline-strong/50";
+  "outline-none focus-visible:ring-3 focus-visible:ring-edition-focus-ring";
 
 export function PublicShell({ children, mainClassName }: PublicShellProps) {
   return (

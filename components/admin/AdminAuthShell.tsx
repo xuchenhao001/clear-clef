@@ -32,7 +32,7 @@ export function AdminAuthShell({
         id="content"
         tabIndex={-1}
         className={cn(
-          "w-full max-w-md outline-none focus-visible:ring-3 focus-visible:ring-edition-hairline-strong/50",
+          "w-full max-w-md outline-none focus-visible:ring-3 focus-visible:ring-edition-focus-ring",
           className,
         )}
       >

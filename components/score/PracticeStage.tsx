@@ -56,6 +56,7 @@ export function PracticeStage({
   const stageRef = useRef<HTMLDivElement>(null);
   const slotRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
+  const toolbarRef = useRef<HTMLDivElement>(null);
   const svgCacheRef = useRef(new Map<number, string>());
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
   const historyPushedRef = useRef(false);
@@ -390,7 +391,48 @@ export function PracticeStage({
       return;
     }
 
+    const dialog = dialogRef.current;
+    if (!dialog) {
+      return;
+    }
+
+    const inertedSiblings: HTMLElement[] = [];
+    for (const child of document.body.children) {
+      if (child !== dialog && child instanceof HTMLElement) {
+        child.inert = true;
+        inertedSiblings.push(child);
+      }
+    }
+
+    const focusableInDialog = () => {
+      const toolbar = toolbarRef.current;
+      const toolbarInert = toolbar?.inert ?? false;
+      return Array.from(
+        dialog.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter((element) => !toolbarInert || !toolbar?.contains(element));
+    };
+
     const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Tab") {
+        const focusables = focusableInDialog();
+        if (focusables.length > 0) {
+          const first = focusables[0];
+          const last = focusables[focusables.length - 1];
+          if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last.focus();
+            return;
+          }
+          if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
+            return;
+          }
+        }
+      }
+
       if (shouldIgnoreKeyboardTarget(event.target)) {
         return;
       }
@@ -407,7 +449,12 @@ export function PracticeStage({
     };
 
     window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      for (const element of inertedSiblings) {
+        element.inert = false;
+      }
+    };
   }, [open, turn, handleClose]);
 
   useEffect(() => {
@@ -424,6 +471,7 @@ export function PracticeStage({
   const pageLabel = formatPageLabel(visiblePages, pageCount);
   const canPrev = canStepPrev(currentPage, layoutMode);
   const canNext = canStepNext(currentPage, pageCount, layoutMode);
+  const chromeInteractive = chromeVisible || reducedMotion;
 
   return createPortal(
     <div
@@ -442,10 +490,16 @@ export function PracticeStage({
         paddingRight: "env(safe-area-inset-right)",
       }}
       onPointerMove={showChrome}
+      onFocusCapture={() => {
+        showChrome();
+      }}
     >
       <div
+        ref={toolbarRef}
+        inert={chromeInteractive ? undefined : true}
+        aria-hidden={chromeInteractive ? undefined : true}
         className={`flex shrink-0 items-center justify-between gap-4 border-b border-edition-hairline px-4 transition-opacity duration-200 ${
-          chromeVisible || reducedMotion ? "opacity-100" : "pointer-events-none opacity-0"
+          chromeInteractive ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
         style={{ minHeight: CHROME_HEIGHT_PX }}
       >

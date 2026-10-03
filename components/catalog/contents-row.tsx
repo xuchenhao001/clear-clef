@@ -26,7 +26,7 @@ export function ContentsRow({ score }: ContentsRowProps) {
           "group flex items-center justify-between gap-6 rounded-xl border border-transparent px-4 py-5",
           "edition-interactive-transition",
           "hover:border-edition-hairline hover:bg-edition-hover",
-          "focus-visible:border-edition-hairline focus-visible:bg-edition-hover focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-edition-hairline-strong/50",
+          "focus-visible:border-edition-hairline focus-visible:bg-edition-hover focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-edition-focus-ring",
         )}
       >
         <div className="min-w-0 flex-1 space-y-2">
@@ -57,7 +57,7 @@ export function ContentsRow({ score }: ContentsRowProps) {
             <div className="relative h-20 w-28 overflow-hidden rounded-sm bg-edition-surface-page">
               <Image
                 src={`/api/scores/${score.id}/preview`}
-                alt={`First page of ${score.title}`}
+                alt=""
                 fill
                 unoptimized
                 className="object-contain p-0.5"

@@ -6,9 +6,10 @@ import { ScoreRights } from "@/components/score/ScoreRights";
 import { ScoreViewerLoader } from "@/components/score/ScoreViewerLoader";
 import { formatCatalogLine } from "@/lib/scores/catalog-line";
 import { isMxlR2Key } from "@/lib/score-file";
+import { PUBLIC_PAGE_REVALIDATE_SECONDS } from "@/lib/cache/public-pages";
 import { getPublicScoreBySlug } from "@/lib/scores/queries";
 
-export const dynamic = "force-dynamic";
+export const revalidate = PUBLIC_PAGE_REVALIDATE_SECONDS;
 
 type ScorePageProps = {
   params: Promise<{ slug: string }>;

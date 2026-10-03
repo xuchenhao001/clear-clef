@@ -34,6 +34,7 @@ tools/sheetsage2-lab/
 - WSL2 Linux with NVIDIA driver + CUDA (`nvidia-smi` shows your GPU)
 - [uv](https://docs.astral.sh/uv/) on `PATH`
 - FFmpeg (`ffmpeg -version`)
+- [faad](https://packages.debian.org/faad) for Nero AAC files that ffmpeg cannot decode (`sudo apt install faad`). These often arrive as `.mp3` but are M4A/AAC from the Nero encoder.
 - Hugging Face access to **both** `m-a-p/SheetSage2` and `m-a-p/MERT-v2-FullSong`
 
 ```bash
@@ -80,14 +81,33 @@ cd tools/sheetsage2-lab
 uv run --no-sync python app.py
 ```
 
-Open [http://127.0.0.1:7860](http://127.0.0.1:7860). Upload audio, transcribe, then:
+Open [http://127.0.0.1:7860](http://127.0.0.1:7860).
+
+### Queue several files
+
+1. **Add audio files** (multi-select) or **Add a recording** (microphone). Each upload appends to the queue; duplicates are ignored.
+2. Optionally remove **queued** rows with **Remove selected** (pick the row in **Select in queue**). **Clear finished** drops done and failed rows.
+3. Click **Transcribe queue**. The GPU processes **one file at a time**; the batch progress bar shows overall position and the active encoding window.
+4. When a file finishes, the **Selected score** pane opens that result automatically. Use **Select in queue** to switch between finished (or failed) jobs.
+
+Per file:
 
 - **Transcription preview** (Files tab) — `transcription.mid` → `preview.wav`.
 - **score.mxl** — MuseScore or ClearClef `/admin/upload`.
 
-Also: ABC / MIDI / MusicXML downloads. Editing ABC and re-converting does not refresh audio; transcribe again to update MIDI/WAV.
+Also: ABC / MIDI / MusicXML downloads. **Convert ABC → MusicXML** writes into the **currently open** job only. Editing ABC and re-converting does not refresh audio; transcribe again to update MIDI/WAV.
 
-The model loads once at startup (may take a minute). One transcription runs at a time.
+If one file fails, the error appears on that queue row and the batch continues with the next file.
+
+**Cancel** stops the batch after the file currently on the GPU finishes. Remaining **queued** files are left in the queue so you can run **Transcribe queue** again.
+
+### Output on disk
+
+Each successful job writes under `tools/sheetsage2-lab/runs/<audio-filename>/` (gitignored), using the upload’s basename without extension (for example `runs/prelude/` for `prelude.m4a`). If that folder already exists, the lab uses `prelude_2`, `prelude_3`, and so on. Expect `score.abc`, `score.mxl`, MIDI files, `events.json`, and `preview.wav`. The UI shows the repo-relative path on finished queue rows and in the status line; the absolute path is also listed there.
+
+Non-WAV/FLAC/AIFF uploads are transcoded to `source.wav` in that folder first. ffmpeg tries a salvage decode, then the lab falls back to `faad` when ffmpeg only recovers a fraction of a second (typical of Nero AAC). Each attempt is appended to `decode.log` in the same folder.
+
+The model loads once at startup (may take a minute). Only one transcription runs at a time on the GPU.
 
 ## License note
 

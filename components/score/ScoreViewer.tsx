@@ -47,6 +47,7 @@ export default function ScoreViewer({
   const [loading, setLoading] = useState(true);
   const [practiceOpen, setPracticeOpen] = useState(false);
   const [practiceXmlId, setPracticeXmlId] = useState<string | null>(null);
+  const [loadAttempt, setLoadAttempt] = useState(0);
 
   const invalidateCache = useCallback(() => {
     svgCacheRef.current.clear();
@@ -104,6 +105,18 @@ export default function ScoreViewer({
     [runEmbeddedLayout],
   );
 
+  const handleRetry = useCallback(() => {
+    toolkitRef.current?.destroy();
+    toolkitRef.current = null;
+    setToolkit(null);
+    setPageCount(0);
+    setCurrentPage(1);
+    setCurrentSvg("");
+    setError(null);
+    setLoading(true);
+    setLoadAttempt((attempt) => attempt + 1);
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
 
@@ -156,7 +169,7 @@ export default function ScoreViewer({
       toolkitRef.current?.destroy();
       toolkitRef.current = null;
     };
-  }, [fileUrl, compressed]);
+  }, [fileUrl, compressed, loadAttempt]);
 
   useEffect(() => {
     if (!toolkit || loading || practiceOpen) {
@@ -247,8 +260,14 @@ export default function ScoreViewer({
 
   if (error) {
     return (
-      <div className="rounded-xl border border-edition-semantic-error/30 bg-edition-semantic-error/5 px-6 py-8 text-sm text-edition-semantic-error">
-        {error}
+      <div
+        role="alert"
+        className="flex flex-col items-start gap-4 rounded-xl border border-edition-semantic-error/30 bg-edition-surface-card px-6 py-8 text-sm text-edition-semantic-error"
+      >
+        <p>{error}</p>
+        <Button type="button" variant="outline" size="sm" onClick={handleRetry}>
+          Retry
+        </Button>
       </div>
     );
   }
@@ -260,12 +279,10 @@ export default function ScoreViewer({
         aria-label={`Engraved score for ${title}`}
         tabIndex={0}
         onKeyDown={handleSectionKeyDown}
-        className="overflow-hidden rounded-xl border border-edition-hairline bg-edition-canvas text-edition-ink outline-none focus-visible:ring-3 focus-visible:ring-edition-hairline-strong/50"
+        className="overflow-hidden rounded-xl border border-edition-hairline bg-edition-canvas text-edition-ink outline-none focus-visible:ring-3 focus-visible:ring-edition-focus-ring"
       >
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-edition-hairline px-4 py-3">
-          <p className="type-caption-mono" aria-label={`Page ${pageLabel}`}>
-            {pageLabel}
-          </p>
+          <p className="type-caption-mono">{pageLabel}</p>
           <div className="flex flex-wrap items-center gap-2">
             <Button
               type="button"

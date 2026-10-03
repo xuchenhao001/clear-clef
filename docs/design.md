@@ -55,16 +55,28 @@ ClearClef reads like a small score library: stone paper, hairline rows, page-1 p
 | `{colors.ink}` | #0c0a09 | Primary text. |
 | `{colors.body}` | #4e4e4e | Running text. |
 | `{colors.body-strong}` | #292524 | Emphasis. |
-| `{colors.muted}` | #777169 | Credit line, subtitles. |
-| `{colors.muted-soft}` | #a8a29e | Disabled, helper text. |
+| `{colors.muted}` | #6b655e | Credit line, subtitles (AA on canvas). |
+| `{colors.muted-soft}` | #8a847d | Disabled, helper text. |
+| `{colors.placeholder}` | #78716c | Input placeholders (light). |
 | `{colors.on-primary}` | #ffffff | Text on ink pill (light mode). |
+
+### Fields and focus
+
+| Token | Hex (light) | Use |
+| --- | --- | --- |
+| `{colors.field-border}` | #8a847d | Input and filter control borders (≥3:1 on white). |
+| `{colors.focus-ring}` | #57534e | `focus-visible` ring on interactive controls. |
+
+Dark mode: `{colors.field-border}` #9ca3af, `{colors.focus-ring}` #d6d3d1, `{colors.placeholder}` #a8a29e.
 
 ### Semantic
 
-| Token | Hex | Use |
+| Token | Hex (light) | Use |
 | --- | --- | --- |
-| `{colors.semantic-success}` | #16a34a | Confirmation. |
-| `{colors.semantic-error}` | #dc2626 | Validation errors. |
+| `{colors.semantic-success}` | #15803d | Confirmation. |
+| `{colors.semantic-error}` | #b91c1c | Validation errors. |
+
+Dark mode semantic text: success #4ade80, error #f87171 (`app/globals.css`).
 
 ### Dark mode — lamp on a stand (locked)
 
@@ -257,7 +269,7 @@ Ink pill. Background `{colors.primary}` (light) or `{colors.primary-dark}` (dark
 
 ### `button-outline`
 
-Transparent pill, 1px `{colors.hairline-strong}` border, ink text.
+Transparent pill, 1px `{colors.field-border}` border (≥3:1 on canvas and card), ink text.
 
 ### `public-shell`
 
@@ -313,7 +325,7 @@ Maps to: [`AdminAuthShell.tsx`](../components/admin/AdminAuthShell.tsx) (login/s
 | Tablet (640-1024px) | Preview visible; nav stays single line |
 | Desktop (> 1024px) | Full contents list with preview column; max width 1200px |
 
-Touch targets: primary pill 40px height minimum.
+Touch targets: 40px height minimum on fine pointers; 44px minimum on coarse pointers (`coarse:` in `globals.css`).
 
 ## CSS variable mapping
 

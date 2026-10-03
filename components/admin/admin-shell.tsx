@@ -14,8 +14,8 @@ export function AdminShell({ email, children }: AdminShellProps) {
     <div className="flex min-h-full flex-col bg-edition-canvas text-edition-ink">
       <SkipToContent />
       <header className="border-b border-edition-hairline bg-edition-canvas">
-        <div className="mx-auto flex h-16 w-full max-w-[1200px] items-center justify-between gap-4 px-6">
-          <div className="flex items-center gap-6">
+        <div className="mx-auto flex min-h-16 w-full max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3 sm:h-16 sm:flex-nowrap sm:gap-4 sm:px-6 sm:py-0">
+          <div className="flex min-w-0 flex-wrap items-center gap-4 sm:gap-6">
             <Link
               href="/"
               className="text-lg font-medium tracking-tight text-edition-ink"
@@ -24,7 +24,7 @@ export function AdminShell({ email, children }: AdminShellProps) {
             </Link>
             <AdminNavLinks />
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex shrink-0 flex-wrap items-center gap-2 sm:gap-3">
             <ThemeMenu />
             <p className="hidden type-body-sm text-edition-muted sm:block">{email}</p>
             <AdminSignOutButton />
@@ -34,7 +34,7 @@ export function AdminShell({ email, children }: AdminShellProps) {
       <main
         id="content"
         tabIndex={-1}
-        className="mx-auto w-full max-w-[1200px] flex-1 px-6 py-8 pb-24 outline-none focus-visible:ring-3 focus-visible:ring-edition-hairline-strong/50"
+        className="mx-auto w-full max-w-[1200px] flex-1 px-6 py-8 pb-24 outline-none focus-visible:ring-3 focus-visible:ring-edition-focus-ring"
       >
         {children}
       </main>

@@ -20,11 +20,11 @@ export function AdminScoreEditSidebar({
       {hasPreview ? (
         <div className="space-y-2">
           <p className="text-sm font-medium text-edition-ink">Page 1 preview</p>
-          <div className="overflow-hidden rounded-xl border border-edition-hairline bg-white p-2">
+          <div className="overflow-hidden rounded-xl border border-edition-hairline bg-edition-surface-page p-2">
             {/* eslint-disable-next-line @next/next/no-img-element -- admin-only SVG from session-gated API */}
             <img
               src={`/api/admin/scores/${scoreId}/preview`}
-              alt="Page 1 preview"
+              alt=""
               className="mx-auto max-h-56 w-full object-contain"
             />
           </div>
