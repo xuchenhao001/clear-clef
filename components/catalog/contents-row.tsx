@@ -23,7 +23,7 @@ export function ContentsRow({ score }: ContentsRowProps) {
       <Link
         href={`/scores/${score.slug}`}
         className={cn(
-          "group flex items-center justify-between gap-6 rounded-xl border border-transparent px-4 py-5",
+          "group relative flex items-center justify-between gap-6 rounded-md border border-transparent px-4 py-4",
           "edition-interactive-transition",
           "hover:border-edition-hairline hover:bg-edition-hover",
           "focus-visible:border-edition-hairline focus-visible:bg-edition-hover focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-edition-focus-ring",
@@ -50,8 +50,8 @@ export function ContentsRow({ score }: ContentsRowProps) {
         {score.previewR2Key ? (
           <div
             className={cn(
-              "hidden shrink-0 rounded-md border border-edition-hairline bg-edition-surface-strong p-1 sm:block",
-              "edition-interactive-transition group-hover:border-edition-hairline-strong",
+              "hidden shrink-0 rounded-md border border-edition-hairline-strong bg-edition-surface-strong p-1 sm:block",
+              "edition-interactive-transition group-hover:border-edition-field-border",
             )}
           >
             <div className="relative h-20 w-28 overflow-hidden rounded-sm bg-edition-surface-page">

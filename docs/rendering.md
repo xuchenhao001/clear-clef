@@ -74,7 +74,7 @@ v1 uses Verovio default glyphs. A dedicated SMuFL webfont (e.g. Bravura) on the 
 
 ## Dark mode (viewer)
 
-Follow [design.md](design.md): **lamp on a stand**. The viewer outer shell uses edition canvas tokens; the inner page stays white. Verovio output is never inverted or re-engraved for dark mode. R2 ingest previews remain black-on-white SVG.
+Follow [design.md](design.md): the viewer **outer shell** uses edition canvas tokens; the **inner page** stays `#ffffff` (notation paper). Verovio output is never inverted or re-engraved for dark mode. R2 ingest previews remain black-on-white SVG.
 
 ## Caching engraved assets
 

@@ -78,6 +78,8 @@ export function EditionSelect({
             triggerVariant === "hairline"
               ? "min-h-11 border-0 border-b border-edition-field-border bg-transparent px-0 py-2 focus-visible:border-edition-field-border"
               : "min-h-11 rounded-md border border-edition-field-border bg-edition-surface-card px-3 py-2 focus-visible:border-edition-field-border",
+            value !== "" && triggerVariant === "hairline" && "archive-locator-active border-b-edition-locator",
+            value !== "" && triggerVariant === "boxed" && "archive-locator-active",
           )}
         >
           <Select.Value placeholder={placeholder} />

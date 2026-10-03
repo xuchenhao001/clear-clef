@@ -13,12 +13,12 @@ export function AdminShell({ email, children }: AdminShellProps) {
   return (
     <div className="flex min-h-full flex-col bg-edition-canvas text-edition-ink">
       <SkipToContent />
-      <header className="border-b border-edition-hairline bg-edition-canvas">
-        <div className="mx-auto flex min-h-16 w-full max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3 sm:h-16 sm:flex-nowrap sm:gap-4 sm:px-6 sm:py-0">
+      <header className="border-b border-edition-hairline-strong bg-edition-surface-card shadow-sm">
+        <div className="mx-auto flex min-h-14 w-full max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3 sm:h-14 sm:flex-nowrap sm:gap-4 sm:px-6 sm:py-0">
           <div className="flex min-w-0 flex-wrap items-center gap-4 sm:gap-6">
             <Link
               href="/"
-              className="text-lg font-medium tracking-tight text-edition-ink"
+              className="font-mono text-sm font-medium tracking-tight text-edition-ink uppercase"
             >
               ClearClef
             </Link>

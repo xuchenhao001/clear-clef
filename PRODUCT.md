@@ -22,7 +22,7 @@ ClearClef makes **edition-quality engraved scores** discoverable and readable on
 
 ## Positioning
 
-A **score library with lamp dark mode**: catalog chrome can darken while **notation stays ink on white paper**; canonical storage is sanitized MusicXML with **page-1 preview SVG generated at ingest**, not per-request server engraving.
+A **score catalog in an archive finding-aid register**: reading-room chrome (light or dark) while **notation stays ink on white paper**; canonical storage is sanitized MusicXML with **page-1 preview SVG generated at ingest**, not per-request server engraving.
 
 ## Capabilities (v1)
 

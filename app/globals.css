@@ -8,10 +8,10 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-public-sans);
   --font-mono: var(--font-geist-mono);
-  --font-display: var(--font-newsreader);
-  --font-heading: var(--font-geist-sans);
+  --font-display: var(--font-spectral);
+  --font-heading: var(--font-public-sans);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -59,6 +59,8 @@
   --color-edition-semantic-success: var(--edition-semantic-success);
   --color-edition-semantic-error: var(--edition-semantic-error);
   --color-edition-hover: var(--edition-hover);
+  --color-edition-locator: var(--edition-locator);
+  --color-edition-on-locator: var(--edition-on-locator);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -71,23 +73,25 @@
 :root {
   color-scheme: light;
   accent-color: var(--edition-ink);
-  --radius: 0.625rem;
-  --edition-canvas: #f5f5f5;
-  --edition-ink: #0c0a09;
-  --edition-body: #4e4e4e;
-  --edition-muted: #6b655e;
-  --edition-muted-soft: #8a847d;
-  --edition-placeholder: #78716c;
-  --edition-field-border: #8a847d;
-  --edition-focus-ring: #57534e;
-  --edition-hairline: #e7e5e4;
-  --edition-hairline-soft: #f0efed;
-  --edition-hairline-strong: #d6d3d1;
+  --radius: 0.5rem;
+  --edition-canvas: #f1ece4;
+  --edition-ink: #121a15;
+  --edition-body: #3a3835;
+  --edition-muted: #4d4a46;
+  --edition-muted-soft: #5f5b56;
+  --edition-placeholder: #4a4744;
+  --edition-field-border: #4a4744;
+  --edition-focus-ring: #121a15;
+  --edition-hairline: #d4ccc2;
+  --edition-hairline-soft: #e5ddd4;
+  --edition-hairline-strong: #b5a99c;
   --edition-surface-page: #ffffff;
-  --edition-surface-card: #ffffff;
-  --edition-surface-strong: #f0efed;
-  --edition-primary: #292524;
-  --edition-on-primary: #ffffff;
+  --edition-surface-card: #f6f1e6;
+  --edition-surface-strong: #e5dccf;
+  --edition-primary: #121a15;
+  --edition-on-primary: #f6f1e6;
+  --edition-locator: #9f1239;
+  --edition-on-locator: #ffffff;
   --edition-semantic-success: #15803d;
   --edition-semantic-error: #b91c1c;
   --edition-hover: color-mix(in srgb, var(--edition-ink) 8%, transparent);
@@ -127,22 +131,24 @@
 .dark {
   color-scheme: dark;
   accent-color: var(--edition-ink);
-  --edition-canvas: #171412;
-  --edition-ink: #f5f5f4;
-  --edition-body: #d6d3d1;
-  --edition-muted: #a8a29e;
-  --edition-muted-soft: #78716c;
-  --edition-placeholder: #a8a29e;
-  --edition-field-border: #9ca3af;
-  --edition-focus-ring: #d6d3d1;
-  --edition-hairline: #3f3a36;
-  --edition-hairline-soft: #292524;
-  --edition-hairline-strong: #57534e;
+  --edition-canvas: #121816;
+  --edition-ink: #e8ebe9;
+  --edition-body: #c5ccc8;
+  --edition-muted: #9aa8a1;
+  --edition-muted-soft: #6f7a74;
+  --edition-placeholder: #9aa8a1;
+  --edition-field-border: #9aa8a1;
+  --edition-focus-ring: #e8ebe9;
+  --edition-hairline: #2e3632;
+  --edition-hairline-soft: #1f2623;
+  --edition-hairline-strong: #3d4843;
   --edition-surface-page: #ffffff;
-  --edition-surface-card: #1c1917;
-  --edition-surface-strong: #292524;
-  --edition-primary: #e7e5e4;
-  --edition-on-primary: #1c1917;
+  --edition-surface-card: #1c211e;
+  --edition-surface-strong: #262b28;
+  --edition-primary: #e8ebe9;
+  --edition-on-primary: #121816;
+  --edition-locator: #fb7185;
+  --edition-on-locator: #121816;
   --edition-hover: color-mix(in srgb, var(--edition-ink) 8%, transparent);
   --edition-semantic-success: #4ade80;
   --edition-semantic-error: #f87171;
@@ -189,6 +195,10 @@
   html {
     @apply font-sans;
   }
+  ::selection {
+    background: color-mix(in srgb, var(--edition-locator) 22%, transparent);
+    color: var(--edition-ink);
+  }
   input::placeholder,
   textarea::placeholder {
     color: var(--edition-placeholder);
@@ -197,20 +207,19 @@
 
 @layer utilities {
   .font-display {
-    font-family: var(--font-newsreader), ui-serif, Georgia, serif;
-    font-variation-settings: "opsz" 72, "wght" 300;
+    font-family: var(--font-spectral), ui-serif, Georgia, serif;
   }
 
   .type-catalog-h1 {
-    @apply font-display text-[2.75rem] font-light leading-[1.08] tracking-[-0.02em] text-edition-ink md:text-[3rem];
+    @apply font-display text-[2.5rem] font-semibold leading-[1.1] tracking-[-0.02em] text-edition-ink md:text-[2.75rem];
   }
 
   .type-work-title {
-    @apply font-display text-2xl font-light leading-[1.2] text-edition-ink;
+    @apply font-display text-[1.375rem] font-semibold leading-[1.25] text-edition-ink;
   }
 
   .type-work-title-detail {
-    @apply font-display text-[2rem] font-light leading-[1.13] tracking-[-0.01em] text-edition-ink md:text-[2rem];
+    @apply font-display text-[1.75rem] font-semibold leading-[1.15] tracking-[-0.01em] text-edition-ink md:text-[2rem];
   }
 
   .type-page-h1 {
@@ -218,7 +227,11 @@
   }
 
   .type-group-label {
-    @apply text-[0.9375rem] font-medium leading-[1.4] text-edition-muted;
+    @apply text-sm font-semibold uppercase leading-[1.35] tracking-[0.06em] text-edition-muted;
+  }
+
+  .type-extent {
+    @apply font-mono text-xs font-normal normal-case tracking-normal text-edition-muted-soft;
   }
 
   .type-body-md {
@@ -250,6 +263,14 @@
   }
 
   .skip-to-content {
-    @apply sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded-full focus:border focus:border-edition-field-border focus:bg-edition-surface-card focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-edition-ink focus:outline-none focus:ring-3 focus:ring-edition-focus-ring;
+    @apply sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded-md focus:border focus:border-edition-field-border focus:bg-edition-surface-card focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-edition-ink focus:outline-none focus:ring-3 focus:ring-edition-focus-ring;
+  }
+
+  .archive-filter-strip {
+    @apply rounded-lg border border-edition-hairline bg-edition-surface-card px-4 py-4 shadow-md;
+  }
+
+  .archive-locator-active {
+    @apply border-edition-locator text-edition-ink ring-2 ring-edition-locator/25;
   }
 }

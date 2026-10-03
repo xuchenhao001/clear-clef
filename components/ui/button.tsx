@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "cn"
 
 const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center rounded-full border border-transparent bg-clip-padding text-[0.9375rem] font-medium whitespace-nowrap edition-interactive-transition outline-none select-none focus-visible:ring-3 focus-visible:ring-edition-focus-ring active:scale-[0.98] disabled:pointer-events-none aria-invalid:border-edition-semantic-error aria-invalid:ring-3 aria-invalid:ring-edition-semantic-error/20 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "group/button inline-flex shrink-0 items-center justify-center rounded-md border border-transparent bg-clip-padding text-[0.9375rem] font-medium whitespace-nowrap edition-interactive-transition outline-none select-none focus-visible:ring-3 focus-visible:ring-edition-focus-ring active:scale-[0.99] disabled:pointer-events-none aria-invalid:border-edition-semantic-error aria-invalid:ring-3 aria-invalid:ring-edition-semantic-error/20 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {

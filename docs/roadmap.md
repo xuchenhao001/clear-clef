@@ -50,8 +50,8 @@ Implementation order for ClearClef.
 ## Phase 6 — Contents-list catalog UI (done)
 
 - Credit-grouped contents list (replaces card grid)
-- Newsreader 300 for catalog H1 and work titles; Geist chrome; Geist Mono metadata
-- Lamp-model viewer chrome; theme menu (Light / Dark / System)
+- Spectral 600 for catalog H1 and work titles; Public Sans chrome; Geist Mono metadata
+- Archive reading-room chrome (unified parchment light theme); white notation invariant; theme menu (Light / Dark / System)
 - Optional `catalog_number` (thematic/opus from MusicXML `<work-number>` or admin override)
 - Sparse metadata line (`catalog_number · key · time`) on list and detail
 - Auto-submit catalog filters (no Apply button)

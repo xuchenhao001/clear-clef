@@ -4,12 +4,12 @@ import { ThemeMenu } from "@/components/theme-menu";
 
 export function SiteHeader() {
   return (
-    <header className="border-b border-edition-hairline bg-edition-canvas">
-      <div className="mx-auto flex h-16 w-full max-w-[1200px] items-center justify-between gap-4 px-6">
+    <header className="border-b border-edition-hairline-strong bg-edition-surface-card shadow-sm">
+      <div className="mx-auto flex h-14 w-full max-w-[1200px] items-center justify-between gap-4 px-6">
         <nav aria-label="Site" className="flex items-center gap-6">
           <Link
             href="/"
-            className="text-lg font-medium tracking-tight text-edition-ink"
+            className="font-mono text-sm font-medium tracking-tight text-edition-ink uppercase"
           >
             ClearClef
           </Link>

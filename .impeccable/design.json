@@ -1,0 +1,76 @@
+{
+  "name": "ClearClef",
+  "description": "Archive finding-aid score catalog; notation stays ink on white paper.",
+  "colors": {
+    "canvas": "#f1ece4",
+    "ink": "#121a15",
+    "body": "#3a3835",
+    "muted": "#4d4a46",
+    "muted-soft": "#5f5b56",
+    "placeholder": "#4a4744",
+    "field-border": "#4a4744",
+    "focus-ring": "#121a15",
+    "hairline": "#d4ccc2",
+    "hairline-soft": "#e5ddd4",
+    "hairline-strong": "#b5a99c",
+    "surface-page": "#ffffff",
+    "surface-card": "#f6f1e6",
+    "surface-strong": "#e5dccf",
+    "primary": "#121a15",
+    "on-primary": "#f6f1e6",
+    "locator": "#9f1239",
+    "on-locator": "#ffffff",
+    "semantic-success": "#15803d",
+    "semantic-error": "#b91c1c",
+    "canvas-dark": "#121816",
+    "ink-dark": "#e8ebe9",
+    "surface-card-dark": "#1c211e",
+    "locator-dark": "#fb7185"
+  },
+  "typography": {
+    "display": {
+      "fontFamily": "var(--font-spectral), Georgia, serif",
+      "fontWeight": 600,
+      "lineHeight": 1.15
+    },
+    "ui": {
+      "fontFamily": "var(--font-public-sans), system-ui, sans-serif",
+      "fontWeight": 400,
+      "lineHeight": 1.5
+    },
+    "metadata": {
+      "fontFamily": "var(--font-geist-mono), ui-monospace, monospace",
+      "fontSize": "12px",
+      "lineHeight": 1.5
+    }
+  },
+  "rounded": {
+    "control": "8px",
+    "card": "8px"
+  },
+  "spacing": {
+    "xs": "8px",
+    "base": "16px",
+    "lg": "24px",
+    "xl": "32px",
+    "section": "96px"
+  },
+  "motion": {
+    "interactive-duration": "200ms",
+    "interactive-ease": "cubic-bezier(0.16, 1, 0.3, 1)"
+  },
+  "components": {
+    "button-primary": {
+      "backgroundColor": "{colors.primary}",
+      "textColor": "{colors.on-primary}",
+      "rounded": "{rounded.control}",
+      "height": "40px"
+    },
+    "button-outline": {
+      "backgroundColor": "transparent",
+      "textColor": "{colors.ink}",
+      "rounded": "{rounded.control}",
+      "height": "40px"
+    }
+  }
+}
