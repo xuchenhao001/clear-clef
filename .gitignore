@@ -54,6 +54,10 @@ Thumbs.db
 coverage/
 .nyc_output/
 
+# Ephemeral agent session notes (not product docs)
+progress.md
+tests.json
+
 # SheetSage2 local trial lab (weights, venv, outputs)
 tools/sheetsage2-lab/.venv/
 tools/sheetsage2-lab/models/
