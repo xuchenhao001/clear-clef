@@ -49,7 +49,7 @@ chmod +x setup.sh
 ./setup.sh
 ```
 
-Install order (handled by `setup.sh`): CUDA PyTorch → snapshot `requirements.txt` → Gradio → re-pin `huggingface-hub==0.36.0`. Do **not** run `uv sync` afterward; it can replace GPU torch with CPU wheels from PyPI.
+Install order (handled by `setup.sh`): CUDA PyTorch → snapshot `requirements.txt` → Gradio → re-pin `huggingface-hub==0.36.2` and `numpy==1.26.4`. Never run `uv sync`: it prunes everything installed outside `pyproject.toml`, including the CUDA PyTorch wheels and the model's own requirements. `uv run` is safe (it updates only `pyproject.toml` dependencies and never prunes), and the pins in `pyproject.toml` keep it from upgrading `huggingface-hub`/`numpy` past what `transformers==4.45.2` and `scipy==1.13.1` accept.
 
 Large CUDA wheels may take 15–20 minutes on first install. If downloads time out, re-run `./setup.sh` or set `UV_HTTP_TIMEOUT=600`.
 
@@ -70,7 +70,7 @@ uv run --no-sync python convert_abc.py runs/smoke/score.abc
 
 Optional CLI clip for a quick try: add `--max-seconds 30` to `infer.py` only.
 
-Use `uv run --no-sync` so the lab venv is not re-resolved against `pyproject.toml` (which would upgrade `huggingface-hub` and break `transformers==4.45.2`).
+Plain `uv run` works too: `pyproject.toml` pins `huggingface-hub<1` and `numpy<2.3`, so syncing cannot break `transformers==4.45.2`. `--no-sync` just skips the (no-op) check.
 
 Expect `runs/smoke/score.abc`, MIDI files, `events.json`, `score.musicxml`, `score.mxl`, and `preview.wav` (when MIDI is present).
 
@@ -78,7 +78,7 @@ Expect `runs/smoke/score.abc`, MIDI files, `events.json`, `score.musicxml`, `sco
 
 ```bash
 cd tools/sheetsage2-lab
-uv run --no-sync python app.py
+uv run app.py
 ```
 
 Open [http://127.0.0.1:7860](http://127.0.0.1:7860).

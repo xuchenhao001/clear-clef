@@ -64,9 +64,11 @@ echo "Installing SheetSage2 snapshot requirements…"
 echo "Installing lab UI (Gradio)…"
 "$UV" pip install 'gradio>=5.26,<6'
 
-# Gradio can upgrade huggingface-hub; SheetSage2 pins transformers 4.45.2.
-echo "Re-pinning huggingface-hub for transformers compatibility…"
-"$UV" pip install huggingface-hub==0.36.0
+# Gradio upgrades huggingface-hub and numpy past what SheetSage2 pins
+# (transformers 4.45.2 needs hub<1.0, scipy 1.13.1 needs numpy<2.3.0). Keep these
+# in step with the pins in pyproject.toml so `uv run app.py` changes nothing.
+echo "Re-pinning huggingface-hub and numpy for transformers/scipy compatibility…"
+"$UV" pip install huggingface-hub==0.36.2 numpy==1.26.4
 
 if command -v git >/dev/null 2>&1 && [[ -d "${MODEL_DIR}/.git" ]]; then
   git -C "${MODEL_DIR}" rev-parse HEAD > REVISION.txt 2>/dev/null || true

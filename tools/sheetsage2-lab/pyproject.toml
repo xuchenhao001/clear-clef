@@ -4,7 +4,16 @@ version = "0.1.0"
 description = "Local SheetSage2 trial UI (not part of ClearClef runtime)"
 readme = "README.md"
 requires-python = ">=3.10,<3.12"
-dependencies = ["gradio>=5.26,<6"]
+# The SheetSage2 snapshot pins transformers==4.45.2 (needs huggingface-hub<1.0),
+# scipy==1.13.1 (needs numpy<2.3.0) and numpy==1.24.3. gradio is the only
+# project dependency, and it pulls both hub and numpy in transitively, so a plain
+# `uv run app.py` would otherwise resolve hub 1.x / numpy 2.x over them and break
+# the model at import. Pin both to what setup.sh installs.
+dependencies = [
+    "gradio>=5.26,<6",
+    "huggingface-hub==0.36.2",
+    "numpy==1.26.4",
+]
 
 [tool.uv]
 package = false
