@@ -1,14 +1,7 @@
 "use client";
 
-import { Menu } from "@base-ui/react/menu";
 import { useSyncExternalStore } from "react";
 import { cn } from "cn";
-import {
-  ThemeDarkIcon,
-  ThemeLightIcon,
-  ThemePreferenceIcon,
-  ThemeSystemIcon,
-} from "@/components/theme-icons";
 import {
   applyThemePreference,
   getStoredThemePreference,
@@ -19,13 +12,7 @@ import {
   type ThemePreference,
 } from "@/lib/theme";
 
-const THEME_OPTIONS: ThemePreference[] = ["light", "dark", "system"];
-
-const THEME_OPTION_ICONS = {
-  light: ThemeLightIcon,
-  dark: ThemeDarkIcon,
-  system: ThemeSystemIcon,
-} as const;
+const CYCLE: ThemePreference[] = ["light", "dark", "system"];
 
 function subscribeToThemeChanges(onStoreChange: () => void) {
   const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
@@ -57,62 +44,35 @@ function subscribeToThemeChanges(onStoreChange: () => void) {
 
 type ThemeMenuProps = {
   className?: string;
-  align?: "start" | "center" | "end";
 };
 
-export function ThemeMenu({ className, align = "end" }: ThemeMenuProps) {
+/** A word in the rail. Each press steps Lamp, Night, System. */
+export function ThemeMenu({ className }: ThemeMenuProps) {
   const preference = useSyncExternalStore<ThemePreference>(
     subscribeToThemeChanges,
     getStoredThemePreference,
     () => "system",
   );
 
-  function choose(next: ThemePreference) {
+  function cycle() {
+    const index = CYCLE.indexOf(preference);
+    const next = CYCLE[(index + 1) % CYCLE.length] ?? "system";
     setThemePreference(next);
   }
 
-  const triggerLabel = `Appearance: ${themePreferenceLabel(preference)}`;
+  const label = themePreferenceLabel(preference);
 
   return (
-    <Menu.Root>
-      <Menu.Trigger
-        type="button"
-        className={cn(
-          "inline-flex size-10 items-center justify-center rounded-full text-edition-muted edition-interactive-transition hover:bg-edition-hover hover:text-edition-ink focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-edition-focus-ring coarse:min-h-11 coarse:min-w-11",
-          className,
-        )}
-        aria-label={triggerLabel}
-        title={triggerLabel}
-      >
-        <ThemePreferenceIcon
-          preference={preference}
-          className="size-[1.125rem]"
-        />
-      </Menu.Trigger>
-      <Menu.Portal>
-        <Menu.Positioner sideOffset={8} align={align}>
-          <Menu.Popup className="z-50 min-w-[9.5rem] origin-[var(--transform-origin)] rounded-xl border border-edition-hairline bg-edition-surface-card p-1 text-edition-ink outline-none transition data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0">
-            {THEME_OPTIONS.map((option) => {
-              const OptionIcon = THEME_OPTION_ICONS[option];
-              return (
-                <Menu.Item
-                  key={option}
-                  className={cn(
-                    "flex cursor-default items-center gap-2 rounded-lg px-3 py-2 text-[0.9375rem] outline-none select-none data-highlighted:bg-edition-hover",
-                    preference === option
-                      ? "font-medium text-edition-ink"
-                      : "font-normal text-edition-muted",
-                  )}
-                  onClick={() => choose(option)}
-                >
-                  <OptionIcon className="size-4 shrink-0" />
-                  {themePreferenceLabel(option)}
-                </Menu.Item>
-              );
-            })}
-          </Menu.Popup>
-        </Menu.Positioner>
-      </Menu.Portal>
-    </Menu.Root>
+    <button
+      type="button"
+      onClick={cycle}
+      className={cn(
+        "type-nav-link edition-interactive-transition hover:text-edition-ink focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-edition-focus-ring",
+        className,
+      )}
+      aria-label={`Appearance: ${label}. Activate to change.`}
+    >
+      {label}
+    </button>
   );
 }

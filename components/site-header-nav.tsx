@@ -4,11 +4,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "cn";
 
-const currentNavClassName =
-  "text-[0.9375rem] font-medium leading-snug text-edition-ink";
-
+// A menu is a value ladder: the current item is bone, everything else sits back
+// in the muted tone and lifts on hover. Selection is a change of value, not a
+// chip — the game never draws a background behind the current entry.
 function navLinkClassName(active: boolean) {
-  return cn(active ? currentNavClassName : "type-nav-link hover:text-edition-ink");
+  return cn(
+    "type-nav-link edition-interactive-transition",
+    active ? "nav-current text-edition-ink" : "hover:text-edition-ink",
+  );
 }
 
 export function CatalogNavLink() {
@@ -21,7 +24,7 @@ export function CatalogNavLink() {
       className={navLinkClassName(onCatalog)}
       aria-current={onCatalog ? "page" : undefined}
     >
-      Catalog
+      Catalogue
     </Link>
   );
 }
@@ -36,7 +39,7 @@ export function AdminNavLink() {
       className={navLinkClassName(onAdmin)}
       aria-current={onAdmin ? "page" : undefined}
     >
-      Admin
+      Register
     </Link>
   );
 }

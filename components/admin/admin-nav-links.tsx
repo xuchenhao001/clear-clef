@@ -4,43 +4,46 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "cn";
 
-const currentNavClassName =
-  "text-[0.9375rem] font-medium leading-snug text-edition-ink";
-
-function navLinkClassName(active: boolean) {
-  return cn(active ? currentNavClassName : "type-nav-link hover:text-edition-ink");
-}
+const ENTRIES = [
+  { href: "/admin", label: "Overview", match: (path: string) => path === "/admin" },
+  {
+    href: "/admin/scores",
+    label: "Scores",
+    match: (path: string) =>
+      path === "/admin/scores" || path.startsWith("/admin/scores/"),
+  },
+  {
+    href: "/admin/upload",
+    label: "Upload",
+    match: (path: string) => path.startsWith("/admin/upload"),
+  },
+] as const;
 
 export function AdminNavLinks() {
   const pathname = usePathname();
-  const onOverview = pathname === "/admin";
-  const onScores =
-    pathname === "/admin/scores" || pathname.startsWith("/admin/scores/");
-  const onUpload = pathname.startsWith("/admin/upload");
 
   return (
-    <nav className="flex items-center gap-4" aria-label="Admin">
-      <Link
-        href="/admin"
-        className={navLinkClassName(onOverview)}
-        aria-current={onOverview ? "page" : undefined}
-      >
-        Overview
-      </Link>
-      <Link
-        href="/admin/scores"
-        className={navLinkClassName(onScores)}
-        aria-current={onScores ? "page" : undefined}
-      >
-        Scores
-      </Link>
-      <Link
-        href="/admin/upload"
-        className={navLinkClassName(onUpload)}
-        aria-current={onUpload ? "page" : undefined}
-      >
-        Upload
-      </Link>
+    <nav aria-label="Register" className="lg:sticky lg:top-20">
+      <p className="type-running-head">Register</p>
+      <ul className="mt-3 border-t border-edition-hairline">
+        {ENTRIES.map((entry) => {
+          const active = entry.match(pathname);
+          return (
+            <li key={entry.href} className="border-b border-edition-hairline-soft">
+              <Link
+                href={entry.href}
+                className={cn(
+                  "type-nav-link inline-flex py-2.5 edition-interactive-transition hover:text-edition-ink",
+                  active && "nav-current",
+                )}
+                aria-current={active ? "page" : undefined}
+              >
+                {entry.label}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
     </nav>
   );
 }

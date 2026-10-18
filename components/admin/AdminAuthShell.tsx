@@ -1,5 +1,5 @@
-import Link from "next/link";
-import { ThemeMenu } from "@/components/theme-menu";
+import { SiteFooter } from "@/components/site-footer";
+import { SiteHeader } from "@/components/site-header";
 import { SkipToContent } from "@/components/skip-to-content";
 import { cn } from "cn";
 
@@ -10,6 +10,13 @@ type AdminAuthShellProps = {
   className?: string;
 };
 
+/**
+ * The sign-in and first-run screens wear the public portal's own chrome: the
+ * same hide header (wordmark, Catalog / Admin with the vermilion current tab,
+ * appearance menu) and the same board colophon. With no score to show, the body
+ * is the marbled endpaper with the plate pasted on — the same treatment as the
+ * public 404 — so the gate reads as part of the binding, not a detached card.
+ */
 export function AdminAuthShell({
   title,
   description,
@@ -17,43 +24,26 @@ export function AdminAuthShell({
   className,
 }: AdminAuthShellProps) {
   return (
-    <div className="relative flex min-h-full flex-col items-center justify-center bg-edition-canvas px-6 py-16 text-edition-ink">
+    <div className="surface-ground flex min-h-dvh flex-col text-edition-ink">
       <SkipToContent />
-      <div className="absolute top-6 right-6 flex items-center gap-4">
-        <Link
-          href="/"
-          className="type-nav-link hidden hover:text-edition-ink sm:inline"
-        >
-          Public catalog
-        </Link>
-        <ThemeMenu />
-      </div>
+      <SiteHeader />
       <main
         id="content"
         tabIndex={-1}
-        className={cn(
-          "w-full max-w-md outline-none focus-visible:ring-3 focus-visible:ring-edition-focus-ring",
-          className,
-        )}
+        className="flex flex-1 items-center justify-center px-6 py-12 outline-none focus-visible:ring-3 focus-visible:ring-edition-focus-ring"
       >
-        <div className="rounded-xl border border-edition-hairline bg-edition-surface-card p-8">
-          <div className="mb-8 space-y-2">
-            <Link
-              href="/"
-              className="text-lg font-medium tracking-tight text-edition-ink"
-            >
-              ClearClef
-            </Link>
-            <p className="type-caption-mono uppercase tracking-wide text-edition-muted">
-              Admin
-            </p>
-            <h1 className="type-page-h1">{title}</h1>
-            <p className="type-body-sm text-edition-muted text-pretty">{description}</p>
-          </div>
-
-          {children}
+        <div className={cn("w-full max-w-md", className)}>
+            <div className="surface-board on-board border border-edition-hairline px-6 py-8 sm:px-8 sm:py-9">
+              <p className="type-imprint">ClearClef · Admin</p>
+              <h1 className="type-page-h1 mt-2 text-balance">{title}</h1>
+              <p className="mt-2 type-body-sm text-edition-muted text-pretty">
+                {description}
+              </p>
+              <div className="mt-8">{children}</div>
+            </div>
         </div>
       </main>
+      <SiteFooter />
     </div>
   );
 }

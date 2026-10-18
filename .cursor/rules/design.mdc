@@ -6,14 +6,22 @@ alwaysApply: false
 
 # ClearClef design
 
-Read [docs/design.md](../docs/design.md) before changing public catalog, viewer, or shared UI styling.
+Read [docs/design.md](../docs/design.md) before changing catalog, viewer, or register styling. If that document and `app/globals.css` disagree, the stylesheet wins, then update the document.
 
-- Canvas `#f5f5f5`, ink pill CTAs, no pastel orbs.
-- Interactive hover uses `--edition-hover` (ink `color-mix` overlay).
-- Newsreader 300 for catalog H1 and work titles only; Geist for nav, filters, group labels, body, and `type-page-h1` admin headings; Geist Mono for metadata and rights line.
-- Never Newsreader on nav, wordmark, buttons, filters, or admin.
-- Catalog index is a credit-grouped contents list with hairline rows, inset rounded hover (`px-4`), and desktop preview thumbnails on `surface-strong` mattes.
-- Catalog filters use Base UI `EditionSelect` popups (edition chrome, not OS native lists); auto-submit on change (no Apply button).
-- `BackToCatalog` outline pill on score detail, score 404, and app 404. `PublicShell` + skip-to-content target `#content` main.
-- Page-1 preview SVG in a white frame. No Verovio on list pages.
-- Dark mode: lamp on a stand — charcoal chrome, white notation page; never invert SVG.
+## Surfaces
+
+- **Ground** (`surface-ground`): navigation, indexes, chapter heads, hints, empty states. Both themes are dark.
+- **Folio** (`surface-folio` + `on-folio`): the engraved score only. Notation inside it stays `#ffffff`.
+- **Plate** (`Plate` / `surface-board`): forms only (sign-in, upload, edit) and floating popups.
+
+Do not put a list or a title on a plate. Do not reintroduce `surface-paper`, `MarbledPanel`, tag pills, or visibility chips.
+
+## Type and color
+
+Capitals are Bitter. Sentence case is EB Garamond. Geist Mono is for identifiers, not page counts or dates.
+
+Gilt marks the current index entry (`nav-current`), the one brass rule, and the live hint. Vermilion is the wordmark bar only. Muted type stays in the warm brown family.
+
+## Interaction
+
+Actions in the catalog, viewer, and register are `type-hint` words. A filled button submits a form. The index is a left column of links, not a row of dropdowns. The masthead is left-aligned over the list.

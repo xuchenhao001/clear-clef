@@ -2,7 +2,6 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { adminFormInputClassName, adminFormLabelClassName } from "@/components/admin/admin-form-styles";
 import { EditionSelect } from "@/components/ui/edition-select";
 import {
   formatAdminScoresSearchPath,
@@ -15,6 +14,10 @@ type AdminScoresFiltersProps = {
   current: AdminScoreListFilters;
 };
 
+/**
+ * Search and visibility for the register. A live value keeps the rubric rule.
+ * Auto-submits on change.
+ */
 export function AdminScoresFilters({ current }: AdminScoresFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -42,31 +45,40 @@ export function AdminScoresFilters({ current }: AdminScoresFiltersProps) {
   }, [q, visibility, router, searchParams]);
 
   const hasFilters = Boolean(visibility || q.trim());
+  const searchLive = q.trim().length > 0;
 
   return (
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-      <div className="grid w-full gap-4 sm:max-w-md">
-        <div className="space-y-2">
-          <label htmlFor="admin-score-search" className={adminFormLabelClassName}>
-            Search
-          </label>
+    <form
+      className="flex flex-wrap items-end gap-x-6 gap-y-4 border-b border-edition-hairline pb-5"
+      onSubmit={(event) => event.preventDefault()}
+    >
+      <div className="flex min-w-[7rem] flex-1 flex-col gap-1 sm:max-w-[20rem]">
+        <label htmlFor="admin-score-search" className="type-label">
+          Search
+        </label>
+        <div
+          className={cn(
+            "relative border-b border-edition-field-border",
+            searchLive && "seal-live border-b-edition-rubric",
+          )}
+        >
           <input
             id="admin-score-search"
             type="search"
             value={q}
             onChange={(event) => setQ(event.target.value)}
             placeholder="Title or composer"
-            className={adminFormInputClassName}
+            className="min-h-11 w-full border-0 bg-transparent px-0 py-2 text-[0.9375rem] text-edition-ink edition-interactive-transition outline-none placeholder:text-edition-placeholder focus-visible:ring-3 focus-visible:ring-edition-focus-ring"
           />
         </div>
       </div>
-      <div className="flex w-full flex-wrap items-end gap-4 sm:w-auto">
+      <div className="flex items-end gap-4">
         <EditionSelect
           name="visibility"
           label="Visibility"
           value={visibility}
-          triggerVariant="boxed"
-          labelVariant="form"
+          triggerVariant="hairline"
+          labelVariant="filter"
           placeholder="All"
           items={[
             { label: "All", value: "" },
@@ -76,23 +88,22 @@ export function AdminScoresFilters({ current }: AdminScoresFiltersProps) {
           ]}
           onValueChange={setVisibility}
         />
-        {hasFilters ? (
+      </div>
+      {hasFilters ? (
+        <div className="flex items-center pb-0.5">
           <button
             type="button"
-            className={cn(
-              "type-nav-link pb-2 hover:text-edition-ink",
-              "edition-interactive-transition",
-            )}
+            className="type-hint hover:text-edition-gilt focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-edition-focus-ring"
             onClick={() => {
               setQ("");
               setVisibility("");
               router.push("/admin/scores");
             }}
           >
-            Clear filters
+            Clear
           </button>
-        ) : null}
-      </div>
-    </div>
+        </div>
+      ) : null}
+    </form>
   );
 }

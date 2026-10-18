@@ -9,7 +9,6 @@ import {
   useSyncExternalStore,
 } from "react";
 import { createPortal } from "react-dom";
-import { Button } from "@/components/ui/button";
 import { PracticeSpread } from "@/components/score/PracticeSpread";
 import { pageTurnFromKeyboard, shouldIgnoreKeyboardTarget } from "@/lib/viewer/keyboard";
 import { shouldReflowLayout, type LayoutSize } from "@/lib/viewer/layout-guard";
@@ -481,7 +480,7 @@ export function PracticeStage({
       aria-modal="true"
       aria-label={`Practice view for ${title}`}
       tabIndex={-1}
-      className="fixed inset-0 z-50 flex flex-col bg-edition-canvas text-edition-ink outline-none"
+      className="surface-board on-board fixed inset-0 z-50 flex flex-col text-edition-ink outline-none"
       style={{
         height: "100dvh",
         paddingTop: "env(safe-area-inset-top)",
@@ -503,29 +502,31 @@ export function PracticeStage({
         }`}
         style={{ minHeight: CHROME_HEIGHT_PX }}
       >
-        <p className="type-caption-mono">{pageLabel}</p>
-        <div className="flex items-center gap-2">
-          <Button
+        <p className="type-shelf">{pageLabel}</p>
+        <div className="flex items-center gap-5">
+          <button
             type="button"
-            variant="outline"
-            size="sm"
             disabled={!canPrev}
             onClick={() => turn("prev")}
+            className="type-hint hover:text-edition-gilt disabled:pointer-events-none disabled:text-edition-muted-soft focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-edition-focus-ring"
           >
             Previous
-          </Button>
-          <Button
+          </button>
+          <button
             type="button"
-            variant="outline"
-            size="sm"
             disabled={!canNext}
             onClick={() => turn("next")}
+            className="type-hint text-edition-gilt hover:text-edition-ink disabled:pointer-events-none disabled:text-edition-muted-soft focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-edition-focus-ring"
           >
             Next
-          </Button>
-          <Button type="button" variant="outline" size="sm" onClick={handleClose}>
+          </button>
+          <button
+            type="button"
+            onClick={handleClose}
+            className="type-hint hover:text-edition-gilt focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-edition-focus-ring"
+          >
             Close
-          </Button>
+          </button>
         </div>
       </div>
 

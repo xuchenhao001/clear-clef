@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Plate } from "@/components/ui/plate";
 
 type AdminDangerZoneProps = {
   title: string;
@@ -11,6 +12,11 @@ type AdminDangerZoneProps = {
   onCancelConfirm: () => void;
 };
 
+/**
+ * The destructive plate: the same leaf as every other section, but ruled in the
+ * rubric (vermilion) instead of brass, so danger reads as a colour of the ledger
+ * rather than a red-tinted card bolted on.
+ */
 export function AdminDangerZone({
   title,
   description,
@@ -20,37 +26,46 @@ export function AdminDangerZone({
   onCancelConfirm,
 }: AdminDangerZoneProps) {
   return (
-    <section className="rounded-xl border border-edition-semantic-error/30 bg-edition-surface-card p-6">
-      <h2 className="text-sm font-semibold text-edition-semantic-error">Danger zone</h2>
-      <p className="mt-2 type-body-sm text-edition-muted">{description}</p>
-      <div className="mt-4 flex flex-wrap items-center gap-3">
-        <Button
-          type="button"
-          variant="destructive"
-          disabled={deletePending}
-          onClick={onDelete}
-        >
-          {confirmDelete
-            ? deletePending
-              ? "Deleting…"
-              : `Confirm delete “${title}”`
-            : "Delete score"}
-        </Button>
-        {confirmDelete && !deletePending ? (
-          <button
+    <Plate edge="rubric">
+      <div className="rule-printed px-4 py-3">
+        <h2 className="font-display text-[0.6875rem] font-semibold tracking-[0.2em] uppercase text-edition-rubric">
+          Danger zone
+        </h2>
+        <p className="mt-1.5 type-body-sm text-edition-muted text-pretty">
+          {description}
+        </p>
+      </div>
+      <div className="p-4 sm:p-6">
+        <div className="flex flex-wrap items-center gap-3">
+          <Button
             type="button"
-            className="text-sm text-edition-muted underline-offset-2 hover:underline"
-            onClick={onCancelConfirm}
+            variant="destructive"
+            disabled={deletePending}
+            onClick={onDelete}
           >
-            Cancel
-          </button>
+            {confirmDelete
+              ? deletePending
+                ? "Deleting…"
+                : `Confirm delete “${title}”`
+              : "Delete score"}
+          </Button>
+          {confirmDelete && !deletePending ? (
+            <button
+              type="button"
+              className="type-nav-link hover:text-edition-ink"
+              onClick={onCancelConfirm}
+            >
+              Cancel
+            </button>
+          ) : null}
+        </div>
+        {confirmDelete ? (
+          <p className="mt-3 type-body-sm text-edition-muted">
+            This permanently removes the score and all stored files. This cannot be
+            undone.
+          </p>
         ) : null}
       </div>
-      {confirmDelete ? (
-        <p className="mt-3 type-body-sm text-edition-muted">
-          This permanently removes the score and all stored files. This cannot be undone.
-        </p>
-      ) : null}
-    </section>
+    </Plate>
   );
 }

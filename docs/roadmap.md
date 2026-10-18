@@ -50,8 +50,9 @@ Implementation order for ClearClef.
 ## Phase 6 — Contents-list catalog UI (done)
 
 - Credit-grouped contents list (replaces card grid)
-- Cormorant Garamond display over EB Garamond text (both self-hosted, Latin subset, real small caps); Public Sans chrome; Geist Mono only for technical strings
-- Archive reading-room chrome (unified parchment light theme); white notation invariant; theme menu (Light / Dark / System)
+- Bitter Egyptian slab for every capital (headings, title, wordmark, labels, buttons, nav), heavy and tightly tracked; EB Garamond for sentence case (self-hosted, Latin subset); Geist Mono only for technical strings. No sans-serif, no small capitals, no third display face (Red Dead recut, menu recut, contents recut)
+- Value structure matches the menus: content sits on near-black **hide panels** (title plate, filter strip, contents plate, admin sections, popups) on an aged **map-paper floor**; brass is the metal and marks the current tab, the one vermilion is reserved for live state; two texture dead ends removed (a camouflaging 285px mottle, a plank-like anisotropic hide grain) and the tile seam ended by building the floor from seamless plain turbulence and painting the panels' lit relief `cover`
+- Archive reading-room chrome; white notation invariant; theme menu (Light / Dark / System)
 - Optional `catalog_number` (thematic/opus from MusicXML `<work-number>` or admin override)
 - Sparse metadata line (`catalog_number · key · time`) on list and detail
 - Auto-submit catalog filters (no Apply button)

@@ -38,13 +38,6 @@ export default async function AdminScoresPage({ searchParams }: AdminScoresPageP
         }
       />
 
-      <Suspense fallback={null}>
-        <AdminScoresFilters
-          key={`${filters.q ?? ""}-${filters.visibility ?? ""}`}
-          current={filters}
-        />
-      </Suspense>
-
       {allScores.length === 0 ? (
         <AdminEmptyState
           title="No scores in the catalog"
@@ -52,15 +45,26 @@ export default async function AdminScoresPage({ searchParams }: AdminScoresPageP
           primaryHref="/admin/upload"
           primaryLabel="Upload score"
         />
-      ) : scores.length === 0 ? (
-        <AdminEmptyState
-          title="No scores match these filters"
-          description="Try a different search or clear filters to see the full list."
-          primaryHref="/admin/scores"
-          primaryLabel="Clear filters"
-        />
       ) : (
-        <AdminScoreList scores={scores} />
+        <>
+          <Suspense fallback={null}>
+            <AdminScoresFilters
+              key={`${filters.q ?? ""}-${filters.visibility ?? ""}`}
+              current={filters}
+            />
+          </Suspense>
+
+          {scores.length === 0 ? (
+            <AdminEmptyState
+              title="No scores match these filters"
+              description="Try a different search or clear filters to see the full list."
+              primaryHref="/admin/scores"
+              primaryLabel="Clear filters"
+            />
+          ) : (
+            <AdminScoreList scores={scores} />
+          )}
+        </>
       )}
     </div>
   );

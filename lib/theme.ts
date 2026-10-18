@@ -4,8 +4,8 @@ export const THEME_STORAGE_KEY = "clear-clef-theme";
 export const THEME_CHANGE_EVENT = "clear-clef-theme-change";
 
 const THEME_LABELS: Record<ThemePreference, string> = {
-  light: "Light",
-  dark: "Dark",
+  light: "Lamp",
+  dark: "Night",
   system: "System",
 };
 

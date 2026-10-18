@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AdminEmptyState } from "@/components/admin/admin-empty-state";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { AdminScoreList } from "@/components/admin/admin-score-list";
 import { AdminStatCard } from "@/components/admin/admin-stat-card";
@@ -15,7 +16,7 @@ export default async function AdminOverviewPage() {
   return (
     <div className="flex flex-col gap-10">
       <AdminPageHeader
-        title="Overview"
+        title="Catalog overview"
         description="Catalog health at a glance. Upload new works or open the full score list to edit metadata."
         actions={
           <>
@@ -33,27 +34,36 @@ export default async function AdminOverviewPage() {
       />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <AdminStatCard label="Total scores" value={stats.total} />
+        <AdminStatCard label="Total" value={stats.total} />
         <AdminStatCard label="Public" value={stats.public} />
         <AdminStatCard label="Unlisted" value={stats.unlisted} />
         <AdminStatCard label="Private" value={stats.private} />
       </div>
 
-      <section className="space-y-4">
-        <div className="flex items-center justify-between gap-4">
-          <h2 className="text-base font-semibold text-edition-ink">Recent scores</h2>
-          {scores.length > 5 ? (
-            <Link href="/admin/scores" className="type-nav-link hover:text-edition-ink">
-              View all
-            </Link>
-          ) : null}
-        </div>
-        {recentScores.length > 0 ? (
-          <AdminScoreList scores={recentScores} compact />
-        ) : (
-          <p className="type-body-md text-edition-muted">No scores yet. Upload your first work.</p>
-        )}
-      </section>
+      {recentScores.length > 0 ? (
+        <AdminScoreList
+          scores={recentScores}
+          compact
+          heading="Recent scores"
+          headAction={
+            scores.length > recentScores.length ? (
+              <Link
+                href="/admin/scores"
+                className="type-nav-link hover:text-edition-ink"
+              >
+                View all
+              </Link>
+            ) : null
+          }
+        />
+      ) : (
+        <AdminEmptyState
+          title="No scores in the catalog"
+          description="Upload a MusicXML file to create the first public catalog entry."
+          primaryHref="/admin/upload"
+          primaryLabel="Upload score"
+        />
+      )}
     </div>
   );
 }

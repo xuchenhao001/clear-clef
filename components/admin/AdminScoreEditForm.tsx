@@ -3,15 +3,13 @@
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { AdminDangerZone } from "@/components/admin/admin-danger-zone";
+import { AdminField, AdminInput } from "@/components/admin/admin-field";
 import {
   AdminCatalogFields,
   AdminRightsFields,
   AdminScoreFileInput,
 } from "@/components/admin/admin-form-fields";
-import {
-  adminFormInputClassName,
-  adminFormLabelClassName,
-} from "@/components/admin/admin-form-styles";
+import { adminFormErrorClassName } from "@/components/admin/admin-form-styles";
 import { AdminSection } from "@/components/admin/admin-section";
 import { AdminScoreEditSidebar } from "@/components/admin/admin-score-edit-sidebar";
 import { AdminStickyActions } from "@/components/admin/admin-sticky-actions";
@@ -169,43 +167,31 @@ export function AdminScoreEditForm({
     <form onSubmit={onSubmit} className="lg:grid lg:grid-cols-[minmax(0,1fr)_280px] lg:gap-10">
       <div className="flex flex-col gap-6">
         <AdminSection legend="Work" description="Displayed title and credits on the public catalog.">
-          <div className="space-y-2">
-            <label htmlFor="title" className={adminFormLabelClassName}>
-              Title
-            </label>
-            <input
+          <AdminField label="Title" htmlFor="title">
+            <AdminInput
               id="title"
               type="text"
               required
               value={form.title}
               onChange={(event) => updateField("title", event.target.value)}
-              className={adminFormInputClassName}
             />
-          </div>
-          <div className="space-y-2">
-            <label htmlFor="composer" className={adminFormLabelClassName}>
-              Composer
-            </label>
-            <input
+          </AdminField>
+          <AdminField label="Composer" htmlFor="composer">
+            <AdminInput
               id="composer"
               type="text"
               value={form.composer}
               onChange={(event) => updateField("composer", event.target.value)}
-              className={adminFormInputClassName}
             />
-          </div>
-          <div className="space-y-2">
-            <label htmlFor="lyricist" className={adminFormLabelClassName}>
-              Lyricist
-            </label>
-            <input
+          </AdminField>
+          <AdminField label="Lyricist" htmlFor="lyricist">
+            <AdminInput
               id="lyricist"
               type="text"
               value={form.lyricist}
               onChange={(event) => updateField("lyricist", event.target.value)}
-              className={adminFormInputClassName}
             />
-          </div>
+          </AdminField>
         </AdminSection>
 
         <AdminSection legend="Catalog metadata" description="Filters and list display on the public index.">
@@ -259,12 +245,12 @@ export function AdminScoreEditForm({
         />
 
         {message ? (
-          <p className="text-sm text-edition-semantic-success" role="status">
+          <p className="type-body-sm text-edition-semantic-success" role="status">
             {message}
           </p>
         ) : null}
         {error ? (
-          <p className="text-sm text-edition-semantic-error" role="alert">
+          <p className={adminFormErrorClassName} role="alert">
             {error}
           </p>
         ) : null}

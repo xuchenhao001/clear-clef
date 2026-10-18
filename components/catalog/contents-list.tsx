@@ -2,7 +2,6 @@ import type { PublicCatalogScore } from "@/lib/scores/queries";
 import { groupScoresByCredit } from "@/lib/scores/group";
 import { ContentsRow } from "@/components/catalog/contents-row";
 import { Fleuron } from "@/components/ui/fleuron";
-import { cn } from "cn";
 
 type ContentsListProps = {
   scores: PublicCatalogScore[];
@@ -13,26 +12,21 @@ export function ContentsList({ scores }: ContentsListProps) {
   const total = scores.length;
 
   return (
-    <div className="surface-leaf shadow-leaf mt-2 overflow-hidden rounded-lg border border-edition-hairline">
-      <div className="rule-printed flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-4 py-3">
-        <span className="type-running-head">Contents</span>
-        <span className="type-running-head">
+    <section className="mt-4" aria-labelledby="catalog-contents">
+      <div className="flex items-baseline justify-between gap-4 border-b border-edition-hairline pb-3">
+        <h2 id="catalog-contents" className="type-running-head">
+          Works
+        </h2>
+        <p className="type-extent">
           {total} {total === 1 ? "work" : "works"}
-        </span>
+        </p>
       </div>
-      {groups.map((group, groupIndex) => (
-        <section
-          key={group.credit}
-          className="border-b border-edition-hairline last:border-b-0"
-        >
-          <div
-            className={cn(
-              "flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-4 pb-3",
-              groupIndex === 0 ? "pt-5" : "pt-8",
-            )}
-          >
-            <h2 className="type-group-label">{group.credit}</h2>
-            <p className="type-extent">
+      {groups.map((group) => (
+        <section key={group.credit} className="pt-8">
+          <div className="mb-1 flex items-center gap-3">
+            <h3 className="type-group-label shrink-0">{group.credit}</h3>
+            <span aria-hidden className="h-px flex-1 bg-edition-hairline" />
+            <p className="type-extent shrink-0">
               {group.scores.length}{" "}
               {group.scores.length === 1 ? "work" : "works"}
             </p>
@@ -46,12 +40,12 @@ export function ContentsList({ scores }: ContentsListProps) {
       ))}
       <div
         aria-hidden
-        className="flex items-center justify-center gap-3 px-4 py-5 text-edition-locator"
+        className="mt-8 flex items-center justify-center gap-3 text-edition-gilt"
       >
         <span className="h-px w-10 bg-edition-hairline-strong" />
-        <Fleuron className="w-5" />
+        <Fleuron className="w-4" />
         <span className="h-px w-10 bg-edition-hairline-strong" />
       </div>
-    </div>
+    </section>
   );
 }

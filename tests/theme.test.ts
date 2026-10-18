@@ -15,8 +15,8 @@ describe("theme preferences", () => {
   });
 
   it("labels preferences for the menu trigger", () => {
-    expect(themePreferenceLabel("light")).toBe("Light");
-    expect(themePreferenceLabel("dark")).toBe("Dark");
+    expect(themePreferenceLabel("light")).toBe("Lamp");
+    expect(themePreferenceLabel("dark")).toBe("Night");
     expect(themePreferenceLabel("system")).toBe("System");
   });
 

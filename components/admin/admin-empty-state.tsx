@@ -1,6 +1,4 @@
 import Link from "next/link";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "cn";
 
 type AdminEmptyStateProps = {
   title: string;
@@ -11,6 +9,7 @@ type AdminEmptyStateProps = {
   secondaryLabel?: string;
 };
 
+/** Nothing to list: a chapter head and hint links, on the same ground as the index. */
 export function AdminEmptyState({
   title,
   description,
@@ -20,20 +19,19 @@ export function AdminEmptyState({
   secondaryLabel,
 }: AdminEmptyStateProps) {
   return (
-    <div className="rounded-xl border border-edition-hairline bg-edition-surface-card px-6 py-12 text-center">
-      <h2 className="text-base font-semibold text-edition-ink">{title}</h2>
-      <p className="mx-auto mt-2 max-w-md type-body-sm text-edition-muted text-pretty">
+    <div className="flex flex-col items-start gap-3 py-2">
+      <p className="type-eyebrow">ClearClef</p>
+      <p className="type-page-h1 text-balance">{title}</p>
+      <span aria-hidden className="rule-gilt block h-0.5 w-16" />
+      <p className="max-w-[46ch] type-body-sm text-edition-body text-pretty">
         {description}
       </p>
-      <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-        <Link href={primaryHref} className={cn(buttonVariants(), "w-fit")}>
+      <div className="mt-2 flex flex-wrap items-center gap-5">
+        <Link href={primaryHref} className="type-hint text-edition-gilt hover:text-edition-ink">
           {primaryLabel}
         </Link>
         {secondaryHref && secondaryLabel ? (
-          <Link
-            href={secondaryHref}
-            className={cn(buttonVariants({ variant: "outline" }), "w-fit")}
-          >
+          <Link href={secondaryHref} className="type-hint hover:text-edition-gilt">
             {secondaryLabel}
           </Link>
         ) : null}

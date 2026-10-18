@@ -1,76 +1,95 @@
 {
   "name": "ClearClef",
-  "description": "Archive finding-aid score catalog; notation stays ink on white paper.",
+  "description": "Score catalog taken from the Red Dead Redemption menus. Type sits on a near-black ground. The folio holds the engraved score. Plates hold forms only.",
+  "rule": "Three surfaces: ground for navigation and lists, folio for notation, plate for forms. Capitals are Bitter. Sentence case is EB Garamond. Geist Mono is for identifiers only. Gilt is the current item. Vermilion is the wordmark bar only.",
+  "valueStructure": "dark ground with light type; paper only for the score; plates only for forms",
   "colors": {
-    "canvas": "#efe8da",
-    "ink": "#1d1a15",
-    "body": "#3a352c",
-    "muted": "#4e483d",
-    "muted-soft": "#5f574a",
-    "placeholder": "#4e483d",
-    "field-border": "#4e483d",
-    "focus-ring": "#1d1a15",
-    "hairline": "#cfc3ad",
-    "hairline-soft": "#ded5c3",
-    "hairline-strong": "#a99c86",
+    "canvas": "#cdb79a",
+    "board": "#16110e",
+    "board-ink": "#f0ece4",
+    "board-muted": "#b3a08c",
+    "board-line": "#3a302b",
+    "ink": "#221a16",
+    "body": "#43362d",
+    "muted": "#57453a",
+    "muted-soft": "#5f4e3e",
+    "print": "#414a3f",
+    "print-on-hide": "#a8ab9a",
+    "placeholder": "#6f5c4c",
+    "field-border": "#6d5a45",
+    "focus-ring": "#221a16",
+    "focus-ring-on-hide": "#f2a92c",
+    "hairline": "#b39d80",
+    "hairline-soft": "#c3ad92",
+    "hairline-strong": "#8a7358",
     "surface-page": "#ffffff",
-    "surface-card": "#f6f0e3",
-    "surface-strong": "#e3d9c6",
-    "primary": "#1d1a15",
-    "on-primary": "#f6f0e3",
-    "locator": "#8f3418",
-    "on-locator": "#f6f0e3",
-    "board": "#241a14",
-    "board-ink": "#e2d6c4",
-    "board-muted": "#a08b73",
-    "board-line": "#4a3626",
-    "marble-ground": "#e6dcc6",
-    "marble-1": "#8f3418",
-    "marble-2": "#6b4a23",
-    "marble-3": "#4a5340",
-    "marble-4": "#3a352c",
-    "marble-5": "#a8763a",
-    "semantic-success": "#15803d",
-    "semantic-error": "#a8321a",
-    "canvas-dark": "#17120e",
-    "ink-dark": "#e9e2d5",
-    "surface-card-dark": "#1f1811",
-    "locator-dark": "#e0916a",
-    "board-dark": "#0f0b08",
-    "marble-ground-dark": "#241c15",
-    "marble-veins-dark": "#7a3d24 / #5f4a2a / #454c3c / #6a6257 / #8a6b42"
+    "surface-strong": "#bfa98d",
+    "surface-well-on-hide": "#100c0a",
+    "primary": "#4b3d3a",
+    "on-primary": "#f0ece4",
+    "gilt": "#a5751a",
+    "gilt-on-hide": "#f2a92c",
+    "gilt-deep": "#7f5a12",
+    "on-gilt": "#241a12",
+    "rubric": "#b3261c",
+    "rubric-on-hide": "#e2493a",
+    "vermilion": "#d92b1e",
+    "slate": "#59616e",
+    "slate-on-hide": "#9aa5b3",
+    "bone": "#f0ece4",
+    "parchment": "#d9c9a6",
+    "leather": "#7d4c2c",
+    "marble-ground": "#c4ad92",
+    "marble-1": "#8a5a2c",
+    "marble-2": "#6d4a2b",
+    "marble-3": "#7a3a30",
+    "marble-4": "#4b3d3a",
+    "marble-5": "#b3803a",
+    "semantic-success": "#4f6b26",
+    "semantic-success-on-hide": "#a7c46a",
+    "semantic-error": "#b3261c",
+    "semantic-error-on-hide": "#e0705f",
+    "semantic-info": "#59616e",
+    "canvas-dark": "#100d0c",
+    "board-dark": "#1a1513",
+    "ink-dark": "#ece4d4",
+    "gilt-dark": "#f2a92c"
   },
-  "typography": {
-    "display": {
-      "fontFamily": "var(--font-cormorant), \"Songti SC\", \"SimSun\", ui-serif, Georgia, serif",
-      "fontWeight": 600,
-      "lineHeight": 1.05,
-      "usage": "title page, page headings, score-detail title, wordmark; 30px and above only",
-      "cjkFallback": "Songti SC / SimSun / Noto Serif CJK SC for CJK work titles"
-    },
-    "text": {
-      "fontFamily": "var(--font-garamond), \"Songti SC\", \"SimSun\", ui-serif, Georgia, serif",
-      "fontWeight": "400 600",
-      "lineHeight": 1.3,
-      "usage": "row titles, credit headings, running heads, extents, shelf marks, colophon",
-      "features": "real smcp/c2sc for small capitals; old-style figures for counts; dlig for titles",
-      "load": "next/font/local, app/fonts/*.woff2, Latin subset, variable weight 400-600"
-    },
-    "ui": {
-      "fontFamily": "var(--font-public-sans), system-ui, sans-serif",
-      "fontWeight": 400,
-      "lineHeight": 1.5
-    },
-    "metadata": {
-      "fontFamily": "var(--font-geist-mono), ui-monospace, monospace",
-      "fontSize": "12px",
-      "lineHeight": 1.5,
-      "usage": "technical strings only: ids, byte sizes, page counters, admin metadata"
+  "provenance": {
+    "from-brief": ["#c22e2e", "#f2a92c", "#7d4c2c", "#c8b19d", "#4b3d3a"],
+    "from-references": {
+      "vermilion": "#d92b1e — the logo 'II' and the map routes/markers; state only",
+      "parchment": "#d9c9a6 — the map sheet",
+      "slate": "#59616e — the map's region lettering; the cool counterpoint",
+      "bone": "#f0ece4 — the logo's letterform white; text on hide",
+      "newsprint olive": "#414a3f — the catalogue pages' printed ink"
     }
   },
+  "typography": {
+    "capitals": {
+      "fontFamily": "var(--font-bitter), \"Songti SC\", \"SimSun\", ui-serif, Georgia, serif",
+      "weights": "400 500 600 700 900",
+      "usage": "catalog H1, page headings, detail title, wordmark (900), nav, buttons, labels, running heads, imprints",
+      "tracking": "0.005em at display sizes; 0.09-0.14em for label sizes — heavy and tight, never light and airy"
+    },
+    "sentence": {
+      "fontFamily": "var(--font-garamond), \"Songti SC\", \"SimSun\", ui-serif, Georgia, serif",
+      "weights": "400 600",
+      "usage": "row titles, credit headings, body reading, extents, shelf marks, form labels",
+      "features": "old-style figures for counts; ligatures",
+      "load": "next/font/local, app/fonts/*.woff2, Latin subset"
+    },
+    "technical": {
+      "fontFamily": "var(--font-geist-mono), ui-monospace, monospace",
+      "fontSize": "12px",
+      "usage": "ids, byte sizes, page counters, admin metadata only"
+    }
+  },
+  "retired": ["Cinzel", "Alegreya Sans", "Rye", "small-caps", "surface-leaf", "surface-paper", "MarbledPanel", "tag pills", "visibility chips"],
   "rounded": {
     "control": "8px",
-    "card": "8px"
+    "card": "8px",
+    "plate": "8px"
   },
   "spacing": {
     "xs": "8px",
@@ -84,28 +103,19 @@
     "interactive-ease": "cubic-bezier(0.16, 1, 0.3, 1)"
   },
   "material": {
-    "paper": "surface-paper: fibre flecks over fine grain, laid and chain lines, top key light, edge vignette",
-    "board": "surface-board: pore over a low-frequency dye blotch, wear at the ends, raking sheen, diagonal falloff",
-    "on-board": "on-board: remaps ink/muted/hairline/focus tokens to board values",
-    "leaf": "surface-leaf + shadow-leaf: paper card with fine grain and four warm corners, plus a warm lifted shadow",
-    "seam": "rule-tooled: blind-tooled groove with light catch below",
-    "printedRule": "rule-printed: strong hairline with a light catch below, on leaves",
-    "inkedRule": "rule-inked: speckle over rust with a dark bed below and a light catch above",
-    "endpaper": "surface-marbled + MarbledPanel: turbulence-displaced stroke marbling, veins via marble-v1..v5; empty catalog and 404 only",
-    "tokens": "--grain-fine, --flecks, --pore, --blotch: one inline SVG turbulence recipe per material, swappable for a scanned tile"
-  },
-  "components": {
-    "button-primary": {
-      "backgroundColor": "{colors.primary}",
-      "textColor": "{colors.on-primary}",
-      "rounded": "{rounded.control}",
-      "height": "40px"
-    },
-    "button-outline": {
-      "backgroundColor": "transparent",
-      "textColor": "{colors.ink}",
-      "rounded": "{rounded.control}",
-      "height": "40px"
-    }
+    "approach": "The page is surface-ground: near-black, fine grain, vignette. The score is surface-folio. Forms are surface-board. See docs/design.md.",
+    "floor": "surface-ground",
+    "panel": "surface-board, forms and popups only",
+    "remap": "on-board — remaps ink, body, muted, print, hairlines, field border, focus, gilt, rubric, semantics, placeholder, surface-strong and the page colour as a recessed well",
+    "seam": "rule-tooled: hidden groove with a brass catch along the board edge",
+    "plateShadow": "shadow-plate",
+    "sheetShadow": "shadow-sheet",
+    "giltRule": "rule-gilt",
+    "rubricRule": "rule-rubric",
+    "currentTab": "nav-current — brass underline, not vermilion",
+    "liveSeal": "seal-live: rubric border plus the ONE vermilion dot",
+    "endpaper": "retired — empty states are type on the ground",
+    "tokens": "--fibre, --grain, --foxing, --mottle, --hide-relief, --pore, --scuff",
+    "dead-ends": "a 285px multiplied mottle (reads as camouflage) and an anisotropic 0.42/0.055 hide grain (reads as planks). Do not reintroduce either."
   }
 }

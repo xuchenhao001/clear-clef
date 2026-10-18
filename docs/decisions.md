@@ -56,4 +56,4 @@ Short architecture decision records. Update when a decision is reversed.
 - **Status:** Accepted
 - **Context:** Admin upload needs real sessions; env-secret headers are brittle and hard to rotate.
 - **Decision:** Use Better Auth with Drizzle adapter on the same D1 database; email/password only; `disableSignUp: true`; admin plugin with first-boot setup at `/admin/setup`; `owner_id` set on ingest.
-- **Consequences:** Auth tables live in D1 (`user`, `session`, `account`, `verification`); `BETTER_AUTH_SECRET` and `BETTER_AUTH_URL` required; first admin is created once via `/admin/setup`; OAuth/membership can extend later without replacing the gate.
+- **Consequences:** Auth tables live in D1 (`user`, `session`, `account`, `verification`); `BETTER_AUTH_SECRET` and `BETTER_AUTH_URL` required; first admin is created once via `/admin/setup`; OAuth/membership can extend later without replacing the gate. When `BETTER_AUTH_URL` is a loopback origin, the common `next dev` ports (3000/3001 on `localhost` and `127.0.0.1`) are trusted as well, so a busy default port does not turn sign-in into `Invalid origin`; deployed base URLs keep the strict single-origin check.

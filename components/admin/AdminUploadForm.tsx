@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AdminCatalogFields, AdminRightsFields, AdminScoreFileInput } from "@/components/admin/admin-form-fields";
+import { adminFormErrorClassName } from "@/components/admin/admin-form-styles";
 import { AdminSection } from "@/components/admin/admin-section";
 import { AdminStickyActions } from "@/components/admin/admin-sticky-actions";
 import { generatePreviewSvg } from "@/lib/verovio/generate-preview-svg";
@@ -120,7 +121,7 @@ export function AdminUploadForm() {
       </AdminSection>
 
       {error ? (
-        <p className="text-sm text-edition-semantic-error" role="alert">
+        <p className={adminFormErrorClassName} role="alert">
           {error}
         </p>
       ) : null}

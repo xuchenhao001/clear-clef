@@ -6,7 +6,6 @@ import {
   useRef,
   useState,
 } from "react";
-import { Button } from "@/components/ui/button";
 import { PracticeStage } from "@/components/score/PracticeStage";
 import { SafeSvg } from "@/components/score/SafeSvg";
 import { ViewerSkeleton } from "@/components/score/viewer-skeleton";
@@ -262,12 +261,16 @@ export default function ScoreViewer({
     return (
       <div
         role="alert"
-        className="flex flex-col items-start gap-4 rounded-xl border border-edition-semantic-error/30 bg-edition-surface-card px-6 py-8 text-sm text-edition-semantic-error"
+        className="flex flex-col items-start gap-4 border-t border-edition-semantic-error/40 py-8 text-sm text-edition-semantic-error"
       >
         <p>{error}</p>
-        <Button type="button" variant="outline" size="sm" onClick={handleRetry}>
+        <button
+          type="button"
+          onClick={handleRetry}
+          className="type-hint hover:text-edition-gilt focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-edition-focus-ring"
+        >
           Retry
-        </Button>
+        </button>
       </div>
     );
   }
@@ -279,41 +282,39 @@ export default function ScoreViewer({
         aria-label={`Engraved score for ${title}`}
         tabIndex={0}
         onKeyDown={handleSectionKeyDown}
-        className="overflow-hidden rounded-xl border border-edition-hairline bg-edition-canvas text-edition-ink outline-none focus-visible:ring-3 focus-visible:ring-edition-focus-ring"
+        className="text-edition-ink outline-none focus-visible:ring-3 focus-visible:ring-edition-focus-ring"
       >
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-edition-hairline px-4 py-3">
-          <p className="type-caption-mono">{pageLabel}</p>
-          <div className="flex flex-wrap items-center gap-2">
-            <Button
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-edition-hairline pb-3">
+          <p className="type-shelf">{pageLabel}</p>
+          <div className="flex flex-wrap items-center gap-5">
+            <button
               type="button"
-              variant="outline"
-              size="sm"
               disabled={currentPage <= 1}
               onClick={() => goToPage(currentPage - 1)}
+              className="type-hint hover:text-edition-gilt disabled:pointer-events-none disabled:text-edition-muted-soft focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-edition-focus-ring"
             >
               Previous
-            </Button>
-            <Button
+            </button>
+            <button
               type="button"
-              variant="outline"
-              size="sm"
               disabled={currentPage >= pageCount}
               onClick={() => goToPage(currentPage + 1)}
+              className="type-hint hover:text-edition-gilt disabled:pointer-events-none disabled:text-edition-muted-soft focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-edition-focus-ring"
             >
               Next
-            </Button>
-            <Button
+            </button>
+            <button
               ref={practiceButtonRef}
               type="button"
-              size="sm"
               onClick={handlePracticeOpen}
+              className="type-hint text-edition-gilt hover:text-edition-ink focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-edition-focus-ring"
             >
               Practice
-            </Button>
+            </button>
           </div>
         </div>
-        <div className="p-3 sm:p-4">
-          <div ref={pageSlotRef} className="bg-edition-surface-page p-4 shadow-leaf">
+        <div className="surface-folio on-folio mt-6 p-3 sm:p-6">
+          <div ref={pageSlotRef} className="surface-notation p-4">
             <SafeSvg
               svg={currentSvg}
               preSanitized

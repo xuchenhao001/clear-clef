@@ -2,7 +2,8 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { adminFormInputClassName, adminFormLabelClassName } from "@/components/admin/admin-form-styles";
+import { AdminField, AdminInput } from "@/components/admin/admin-field";
+import { adminFormErrorClassName } from "@/components/admin/admin-form-styles";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 
@@ -38,11 +39,8 @@ export function AdminLoginForm() {
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <label htmlFor="email" className={adminFormLabelClassName}>
-          Email
-        </label>
-        <input
+      <AdminField label="Email" htmlFor="email">
+        <AdminInput
           id="email"
           name="email"
           type="email"
@@ -50,15 +48,11 @@ export function AdminLoginForm() {
           required
           value={email}
           onChange={(event) => setEmail(event.target.value)}
-          className={adminFormInputClassName}
         />
-      </div>
+      </AdminField>
 
-      <div className="space-y-2">
-        <label htmlFor="password" className={adminFormLabelClassName}>
-          Password
-        </label>
-        <input
+      <AdminField label="Password" htmlFor="password">
+        <AdminInput
           id="password"
           name="password"
           type="password"
@@ -66,12 +60,11 @@ export function AdminLoginForm() {
           required
           value={password}
           onChange={(event) => setPassword(event.target.value)}
-          className={adminFormInputClassName}
         />
-      </div>
+      </AdminField>
 
       {error ? (
-        <p className="text-sm text-edition-semantic-error" role="alert">
+        <p className={adminFormErrorClassName} role="alert">
           {error}
         </p>
       ) : null}

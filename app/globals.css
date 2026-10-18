@@ -5,16 +5,36 @@
 @custom-variant dark (&:is(.dark *));
 @custom-variant coarse (@media (pointer: coarse));
 
+/*
+  ClearClef is dressed from the Red Dead Redemption menus, and the menus have a
+  value structure of their own: type is laid STRAIGHT ONTO A NEAR-BLACK GROUND
+  and separated by hairlines. There are no cards, no elevation and no drop
+  shadows. Paper appears in exactly one situation — when the content itself is a
+  document — which for this product is the score, and the record of one score,
+  set on an open folio.
+
+  So the app has two regimes and nothing in between:
+
+    the ground   near-black, bone type, hairline rules, torn edges   (chrome)
+    the folio    aged paper, ink type, printed rules                 (the score)
+
+  `on-folio` remaps every token a child might use, so a component written for
+  the ground drops onto paper unchanged — the mirror of the old `on-board`.
+*/
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-public-sans);
+  /* Red Dead's menus carry no sans. ClearClef keeps two voices: capitals are
+     always Bitter (Egyptian slab), sentence case is always EB Garamond. */
+  --font-sans: var(--font-bitter);
   --font-mono: var(--font-geist-mono);
-  --font-display: var(--font-cormorant), "Songti SC", "SimSun", "Noto Serif CJK SC",
-    "Source Han Serif SC", ui-serif, Georgia, serif;
+  --font-brand: var(--font-bitter), "Songti SC", ui-serif, Georgia, serif;
+  --font-display: var(--font-bitter), "Songti SC", "SimSun",
+    "Noto Serif CJK SC", "Source Han Serif SC", ui-serif, Georgia, serif;
   --font-text: var(--font-garamond), "Songti SC", "SimSun", "Noto Serif CJK SC",
     "Source Han Serif SC", ui-serif, Georgia, serif;
-  --font-heading: var(--font-public-sans);
+  --font-heading: var(--font-bitter), "Songti SC", ui-serif, Georgia, serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -45,10 +65,13 @@
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
   --color-edition-canvas: var(--edition-canvas);
+  --color-edition-ground: var(--edition-ground);
+  --color-edition-ground-2: var(--edition-ground-2);
   --color-edition-ink: var(--edition-ink);
   --color-edition-body: var(--edition-body);
   --color-edition-muted: var(--edition-muted);
   --color-edition-muted-soft: var(--edition-muted-soft);
+  --color-edition-print: var(--edition-print);
   --color-edition-hairline: var(--edition-hairline);
   --color-edition-hairline-soft: var(--edition-hairline-soft);
   --color-edition-hairline-strong: var(--edition-hairline-strong);
@@ -61,13 +84,28 @@
   --color-edition-on-primary: var(--edition-on-primary);
   --color-edition-semantic-success: var(--edition-semantic-success);
   --color-edition-semantic-error: var(--edition-semantic-error);
+  --color-edition-semantic-info: var(--edition-semantic-info);
   --color-edition-hover: var(--edition-hover);
-  --color-edition-locator: var(--edition-locator);
-  --color-edition-on-locator: var(--edition-on-locator);
+  --color-edition-gilt: var(--edition-gilt);
+  --color-edition-gilt-deep: var(--edition-gilt-deep);
+  --color-edition-on-gilt: var(--edition-on-gilt);
+  --color-edition-rubric: var(--edition-rubric);
+  --color-edition-rubric-bright: var(--edition-rubric-bright);
+  --color-edition-vermilion: var(--edition-vermilion);
+  --color-edition-slate: var(--edition-slate);
+  --color-edition-bone: var(--edition-bone);
+  --color-edition-parchment: var(--edition-parchment);
+  --color-edition-leather: var(--edition-leather);
   --color-edition-board: var(--edition-board);
   --color-edition-board-ink: var(--edition-board-ink);
   --color-edition-board-muted: var(--edition-board-muted);
   --color-edition-board-line: var(--edition-board-line);
+  --color-edition-folio-paper: var(--edition-folio-paper);
+  --color-edition-folio-paper-2: var(--edition-folio-paper-2);
+  --color-edition-folio-ink: var(--edition-folio-ink);
+  --color-edition-folio-body: var(--edition-folio-body);
+  --color-edition-folio-muted: var(--edition-folio-muted);
+  --color-edition-folio-rule: var(--edition-folio-rule);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -77,50 +115,87 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* ---------------------------------------------------------------- by lamplight
+
+   Theme "light" is not a pale screen. Red Dead has no pale screen. It is the
+   menus under a warm lamp: a brown-black ground, brass gone deep and amber, and
+   a slightly heavier grain. Theme "dark" is the same menus after dark. Both are
+   dark grounds; the folio paper is identical in each. */
+
 :root {
-  color-scheme: light;
-  accent-color: var(--edition-ink);
-  --radius: 0.5rem;
-  /* Calf binding: aged paper leaf, leather boards, rust rubric */
-  --edition-canvas: #efe8da;
-  --edition-ink: #1d1a15;
-  --edition-body: #3a352c;
-  --edition-muted: #4e483d;
-  --edition-muted-soft: #5f574a;
-  --edition-placeholder: #4e483d;
-  --edition-field-border: #4e483d;
-  --edition-focus-ring: #1d1a15;
-  --edition-hairline: #cfc3ad;
-  --edition-hairline-soft: #ded5c3;
-  --edition-hairline-strong: #a99c86;
+  color-scheme: dark;
+  accent-color: var(--edition-gilt);
+  /* Square. There is no rounded rectangle in the game's menus. */
+  --radius: 0.125rem;
+
+  /* --- the ground ------------------------------------------------------- */
+  --edition-ground: #15110e;
+  --edition-ground-2: #1d1714;
+  --edition-canvas: var(--edition-ground);
+
+  /* --- type on the ground ---------------------------------------------- */
+  --edition-ink: #f0ece4;
+  --edition-body: #d3c8b4;
+  --edition-muted: #a2917a;
+  --edition-muted-soft: #8b7c69;
+  --edition-placeholder: #8b7c69;
+  --edition-print: #a8ab9a;
+  --edition-slate: #a2917a;
+
+  /* --- rules and fields ------------------------------------------------- */
+  --edition-hairline: color-mix(in srgb, var(--edition-ink) 14%, transparent);
+  --edition-hairline-soft: color-mix(in srgb, var(--edition-ink) 8%, transparent);
+  --edition-hairline-strong: color-mix(in srgb, var(--edition-ink) 28%, transparent);
+  --edition-field-border: color-mix(in srgb, var(--edition-ink) 30%, transparent);
+  --edition-focus-ring: #f2a92c;
+
+  /* --- surfaces --------------------------------------------------------- */
   --edition-surface-page: #ffffff;
-  --edition-surface-card: #f6f0e3;
-  --edition-surface-strong: #e3d9c6;
-  --edition-primary: #1d1a15;
-  --edition-on-primary: #f6f0e3;
-  --edition-locator: #8f3418;
-  --edition-on-locator: #f6f0e3;
-  --edition-board: #241a14;
-  --edition-board-ink: #e2d6c4;
-  --edition-board-muted: #a08b73;
-  --edition-board-line: #4a3626;
-  /* Marbled endpaper: the one surface a fine binding has that the catalog does not */
-  --marble-ground: #e6dcc6;
-  --marble-1: #8f3418;
-  --marble-2: #6b4a23;
-  --marble-3: #4a5340;
-  --marble-4: #3a352c;
-  --marble-5: #a8763a;
-  --edition-semantic-success: #15803d;
-  --edition-semantic-error: #a8321a;
-  --edition-hover: color-mix(in srgb, var(--edition-ink) 8%, transparent);
-  /* Texture recipes: one token per material so a scanned tile can replace
-     any of them without touching a call site. */
-  --grain-fine: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.28'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='120' height='120' filter='url%28%23n%29'/%3E%3C/svg%3E");
-  --flecks: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='1' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='table' tableValues='0 0 0 0 0 0 0 0 0 0 0 1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='200' height='200' filter='url%28%23n%29'/%3E%3C/svg%3E");
-  --pore: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.5'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='200' height='200' filter='url%28%23n%29'/%3E%3C/svg%3E");
-  --blotch: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.008' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.85'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='600' height='600' filter='url%28%23n%29'/%3E%3C/svg%3E");
-  --background: var(--edition-canvas);
+  --edition-surface-card: #221c18;
+  --edition-surface-strong: color-mix(in srgb, var(--edition-ink) 11%, transparent);
+  --edition-primary: #f0ece4;
+  --edition-on-primary: #15110e;
+  --edition-hover: color-mix(in srgb, var(--edition-ink) 9%, transparent);
+
+  /* --- metal, state ----------------------------------------------------- */
+  --edition-gilt: #e0a02a;
+  --edition-gilt-deep: #b07c18;
+  --edition-on-gilt: #1a1206;
+  --edition-rubric: #e2493a;
+  --edition-rubric-bright: #d92b1e;
+  --edition-vermilion: #d92b1e;
+  --edition-bone: #f0ece4;
+  --edition-parchment: #d9c9a6;
+  --edition-leather: #7d4c2c;
+  --edition-board: #1d1714;
+  --edition-board-ink: #f0ece4;
+  --edition-board-muted: #a2917a;
+  --edition-board-line: color-mix(in srgb, #f0ece4 14%, transparent);
+  --edition-semantic-success: #a7c46a;
+  --edition-semantic-error: #e0705f;
+  --edition-semantic-info: #9aa5b3;
+
+  /* --- the folio --------------------------------------------------------
+     Paper is paper in both themes. It is aged newsprint, not a pale card: the
+     catalogue leaf the game lays open when the content is a printed document. */
+  --edition-folio-paper: #d6c8ab;
+  --edition-folio-paper-2: #cbbc9d;
+  --edition-folio-ink: #241d16;
+  --edition-folio-body: #3b3227;
+  --edition-folio-muted: #6b5d4c;
+  --edition-folio-rule: color-mix(in srgb, #241d16 24%, transparent);
+
+  /* --- texture recipes --------------------------------------------------
+     One token per material layer. Every tiling layer is PLAIN stitched
+     turbulence so it repeats with no seam. The ground is never lit; it is
+     grained and vignetted, so black stays black but stops being flat. */
+  --grain-fine: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='a'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.15'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23a)'/%3E%3C/svg%3E");
+  --grain-coarse: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='540' height='540'%3E%3Cfilter id='a'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.026' numOctaves='3' seed='17' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.12'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='540' height='540' filter='url(%23a)'/%3E%3C/svg%3E");
+  --paper-fibre: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='340' height='340'%3E%3Cfilter id='a'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' seed='8' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.19'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='340' height='340' filter='url(%23a)'/%3E%3C/svg%3E");
+  --scuff: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='760' height='760'%3E%3Cfilter id='a'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55 0.03' numOctaves='2' seed='27' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='table' tableValues='0 0 0 0 0 0 0 0 0 0 0 0 0.24 1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='760' height='760' filter='url(%23a)'/%3E%3C/svg%3E");
+
+  /* --- shadcn surface wiring ------------------------------------------- */
+  --background: var(--edition-ground);
   --foreground: var(--edition-ink);
   --card: var(--edition-surface-card);
   --card-foreground: var(--edition-ink);
@@ -138,12 +213,12 @@
   --border: var(--edition-hairline);
   --input: var(--edition-field-border);
   --ring: var(--edition-focus-ring);
-  --chart-1: var(--edition-muted);
-  --chart-2: var(--edition-body);
-  --chart-3: var(--edition-ink);
-  --chart-4: var(--edition-primary);
-  --chart-5: var(--edition-hairline-strong);
-  --sidebar: var(--edition-surface-card);
+  --chart-1: var(--edition-slate);
+  --chart-2: var(--edition-print);
+  --chart-3: var(--edition-gilt);
+  --chart-4: var(--edition-leather);
+  --chart-5: var(--edition-vermilion);
+  --sidebar: var(--edition-ground-2);
   --sidebar-foreground: var(--edition-ink);
   --sidebar-primary: var(--edition-primary);
   --sidebar-primary-foreground: var(--edition-on-primary);
@@ -153,71 +228,28 @@
   --sidebar-ring: var(--edition-focus-ring);
 }
 
+/* ------------------------------------------------------------------ after dark
+
+   The same menus at night. The ground drops to a cold near-black and the brass
+   catches the lamp harder; there is no second palette. */
+
 .dark {
   color-scheme: dark;
-  accent-color: var(--edition-ink);
-  --edition-canvas: #17120e;
-  --edition-ink: #e9e2d5;
-  --edition-body: #d5cbb8;
-  --edition-muted: #a89f8e;
-  --edition-muted-soft: #8a8171;
-  --edition-placeholder: #a89f8e;
-  --edition-field-border: #a89f8e;
-  --edition-focus-ring: #e9e2d5;
-  --edition-hairline: #33291f;
-  --edition-hairline-soft: #241c15;
-  --edition-hairline-strong: #4a3b2b;
-  --edition-surface-page: #ffffff;
-  --edition-surface-card: #1f1811;
-  --edition-surface-strong: #2a2118;
-  --edition-primary: #e9e2d5;
-  --edition-on-primary: #17120e;
-  --edition-locator: #e0916a;
-  --edition-on-locator: #17120e;
-  --edition-board: #0f0b08;
-  --edition-board-ink: #d8cbb6;
-  --edition-board-muted: #8a7862;
-  --edition-board-line: #33261a;
-  --marble-ground: #241c15;
-  --marble-1: #7a3d24;
-  --marble-2: #5f4a2a;
-  --marble-3: #454c3c;
-  --marble-4: #6a6257;
-  --marble-5: #8a6b42;
-  --edition-hover: color-mix(in srgb, var(--edition-ink) 8%, transparent);
-  --edition-semantic-success: #4ade80;
-  --edition-semantic-error: #f87171;
-  --background: var(--edition-canvas);
-  --foreground: var(--edition-ink);
-  --card: var(--edition-surface-card);
-  --card-foreground: var(--edition-ink);
-  --popover: var(--edition-surface-card);
-  --popover-foreground: var(--edition-ink);
-  --primary: var(--edition-primary);
-  --primary-foreground: var(--edition-on-primary);
-  --secondary: var(--edition-surface-strong);
-  --secondary-foreground: var(--edition-ink);
-  --muted: var(--edition-surface-strong);
-  --muted-foreground: var(--edition-muted);
-  --accent: var(--edition-surface-strong);
-  --accent-foreground: var(--edition-ink);
-  --destructive: var(--edition-semantic-error);
-  --border: var(--edition-hairline);
-  --input: var(--edition-field-border);
-  --ring: var(--edition-focus-ring);
-  --chart-1: var(--edition-muted);
-  --chart-2: var(--edition-body);
-  --chart-3: var(--edition-ink);
-  --chart-4: var(--edition-primary);
-  --chart-5: var(--edition-hairline-strong);
-  --sidebar: var(--edition-surface-card);
-  --sidebar-foreground: var(--edition-ink);
-  --sidebar-primary: var(--edition-primary);
-  --sidebar-primary-foreground: var(--edition-on-primary);
-  --sidebar-accent: var(--edition-surface-strong);
-  --sidebar-accent-foreground: var(--edition-ink);
-  --sidebar-border: var(--edition-hairline);
-  --sidebar-ring: var(--edition-focus-ring);
+  --edition-ground: #0a0908;
+  --edition-ground-2: #131110;
+  --edition-ink: #ece4d4;
+  --edition-body: #cfc4ae;
+  --edition-muted: #97866e;
+  --edition-muted-soft: #867664;
+  --edition-placeholder: #867664;
+  --edition-print: #a8ab9a;
+  --edition-slate: #97866e;
+  --edition-surface-card: #1b1614;
+  --edition-board: #131110;
+  --edition-gilt: #f2a92c;
+  --edition-gilt-deep: #f2a92c;
+  --edition-primary: #ece4d4;
+  --edition-on-primary: #0a0908;
 }
 
 @layer base {
@@ -225,25 +257,33 @@
     @apply border-border outline-none;
   }
   body {
-    @apply bg-edition-canvas text-edition-ink;
+    @apply bg-edition-ground text-edition-ink;
   }
   html {
     @apply font-sans;
   }
   ::selection {
-    background: color-mix(in srgb, var(--edition-locator) 22%, transparent);
+    background: color-mix(in srgb, var(--edition-vermilion) 34%, transparent);
     color: var(--edition-ink);
   }
   input::placeholder,
   textarea::placeholder {
     color: var(--edition-placeholder);
   }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
 }
 
 @layer utilities {
   .font-display {
     font-family:
-      var(--font-cormorant), "Songti SC", "SimSun", "Noto Serif CJK SC",
+      var(--font-bitter), "Songti SC", "SimSun", "Noto Serif CJK SC",
       "Source Han Serif SC", ui-serif, Georgia, serif;
   }
 
@@ -253,70 +293,139 @@
       "Source Han Serif SC", ui-serif, Georgia, serif;
   }
 
-  /* Cormorant is a fine-press face with a small x-height: it wants size, so it
-     is the title page, the wordmark and the page headings only. Everything at
-     reading size is EB Garamond. */
-  .type-catalog-h1 {
-    @apply font-display text-[3rem] font-semibold leading-[1.02] tracking-[-0.015em] text-edition-ink md:text-[3.75rem];
+  .font-brand {
+    font-family:
+      var(--font-bitter), "Songti SC", ui-serif, Georgia, serif;
   }
 
-  .type-work-title {
-    @apply font-text text-[1.375rem] font-semibold leading-[1.25] text-edition-ink;
+  /* ------------------------------------------------------------------ type
+
+     TYPE RULE — the whole system turns on one sentence:
+
+       capitals are always Bitter (slab); sentence case is always EB Garamond.
+
+     The refinement that keeps it faithful to the game: in the menus, a SECTION
+     or a TITLE is slab caps ("WHITETAIL DEER", "CONTENTS"), but a FIELD or a
+     STAT is set in the serif, sentence case ("Total Progress", "Tracked"). So
+     labels are serif, not caps — the menus are nowhere near as shouty as an
+     all-caps system, and neither is this one. Technical strings are Geist Mono. */
+
+  /* --- slab caps: titles, sections, chrome ------------------------------ */
+
+  /* The masthead: the one big slab line a screen is named by, set left. */
+  .type-masthead {
+    @apply font-display text-[2.25rem] font-black leading-[0.92] tracking-[-0.015em] text-edition-ink uppercase md:text-[3.5rem];
   }
 
-  .type-work-title-detail {
-    @apply font-display text-[2rem] font-semibold leading-[1.1] tracking-[-0.01em] text-edition-ink md:text-[2.5rem];
+  .type-masthead-sm {
+    @apply font-display text-[1.625rem] font-black leading-[0.95] tracking-[-0.012em] text-edition-ink uppercase md:text-[2.25rem];
   }
 
-  .type-page-h1 {
-    @apply font-display text-[2.25rem] font-semibold leading-[1.15] tracking-[-0.01em] text-edition-ink md:text-[2.5rem];
+  /* The imprint line above a masthead: "CLEARCLEF · PUBLIC CATALOGUE". */
+  .type-eyebrow {
+    @apply font-display text-[0.625rem] font-bold tracking-[0.18em] text-edition-muted uppercase;
   }
 
-  /* Real small capitals from the self-hosted files, not scaled capitals. */
+  /* The wordmark: bone slab, no gilt gradient — the game's logotype is white
+     with a single red mark, and gilt is for metal, not for type. */
+  .type-wordmark {
+    @apply font-brand text-[1.0625rem] font-black leading-none tracking-[0.1em] text-edition-bone uppercase;
+  }
+
+  .type-nav-link {
+    @apply font-display text-[0.78125rem] font-bold tracking-[0.11em] text-edition-muted uppercase;
+  }
+
+  /* A section name on a plate or a running head on a rule. */
   .type-running-head {
-    @apply font-text text-[1rem] font-semibold tracking-[0.12em] text-edition-muted;
-    font-variant-caps: small-caps;
-  }
-
-  .type-group-label {
-    @apply font-text text-[1.1875rem] font-semibold leading-[1.35] tracking-[0.05em] text-edition-muted;
-    font-variant-caps: small-caps;
+    @apply font-display text-[0.6875rem] font-bold tracking-[0.15em] text-edition-muted uppercase;
   }
 
   .type-imprint {
-    @apply font-text text-xs font-semibold tracking-[0.18em] text-edition-muted;
-    font-variant-caps: small-caps;
+    @apply font-display text-[0.625rem] font-bold tracking-[0.16em] text-edition-muted uppercase;
   }
 
-  .type-extent {
-    @apply font-text text-[0.9375rem] font-normal tracking-[0.02em] text-edition-muted-soft;
+  /* The control hint: "Read ◎", "Back ◄", bottom right, as the game runs them. */
+  .type-hint {
+    @apply font-display text-[0.6875rem] font-bold tracking-[0.14em] text-edition-body uppercase;
+  }
+
+  /* An admin page H1, quieter than a masthead. */
+  .type-page-h1 {
+    @apply font-display text-[1.75rem] font-black leading-[0.98] tracking-[-0.012em] text-edition-ink uppercase md:text-[2.125rem];
+  }
+
+  /* --- serif: labels, values, titles, reading --------------------------- */
+
+  /* A field or stat label. Sentence case, as the game sets "Total Progress". */
+  .type-label {
+    @apply font-text text-[0.8125rem] leading-tight tracking-[0.01em] text-edition-muted;
+  }
+
+  .type-value {
+    @apply font-text text-[0.9375rem] font-semibold leading-tight text-edition-ink;
     font-variant-numeric: oldstyle-nums;
   }
 
-  /* Catalogue entries: a printed shelf mark rather than a terminal readout.
-     Technical strings (ids, byte sizes, page counters) stay in mono. */
+  .type-credit {
+    @apply font-text text-[1.3125rem] font-semibold leading-tight text-edition-ink;
+  }
+
+  .type-row-title {
+    @apply font-text text-[1.125rem] font-semibold leading-snug text-edition-ink;
+  }
+
+  /* Kept as the old name: a row title in the detail view. */
+  .type-work-title {
+    @apply font-text text-[1.3125rem] font-semibold leading-snug text-edition-ink;
+  }
+
+  .type-work-title-detail {
+    @apply font-text text-[1.5625rem] font-semibold leading-tight text-edition-ink md:text-[1.875rem];
+  }
+
+  .type-group-label {
+    @apply font-text text-[1.25rem] font-semibold leading-tight text-edition-ink;
+  }
+
+  .type-extent {
+    @apply font-text text-[0.8125rem] leading-none tracking-[0.02em] text-edition-print;
+    font-variant-numeric: oldstyle-nums;
+  }
+
   .type-shelf {
-    @apply font-text text-[0.8125rem] leading-normal tracking-[0.03em] text-edition-muted-soft;
+    @apply font-text text-[0.8125rem] leading-tight tracking-[0.02em] text-edition-muted;
+    font-variant-numeric: oldstyle-nums;
   }
 
   .type-body-md {
-    @apply text-base leading-normal text-edition-body;
+    @apply font-text text-[1.0625rem] leading-[1.55] text-edition-body;
   }
 
   .type-body-sm {
-    @apply text-[0.9375rem] leading-normal text-edition-body;
+    @apply font-text text-[0.9375rem] leading-normal text-edition-body;
   }
 
   .type-caption-mono {
     @apply font-mono text-xs leading-normal text-edition-muted;
   }
 
-  .type-nav-link {
-    @apply text-[0.9375rem] font-medium leading-snug text-edition-muted;
+  /* --- the folio's own type (paper) ------------------------------------- */
+
+  .type-folio-title {
+    @apply font-display text-[2rem] font-black leading-[0.9] tracking-[-0.015em] uppercase md:text-[2.75rem];
+  }
+
+  .type-folio-deck {
+    @apply font-display text-[0.6875rem] font-bold tracking-[0.14em] uppercase;
+  }
+
+  .type-folio-body {
+    @apply font-text text-[0.9375rem] leading-[1.6];
   }
 
   .edition-interactive-transition {
-    transition-property: background-color, border-color, color;
+    transition-property: background-color, border-color, color, box-shadow, opacity;
     transition-duration: 200ms;
     transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
   }
@@ -327,167 +436,232 @@
     }
   }
 
-  /* Material system: paper leaf, leather boards, blind tooling, marbled endpaper.
-     Every recipe is a token plus gradients, so a scanned tile can replace any
-     layer later without touching a call site. */
+  /* ---------------------------------------------------------------- materials
 
-  .surface-paper {
-    /* The floor: cotton-rag paper. Fine grain under fibre flecks, then the laid
-       and chain lines of a handmade sheet, then the ageing vignette. */
-    background-color: var(--edition-canvas);
+     surface-ground — the page floor. Near-black, grained, vignetted. Nothing is
+     lit here: the layers are plain stitched turbulence so the floor tiles with
+     no seam, over one soft key and the falloff that makes the black read deep. */
+
+  .surface-ground {
+    background-color: var(--edition-ground);
     background-image:
-      var(--flecks),
       var(--grain-fine),
-      repeating-linear-gradient(
-        90deg,
-        color-mix(in srgb, #3a2a18 2.5%, transparent) 0 1px,
-        transparent 1px 6px
+      var(--grain-coarse),
+      radial-gradient(
+        110% 62% at 50% -14%,
+        color-mix(in srgb, var(--edition-gilt) 8%, transparent),
+        transparent 62%
       ),
-      repeating-linear-gradient(
-        0deg,
-        color-mix(in srgb, #3a2a18 1.5%, transparent) 0 1px,
-        transparent 1px 26px
-      ),
-      radial-gradient(135% 90% at 50% -12%, color-mix(in srgb, #fff 12%, transparent), transparent 58%),
-      radial-gradient(150% 120% at 50% 50%, transparent 62%, color-mix(in srgb, #3a2a18 13%, transparent));
-    background-blend-mode: multiply, soft-light, multiply, multiply, normal, normal;
-  }
-
-  .surface-board {
-    /* Boards: pore over an uneven dye lot, a raking sheen, and wear where the
-       bar meets the edges. */
-    background-color: var(--edition-board);
-    background-image:
-      var(--pore),
-      var(--blotch),
-      radial-gradient(60% 130% at 0% 50%, color-mix(in srgb, #ffecd0 10%, transparent), transparent 60%),
-      radial-gradient(60% 130% at 100% 50%, color-mix(in srgb, #ffecd0 8%, transparent), transparent 60%),
-      radial-gradient(95% 130% at 74% -12%, color-mix(in srgb, #fff5e4 20%, transparent), transparent 58%),
-      linear-gradient(
-        115deg,
-        color-mix(in srgb, #fff 5%, transparent),
-        transparent 40%,
-        color-mix(in srgb, #000 46%, transparent)
+      radial-gradient(
+        150% 120% at 50% 38%,
+        transparent 52%,
+        color-mix(in srgb, #000 62%, transparent)
       );
-    background-blend-mode: overlay, multiply, normal, normal, normal, normal;
-    color: var(--edition-board-ink);
+    background-size: 180px 180px, 540px 540px, auto, auto;
+    background-repeat: repeat, repeat, no-repeat, no-repeat;
+    background-blend-mode: overlay, soft-light, normal, normal;
   }
 
+  /* surface-rail — a bar that sits on the floor: the header, the footer, the
+     index strip. A hairline's worth of lift, no shadow, no radius. */
+  .surface-rail {
+    background-color: color-mix(in srgb, var(--edition-ground-2) 82%, transparent);
+    background-image: var(--grain-fine);
+    background-size: 180px 180px;
+    background-blend-mode: overlay;
+    backdrop-filter: blur(6px);
+  }
+
+  /* surface-panel — the few things that really are an object on the floor: a
+     dropdown, a form well, a gallery matte. Square, flat, hairline-framed. */
+  .surface-panel {
+    background-color: var(--edition-ground-2);
+    background-image: var(--grain-fine);
+    background-size: 180px 180px;
+    background-blend-mode: overlay;
+    color: var(--edition-ink);
+  }
+
+  /* surface-board — kept as the name the admin already uses. */
+  .surface-board {
+    background-color: var(--edition-ground-2);
+    background-image: var(--grain-fine), var(--scuff);
+    background-size: 180px 180px, 760px 760px;
+    background-repeat: repeat, repeat;
+    background-blend-mode: overlay, overlay;
+    color: var(--edition-ink);
+  }
+
+  /* surface-folio — the leaf. Aged paper: fine tooth and a soft edge shading.
+     There is deliberately NO mid-frequency mottle: a 285px multiplied blotch
+     reads as camouflage, and it was the reason the last floor looked wrong. */
+  .surface-folio {
+    background-color: var(--edition-folio-paper);
+    background-image:
+      var(--paper-fibre),
+      var(--grain-coarse),
+      radial-gradient(
+        130% 100% at 50% -16%,
+        color-mix(in srgb, #fff8e6 30%, transparent),
+        transparent 62%
+      ),
+      radial-gradient(
+        150% 130% at 50% 50%,
+        transparent 58%,
+        color-mix(in srgb, #3a2312 24%, transparent)
+      );
+    background-size: 340px 340px, 540px 540px, auto, auto;
+    background-repeat: repeat, repeat, no-repeat, no-repeat;
+    background-blend-mode: multiply, multiply, normal, normal;
+  }
+
+  /* surface-notation — the engraved page. Pure white in every mode, forever. */
+  .surface-notation {
+    background-color: var(--edition-surface-page);
+  }
+
+  /* on-folio remaps every token a child might use to the paper regime, so a
+     component written for the ground drops onto a leaf unchanged. */
+  .on-folio {
+    --edition-ink: var(--edition-folio-ink);
+    --edition-body: var(--edition-folio-body);
+    --edition-muted: var(--edition-folio-muted);
+    --edition-muted-soft: color-mix(in srgb, var(--edition-folio-muted) 78%, transparent);
+    --edition-print: #5c6350;
+    --edition-slate: #4d5766;
+    --edition-hairline: var(--edition-folio-rule);
+    --edition-hairline-soft: color-mix(in srgb, #241d16 13%, transparent);
+    --edition-hairline-strong: color-mix(in srgb, #241d16 40%, transparent);
+    --edition-field-border: color-mix(in srgb, #241d16 42%, transparent);
+    --edition-focus-ring: #8a5a12;
+    --edition-gilt: #8a5a12;
+    --edition-gilt-deep: #7f5a12;
+    --edition-rubric: #a3231a;
+    --edition-rubric-bright: #b3261c;
+    --edition-vermilion: #b3261c;
+    --edition-surface-strong: color-mix(in srgb, #241d16 9%, transparent);
+    --edition-surface-card: #cbbc9d;
+    --edition-ground: var(--edition-folio-paper);
+    --edition-ground-2: var(--edition-folio-paper-2);
+    --edition-canvas: var(--edition-folio-paper-2);
+    --edition-hover: color-mix(in srgb, #241d16 7%, transparent);
+    --edition-placeholder: var(--edition-folio-muted);
+    --edition-primary: #241d16;
+    --edition-on-primary: var(--edition-folio-paper);
+    --edition-semantic-error: #a3231a;
+    --edition-semantic-success: #4f6b26;
+    --edition-semantic-info: #4d5766;
+    color: var(--edition-ink);
+  }
+
+  /* on-board is the old name for "inside a dark object"; it now only has to keep
+     the tokens pointing at the ground. */
   .on-board {
     --edition-ink: var(--edition-board-ink);
-    --edition-body: var(--edition-board-ink);
     --edition-muted: var(--edition-board-muted);
-    --edition-muted-soft: var(--edition-board-muted);
     --edition-hairline: var(--edition-board-line);
-    --edition-hairline-strong: var(--edition-board-line);
-    --edition-focus-ring: var(--edition-board-ink);
-    --edition-hover: color-mix(in srgb, var(--edition-board-ink) 14%, transparent);
+    --edition-focus-ring: var(--edition-gilt);
+    color: var(--edition-ink);
   }
 
-  .surface-leaf {
-    /* Leaves: the quietest surface, because text sits on it. Fine grain, a
-       light dusting of flecks, and four warm corners so each leaf ages on its
-       own instead of the whole viewport carrying one flat tint. */
-    background-color: var(--edition-surface-card);
-    background-image:
-      var(--grain-fine),
-      radial-gradient(72% 72% at 0% 0%, color-mix(in srgb, #54391e 9%, transparent), transparent 62%),
-      radial-gradient(72% 72% at 100% 0%, color-mix(in srgb, #54391e 7%, transparent), transparent 62%),
-      radial-gradient(72% 72% at 0% 100%, color-mix(in srgb, #54391e 8%, transparent), transparent 62%),
-      radial-gradient(72% 72% at 100% 100%, color-mix(in srgb, #54391e 10%, transparent), transparent 62%);
-    background-blend-mode: soft-light, normal, normal, normal, normal;
+  /* --------------------------------------------------------------- materials */
+
+  /* No elevation anywhere: a "raised" plate is a hairline and a slightly
+     lighter ground. The names survive so callers do not have to change. */
+  .shadow-plate,
+  .shadow-sheet {
+    box-shadow: none;
   }
 
-  .shadow-leaf {
-    box-shadow:
-      inset 0 1px 0 color-mix(in srgb, #fff 45%, transparent),
-      0 14px 30px -18px color-mix(in srgb, #2e2013 62%, transparent),
-      0 2px 4px color-mix(in srgb, #2e2013 16%, transparent);
+  /* The brass rule. One per view: it marks the one thing the screen is about. */
+  .rule-gilt {
+    background-color: var(--edition-gilt);
+    background-image: linear-gradient(
+      180deg,
+      color-mix(in srgb, #ffe7ad 70%, transparent),
+      transparent 46%,
+      color-mix(in srgb, #000 34%, transparent)
+    );
   }
 
-  .rule-tooled {
-    border-bottom: 1px solid var(--edition-board-line);
-    box-shadow:
-      inset 0 -1px 0 color-mix(in srgb, #000 45%, transparent),
-      0 1px 0 color-mix(in srgb, #fff 8%, transparent);
-  }
-
+  /* A printed hairline on the ground. */
   .rule-printed {
-    border-bottom: 1px solid var(--edition-hairline-strong);
-    box-shadow: 0 1px 0 color-mix(in srgb, #fff 55%, transparent);
+    border-bottom: 1px solid var(--edition-hairline);
   }
 
-  /* Inked rather than filled: speckle under a dark bed and a light catch, so a
-     rust rule reads as printed on the sheet. */
-  .rule-inked {
-    background-color: var(--edition-locator);
-    background-image: var(--grain-fine);
-    background-blend-mode: screen;
-    box-shadow:
-      0 1px 0 color-mix(in srgb, #000 32%, transparent),
-      0 -1px 0 color-mix(in srgb, #fff 22%, transparent);
+  /* The old board seam is now just a hairline: there are no boards. */
+  .rule-tooled {
+    border-bottom: 1px solid var(--edition-hairline);
   }
 
-  .surface-marbled {
-    background-color: var(--marble-ground);
+  .rule-rubric {
+    border-bottom: 2px solid var(--edition-rubric);
   }
 
-  .marble-v1 {
-    stroke: var(--marble-1);
+  /* The game's double rule, used under a masthead. */
+  .rule-double {
+    border-top: 1px solid var(--edition-hairline-strong);
+    border-bottom: 1px solid var(--edition-hairline-soft);
+    height: 3px;
   }
 
-  .marble-v2 {
-    stroke: var(--marble-2);
+  /* The current tab: brighter type over a brass hairline. Vermilion is held
+     back for live state, so there is exactly one hot red on any screen. */
+  .nav-current {
+    position: relative;
+    color: var(--edition-ink);
   }
 
-  .marble-v3 {
-    stroke: var(--marble-3);
+  .nav-current::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 0.35rem;
+    height: 2px;
+    background-color: var(--edition-gilt);
   }
 
-  .marble-v4 {
-    stroke: var(--marble-4);
+  /* A live filter: the rubric hairline plus the one vermilion dot. */
+  .seal-live {
+    position: relative;
+    @apply border-edition-rubric text-edition-ink;
   }
 
-  .marble-v5 {
-    stroke: var(--marble-5);
+  .seal-live::after {
+    content: "";
+    position: absolute;
+    top: 0.1rem;
+    right: 0;
+    width: 0.4375rem;
+    height: 0.4375rem;
+    border-radius: 9999px;
+    background-color: var(--edition-vermilion);
+    background-image: radial-gradient(
+      circle at 34% 28%,
+      color-mix(in srgb, #ff9180 90%, transparent),
+      transparent 62%
+    );
+  }
+
+  /* A register row: label left, value right, a hairline under. This is the
+     animal-info screen, and it is how every statistic in the app is set. */
+  .stat-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.4375rem 0;
+    border-bottom: 1px solid var(--edition-hairline-soft);
+  }
+
+  .stat-row > :last-child {
+    text-align: right;
   }
 
   .skip-to-content {
-    @apply sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded-md focus:border focus:border-edition-field-border focus:bg-edition-surface-card focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-edition-ink focus:outline-none focus:ring-3 focus:ring-edition-focus-ring;
+    @apply sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:border focus:border-edition-gilt focus:bg-edition-ground-2 focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-edition-ink focus:outline-none focus:ring-3 focus:ring-edition-focus-ring;
   }
 
-  .archive-filter-strip {
-    @apply rounded-lg border border-edition-hairline px-4 py-4;
-  }
-
-  .archive-locator-active {
-    position: relative;
-    @apply border-edition-locator text-edition-ink;
-  }
-
-  /* The locator on an active filter: a woven ribbon, notched at the foot. */
-  .archive-locator-active::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    right: 0.5rem;
-    width: 0.5625rem;
-    height: 0.8125rem;
-    background-color: var(--edition-locator);
-    background-image:
-      repeating-linear-gradient(
-        90deg,
-        color-mix(in srgb, #000 14%, transparent) 0 1px,
-        transparent 1px 3px
-      ),
-      linear-gradient(
-        90deg,
-        color-mix(in srgb, #000 24%, transparent),
-        transparent 30%,
-        transparent 70%,
-        color-mix(in srgb, #000 24%, transparent)
-      );
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%);
-    box-shadow: 0 1px 2px color-mix(in srgb, #000 30%, transparent);
-  }
 }

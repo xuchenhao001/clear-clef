@@ -2,7 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { adminFormInputClassName, adminFormLabelClassName } from "@/components/admin/admin-form-styles";
+import { AdminField, AdminInput } from "@/components/admin/admin-field";
+import { adminFormErrorClassName } from "@/components/admin/admin-form-styles";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 
@@ -59,11 +60,8 @@ export function AdminSetupForm() {
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <label htmlFor="name" className={adminFormLabelClassName}>
-          Name
-        </label>
-        <input
+      <AdminField label="Name" htmlFor="name">
+        <AdminInput
           id="name"
           name="name"
           type="text"
@@ -71,15 +69,11 @@ export function AdminSetupForm() {
           required
           value={name}
           onChange={(event) => setName(event.target.value)}
-          className={adminFormInputClassName}
         />
-      </div>
+      </AdminField>
 
-      <div className="space-y-2">
-        <label htmlFor="email" className={adminFormLabelClassName}>
-          Email
-        </label>
-        <input
+      <AdminField label="Email" htmlFor="email">
+        <AdminInput
           id="email"
           name="email"
           type="email"
@@ -87,15 +81,11 @@ export function AdminSetupForm() {
           required
           value={email}
           onChange={(event) => setEmail(event.target.value)}
-          className={adminFormInputClassName}
         />
-      </div>
+      </AdminField>
 
-      <div className="space-y-2">
-        <label htmlFor="password" className={adminFormLabelClassName}>
-          Password
-        </label>
-        <input
+      <AdminField label="Password" htmlFor="password">
+        <AdminInput
           id="password"
           name="password"
           type="password"
@@ -104,15 +94,11 @@ export function AdminSetupForm() {
           required
           value={password}
           onChange={(event) => setPassword(event.target.value)}
-          className={adminFormInputClassName}
         />
-      </div>
+      </AdminField>
 
-      <div className="space-y-2">
-        <label htmlFor="confirmPassword" className={adminFormLabelClassName}>
-          Confirm password
-        </label>
-        <input
+      <AdminField label="Confirm password" htmlFor="confirmPassword">
+        <AdminInput
           id="confirmPassword"
           name="confirmPassword"
           type="password"
@@ -121,12 +107,11 @@ export function AdminSetupForm() {
           required
           value={confirmPassword}
           onChange={(event) => setConfirmPassword(event.target.value)}
-          className={adminFormInputClassName}
         />
-      </div>
+      </AdminField>
 
       {error ? (
-        <p className="text-sm text-edition-semantic-error" role="alert">
+        <p className={adminFormErrorClassName} role="alert">
           {error}
         </p>
       ) : null}

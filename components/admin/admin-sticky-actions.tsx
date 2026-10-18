@@ -9,6 +9,7 @@ type AdminStickyActionsProps = {
   pendingLabel?: string;
 };
 
+/** The save bar: pinned to the foot of the form, ruled off from the paper. */
 export function AdminStickyActions({
   pending,
   backHref,
@@ -16,9 +17,7 @@ export function AdminStickyActions({
   pendingLabel = "Saving…",
 }: AdminStickyActionsProps) {
   return (
-    <div
-      className="sticky bottom-0 z-10 -mx-6 border-t border-edition-hairline bg-edition-canvas/95 px-6 py-4 backdrop-blur-sm"
-    >
+    <div className="sticky bottom-0 z-10 -mx-6 border-t border-edition-hairline-strong bg-edition-canvas/95 px-6 py-4 backdrop-blur-sm">
       <div className="flex flex-wrap items-center gap-3">
         <Button type="submit" disabled={pending}>
           {pending ? pendingLabel : submitLabel}

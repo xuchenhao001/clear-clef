@@ -21,7 +21,7 @@ type EditionSelectProps = {
 };
 
 const popupClassName =
-  "z-50 min-w-[var(--anchor-width)] origin-[var(--transform-origin)] rounded-xl border border-edition-hairline bg-edition-surface-card p-1 text-edition-ink outline-none transition data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0";
+  "z-50 min-w-[var(--anchor-width)] origin-[var(--transform-origin)] rounded-lg border border-edition-hairline surface-board on-board p-1 text-edition-ink outline-none transition data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0";
 
 function SelectChevronIcon() {
   return (
@@ -56,8 +56,8 @@ export function EditionSelect({
         id={labelId}
         className={cn(
           labelVariant === "form"
-            ? "text-sm font-medium text-edition-ink"
-            : "type-caption-mono uppercase tracking-wide text-edition-muted",
+            ? "text-sm font-semibold text-edition-ink"
+            : "type-label",
         )}
       >
         {label}
@@ -77,9 +77,9 @@ export function EditionSelect({
             "flex w-full items-center justify-between gap-2 text-left text-sm text-edition-ink edition-interactive-transition outline-none focus-visible:ring-3 focus-visible:ring-edition-focus-ring",
             triggerVariant === "hairline"
               ? "min-h-11 border-0 border-b border-edition-field-border bg-transparent px-0 py-2 focus-visible:border-edition-field-border"
-              : "min-h-11 rounded-md border border-edition-field-border bg-edition-surface-card px-3 py-2 focus-visible:border-edition-field-border",
-            value !== "" && triggerVariant === "hairline" && "archive-locator-active border-b-edition-locator",
-            value !== "" && triggerVariant === "boxed" && "archive-locator-active",
+              : "min-h-11 rounded-md border border-edition-field-border bg-edition-canvas/50 px-3 py-2 focus-visible:border-edition-gilt",
+            value !== "" && triggerVariant === "hairline" && "seal-live border-b-edition-rubric",
+            value !== "" && triggerVariant === "boxed" && "seal-live",
           )}
         >
           <Select.Value placeholder={placeholder} />
