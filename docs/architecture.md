@@ -8,7 +8,7 @@ ClearClef is a greenfield Next.js App Router app deployed to Cloudflare Workers 
 | --- | --- | --- |
 | Package manager | pnpm 11 (Corepack; `packageManager` in `package.json`) | Do not use npm or yarn |
 | App | Next.js App Router + TypeScript | Node.js runtime only — **do not** set `export const runtime = "edge"` |
-| Deploy | OpenNext Cloudflare adapter | `opennextjs-cloudflare` for build / preview / deploy |
+| Deploy | OpenNext Cloudflare adapter | `opennextjs-cloudflare` for build / preview / deploy (still Wrangler). Operator commands such as D1 migrations use the [`cf`](https://developers.cloudflare.com/cf/) CLI |
 | Local bindings | `initOpenNextCloudflareForDev()` in `next.config` | Use `next dev` for day-to-day; `pnpm preview` for Workers runtime |
 | UI | Tailwind + shadcn/ui | Keep catalog HTML light |
 | Score objects | Cloudflare **R2** (`clear-clef`) | Zero egress; immutable object caching |

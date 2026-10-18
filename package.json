@@ -21,8 +21,8 @@
     "upload": "opennextjs-cloudflare build && opennextjs-cloudflare upload",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv --include-runtime false cloudflare-env.d.ts",
     "db:generate": "drizzle-kit generate",
-    "db:migrate:local": "wrangler d1 migrations apply clear-clef --local",
-    "db:migrate:remote": "wrangler d1 migrations apply clear-clef --remote"
+    "db:migrate:local": "cf d1 migrations apply f5e030c1-90d1-48d9-bd98-5b986a78d745 --local --dir drizzle",
+    "db:migrate:remote": "cf d1 migrations apply f5e030c1-90d1-48d9-bd98-5b986a78d745 --dir drizzle"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
@@ -49,6 +49,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "better-sqlite3": "^13.0.3",
+    "cf": "1.0.0-beta.18",
     "drizzle-kit": "^0.31.10",
     "eslint": "^9",
     "eslint-config-next": "16.3.4",

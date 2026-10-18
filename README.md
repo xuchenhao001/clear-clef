@@ -24,7 +24,7 @@ Anyone can browse. Uploads are admin-only in v1 (Better Auth email/password; pub
 
 ## Local development
 
-Requires Node 20+, [pnpm](https://pnpm.io) 11 (via Corepack), and a logged-in Wrangler session (`pnpm exec wrangler login`, then `pnpm exec wrangler whoami`).
+Requires Node 20+, [pnpm](https://pnpm.io) 11 (via Corepack), and a logged-in Cloudflare CLI session (`pnpm exec cf auth login`, then `pnpm exec cf auth whoami`). D1 migrations use [`cf`](https://developers.cloudflare.com/cf/). The Worker is still built and deployed by OpenNext through Wrangler (`pnpm preview`, `pnpm deploy`).
 
 ```bash
 corepack enable
