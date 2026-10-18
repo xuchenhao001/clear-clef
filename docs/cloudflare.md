@@ -22,7 +22,6 @@ ClearClef uses the native **`cf`** workflow: one **`cloudflare.config.ts`**, no 
 | `pnpm dev` | `cf dev` → Vite in **`development`** mode (`persistState`: `.cloudflare/state`) |
 | `pnpm build` | `tsc` + `cf build` → `.cloudflare/output/` |
 | `pnpm deploy` | `pnpm build` + `cf deploy --prebuilt` |
-| `pnpm deploy:staging` | same with `--mode staging` |
 | `pnpm db:migrate:local` | D1 migrations into `.cloudflare/state` |
 | `pnpm cf-typegen` | Refresh `.cloudflare/types/index.d.ts` |
 
@@ -33,8 +32,7 @@ ClearClef uses the native **`cf`** workflow: one **`cloudflare.config.ts`**, no 
 | Mode | Typical command | Worker | `BETTER_AUTH_URL` |
 | --- | --- | --- | --- |
 | `development` | `pnpm dev` | `clear-clef` | `http://localhost:3000` |
-| `production` | `pnpm deploy` | `clear-clef` | production workers.dev |
-| `staging` | `pnpm deploy:staging` | `clear-clef-staging` | staging workers.dev |
+| `production` | `pnpm deploy` | `clear-clef` | `https://clear-clef.xu-chenhao.workers.dev` |
 
 ## Deploy secrets
 

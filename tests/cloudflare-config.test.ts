@@ -16,19 +16,14 @@ function textValue(binding: unknown): string {
 
 describe("cloudflare.config.ts", () => {
   it("maps worker name per mode", async () => {
-    for (const mode of ["development", "production", "staging", undefined] as const) {
+    for (const mode of ["development", "production", undefined] as const) {
       const config = await cloudflareConfig({ mode, isPreview: false });
       expect(config.worker.name).toBe(workerNameForMode(mode));
     }
   });
 
   it("maps BETTER_AUTH_URL to worker-bindings per mode", async () => {
-    for (const mode of [
-      "development",
-      "production",
-      "staging",
-      undefined,
-    ] as const) {
+    for (const mode of ["development", "production", undefined] as const) {
       const config = await cloudflareConfig({ mode, isPreview: false });
       expect(textValue(config.worker.env.BETTER_AUTH_URL)).toBe(
         betterAuthUrlForMode(mode),

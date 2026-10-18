@@ -7,7 +7,7 @@ import {
 
 /**
  * Worker configuration for `cf` and `@cloudflare/vite-plugin`.
- * Modes: `development` (`cf dev`), `staging` (`cf deploy --mode staging`), `production` (deploy/build).
+ * Modes: `development` (`cf dev`), `production` (`pnpm deploy` / `cf build`).
  * D1: `cf d1 migrations apply <id> --local --dir drizzle --persist-to .cloudflare/state`
  * Secrets: `bindings.secret()` + `.dev.vars` locally; `cf deploy --secrets-file` or dashboard in deploy.
  */
