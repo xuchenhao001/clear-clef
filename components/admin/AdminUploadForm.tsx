@@ -1,6 +1,5 @@
-"use client";
 
-import { useRouter } from "next/navigation";
+import { useNavigate, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { AdminCatalogFields, AdminRightsFields, AdminScoreFileInput } from "@/components/admin/admin-form-fields";
 import { adminFormErrorClassName } from "@/components/admin/admin-form-styles";
@@ -9,6 +8,7 @@ import { AdminStickyActions } from "@/components/admin/admin-sticky-actions";
 import { generatePreviewSvg } from "@/lib/verovio/generate-preview-svg";
 
 export function AdminUploadForm() {
+  const navigate = useNavigate();
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -67,8 +67,12 @@ export function AdminUploadForm() {
         throw new Error("Score uploaded, but preview generation failed");
       }
 
-      router.push(`/admin/scores/${uploadJson.id}?uploaded=1`);
-      router.refresh();
+      navigate({
+        to: "/admin/scores/$id",
+        params: { id: uploadJson.id! },
+        search: { uploaded: "1" },
+      });
+      await router.invalidate();
     } catch (submitError) {
       setError(
         submitError instanceof Error ? submitError.message : "Upload failed",

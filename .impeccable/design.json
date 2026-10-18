@@ -70,19 +70,21 @@
       "fontFamily": "var(--font-bitter), \"Songti SC\", \"SimSun\", ui-serif, Georgia, serif",
       "weights": "400 500 600 700 900",
       "usage": "catalog H1, page headings, detail title, wordmark (900), nav, buttons, labels, running heads, imprints",
-      "tracking": "0.005em at display sizes; 0.09-0.14em for label sizes — heavy and tight, never light and airy"
+      "tracking": "0.005em at display sizes; 0.09-0.14em for label sizes — heavy and tight, never light and airy",
+      "load": "@fontsource/bitter (400–900), src/styles/fonts.css"
     },
     "sentence": {
       "fontFamily": "var(--font-garamond), \"Songti SC\", \"SimSun\", ui-serif, Georgia, serif",
       "weights": "400 600",
       "usage": "row titles, credit headings, body reading, extents, shelf marks, form labels",
       "features": "old-style figures for counts; ligatures",
-      "load": "next/font/local, app/fonts/*.woff2, Latin subset"
+      "load": "@font-face EB Garamond, public/fonts/eb-garamond.woff2, Latin subset, src/styles/fonts.css"
     },
     "technical": {
       "fontFamily": "var(--font-geist-mono), ui-monospace, monospace",
       "fontSize": "12px",
-      "usage": "ids, byte sizes, page counters, admin metadata only"
+      "usage": "ids, byte sizes, page counters, admin metadata only",
+      "load": "@fontsource/geist-mono (400), src/styles/fonts.css"
     }
   },
   "retired": ["Cinzel", "Alegreya Sans", "Rye", "small-caps", "surface-leaf", "surface-paper", "MarbledPanel", "tag pills", "visibility chips"],

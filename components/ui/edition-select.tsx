@@ -1,4 +1,3 @@
-"use client";
 
 import { Select } from "@base-ui/react/select";
 import { cn } from "cn";

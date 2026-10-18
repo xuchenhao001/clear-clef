@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 
 type AdminEmptyStateProps = {
   title: string;
@@ -27,11 +27,11 @@ export function AdminEmptyState({
         {description}
       </p>
       <div className="mt-2 flex flex-wrap items-center gap-5">
-        <Link href={primaryHref} className="type-hint text-edition-gilt hover:text-edition-ink">
+        <Link to={primaryHref} className="type-hint text-edition-gilt hover:text-edition-ink">
           {primaryLabel}
         </Link>
         {secondaryHref && secondaryLabel ? (
-          <Link href={secondaryHref} className="type-hint hover:text-edition-gilt">
+          <Link to={secondaryHref} className="type-hint hover:text-edition-gilt">
             {secondaryLabel}
           </Link>
         ) : null}

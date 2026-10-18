@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("next/cache", () => ({
-  revalidatePath: vi.fn(),
+vi.mock("@/lib/cache/public-pages", () => ({
+  purgePublicScore: vi.fn(),
 }));
 
 vi.mock("@/lib/scores/r2", () => ({

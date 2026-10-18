@@ -11,6 +11,10 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "."),
+      "cloudflare:workers": path.resolve(
+        import.meta.dirname,
+        "tests/mocks/cloudflare-workers.ts",
+      ),
     },
   },
 });

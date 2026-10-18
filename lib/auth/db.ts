@@ -1,11 +1,8 @@
-import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { env } from "cloudflare:workers";
 import { drizzle } from "drizzle-orm/d1";
-import { cache } from "react";
 import { authDrizzleSchema } from "@/lib/auth/create-auth";
 
-export const getAuthDb = cache(async () => {
-  const { env } = await getCloudflareContext({ async: true });
+export function getAuthDb() {
   const db = drizzle(env.DB, { schema: authDrizzleSchema });
-
   return { db, env };
-});
+}

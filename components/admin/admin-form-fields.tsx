@@ -1,4 +1,3 @@
-"use client";
 
 import { AdminField, AdminInput } from "@/components/admin/admin-field";
 import { EditionSelect } from "@/components/ui/edition-select";

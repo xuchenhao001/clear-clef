@@ -1,6 +1,10 @@
-NEXTJS_ENV=development
-BETTER_AUTH_URL=http://localhost:3000
+# Local Worker secrets for `pnpm dev` / `cf dev` → `cloudflare:workers` `env`.
+# Copy to `.dev.vars` (gitignored). Only keys declared in `cloudflare.config.ts` apply.
+#
+#   cp .dev.vars.example .dev.vars
+#
+# BETTER_AUTH_URL is set in cloudflare.config.ts (`development` mode → http://localhost:3000).
+# Do not put BETTER_AUTH_URL here — `bindings.text()` ignores `.dev.vars`.
 
-# Wrangler secret for local Workers runtime (.dev.vars). Generate with:
-# openssl rand -base64 32
+# Generate with: openssl rand -base64 32 (must be at least 32 characters)
 BETTER_AUTH_SECRET=replace-me-run-openssl-rand-base64-32

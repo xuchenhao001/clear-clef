@@ -1,15 +1,12 @@
-"use client";
 
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useState } from "react";
 
-/** A slip pasted into the ledger after an upload: a leaf strip with a brass mark. */
 export function AdminUploadedBanner() {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const router = useRouter();
+  const navigate = useNavigate();
+  const search = useSearch({ strict: false }) as { uploaded?: string };
   const [dismissed, setDismissed] = useState(false);
-  const uploaded = searchParams.get("uploaded") === "1";
+  const uploaded = search.uploaded === "1";
 
   if (!uploaded || dismissed) {
     return null;
@@ -17,10 +14,15 @@ export function AdminUploadedBanner() {
 
   function dismiss() {
     setDismissed(true);
-    const params = new URLSearchParams(searchParams.toString());
-    params.delete("uploaded");
-    const query = params.toString();
-    router.replace(query ? `${pathname}?${query}` : pathname);
+    navigate({
+      to: ".",
+      search: (prev) => {
+        const next = { ...prev } as Record<string, unknown>;
+        delete next.uploaded;
+        return next;
+      },
+      replace: true,
+    });
   }
 
   return (

@@ -15,3 +15,11 @@ export function buildCatalogFilterQuery(
 
   return params.toString();
 }
+
+export function buildCatalogFilterSearch(
+  fields: CatalogFilterField[],
+  updates: Partial<Record<string, string>> = {},
+): Record<string, string> {
+  const query = buildCatalogFilterQuery(fields, updates);
+  return Object.fromEntries(new URLSearchParams(query));
+}

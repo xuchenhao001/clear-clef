@@ -1,14 +1,18 @@
-import { hasCatalogFilters } from "@/lib/catalog/search-params";
-import { listFilterOptions, type CatalogFilters } from "@/lib/scores/queries";
 import { CatalogFiltersBar } from "@/components/catalog/catalog-filters-bar";
+import { hasCatalogFilters } from "@/lib/catalog/search-params";
+import type { CatalogFilters } from "@/lib/scores/queries";
+import type { listFilterOptions } from "@/lib/scores/queries";
+
+export type CatalogFilterOptions = Awaited<
+  ReturnType<typeof listFilterOptions>
+>;
 
 type CatalogFiltersProps = {
   current?: CatalogFilters;
+  options: CatalogFilterOptions;
 };
 
-export async function CatalogFilters({ current }: CatalogFiltersProps) {
-  const options = await listFilterOptions();
-
+export function CatalogFilters({ current, options }: CatalogFiltersProps) {
   const fields = [
     {
       name: "key",

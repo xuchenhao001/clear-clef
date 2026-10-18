@@ -70,10 +70,9 @@ Prefer `.mxl` for the original upload when the client sent compressed MusicXML. 
 scores/{id}/original.mxl          # or original.musicxml / original.abc if that was uploaded
 scores/{id}/canonical.musicxml    # Sanitized MusicXML (DOCTYPE stripped; not a 4.x rewrite)
 scores/{id}/preview.svg           # page 1 only, generated at ingest
-incremental-cache/                # OpenNext ISR / data cache (NEXT_INC_CACHE_R2_PREFIX)
 ```
 
-Do not write catalog objects under `incremental-cache/`. Do not write ISR cache under `scores/`.
+All catalog objects live under `scores/{id}/`. Public HTML caching is handled at the edge (see [architecture.md](architecture.md)), not as R2 keys.
 
 ## TypeScript (`ScoreFile`)
 

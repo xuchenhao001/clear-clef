@@ -1,16 +1,18 @@
-"use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useNavigate, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { AdminField, AdminInput } from "@/components/admin/admin-field";
 import { adminFormErrorClassName } from "@/components/admin/admin-form-styles";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 
-export function AdminLoginForm() {
+type AdminLoginFormProps = {
+  nextPath: string;
+};
+
+export function AdminLoginForm({ nextPath }: AdminLoginFormProps) {
+  const navigate = useNavigate();
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const nextPath = searchParams.get("next") ?? "/admin";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -33,8 +35,8 @@ export function AdminLoginForm() {
       return;
     }
 
-    router.push(nextPath);
-    router.refresh();
+    await router.invalidate();
+    navigate({ href: nextPath });
   }
 
   return (

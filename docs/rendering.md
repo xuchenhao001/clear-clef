@@ -9,13 +9,13 @@ ClearClef is a **viewer** catalog, not an in-browser editor. Engraving happens i
 | **[Verovio](https://www.verovio.org)** (`verovio` npm, C++ → WASM) | Engraving quality; MusicXML, ABC, MEI, Humdrum; SVG | Large WASM (~several MB) — load only on score pages |
 | **[OpenSheetMusicDisplay](https://opensheetmusicdisplay.github.io)** | MusicXML-only, simpler TS API, no WASM | Weaker engraving |
 
-**Default: Verovio.** OSMD is the documented fallback if WASM bundling on OpenNext / Next becomes painful.
+**Default: Verovio.** OSMD is the documented fallback if WASM bundling on Vite / Workers becomes painful.
 
 Both are viewers, not editors. Full editing is a different product (Flat.io, MuseScore Studio, or ABC + abcjs).
 
 ## Client-only loading
 
-1. `ScoreViewer` is a Client Component loaded via `ScoreViewerLoader` (`next/dynamic` + `ssr: false`) from the score detail page.
+1. `ScoreViewer` loads only on the client via `ScoreViewerLoader` (`React.lazy` + `Suspense`) from the score detail route.
 2. Prefer ESM + modular WASM:
 
 ```ts
@@ -34,7 +34,7 @@ const tk = new VerovioToolkit(module);
 8. Call `destroy()` on the toolkit when `ScoreViewer` unmounts.
 9. Sanitize Verovio SVG (`script`, `foreignObject`, `on*`) before `innerHTML`. See [`lib/viewer/sanitize-svg.ts`](../lib/viewer/sanitize-svg.ts).
 
-**Do not** import Verovio on list pages or into shared Server Component trees.
+**Do not** import Verovio on list pages or into route modules that ship to the client without lazy boundaries.
 
 ## Practice overlay
 
@@ -48,7 +48,7 @@ const tk = new VerovioToolkit(module);
 | Turn | Tap zones (left / center chrome / right), swipe, keyboard (Arrow, PageUp/Down, Space, Home/End) |
 | Wake lock | `navigator.wakeLock.request("screen")` while practice is open |
 | History | `pushState` on open; device Back closes practice |
-| Safe area | Root layout exports `viewportFit: "cover"` |
+| Safe area | Root route `head` meta includes `viewport-fit=cover` |
 
 ## Serving score bytes
 
@@ -78,7 +78,7 @@ Follow [design.md](design.md): the viewer **outer shell** uses edition canvas to
 
 ## Caching engraved assets
 
-Preview and immutable score objects: long-lived `Cache-Control` (see [architecture.md](architecture.md)). HTML detail pages remain short-cached so metadata updates show up after revalidation.
+Preview and immutable score objects: long-lived `Cache-Control` (see [architecture.md](architecture.md)). HTML detail pages use short CDN cache windows and purge on catalog writes.
 
 Client-side: cache `renderToSVG` strings per page until the next `redoLayout()`.
 

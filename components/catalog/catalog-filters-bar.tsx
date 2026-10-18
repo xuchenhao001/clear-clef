@@ -1,5 +1,5 @@
-import Link from "next/link";
-import { buildCatalogFilterQuery } from "@/lib/catalog/filter-url";
+import { Link } from "@tanstack/react-router";
+import { buildCatalogFilterSearch } from "@/lib/catalog/filter-url";
 import type { CatalogFilterField } from "@/lib/catalog/types";
 import { cn } from "cn";
 
@@ -7,11 +7,6 @@ type CatalogFiltersBarProps = {
   fields: CatalogFilterField[];
   hasFilters: boolean;
 };
-
-function fieldHref(fields: CatalogFilterField[], name: string, value: string) {
-  const query = buildCatalogFilterQuery(fields, { [name]: value });
-  return query ? `/?${query}` : "/";
-}
 
 /**
  * The pause-menu column: each filter is a list of entries on the ground, and
@@ -26,8 +21,8 @@ export function CatalogFiltersBar({ fields, hasFilters }: CatalogFiltersBarProps
       <ul className="mt-3 border-t border-edition-hairline">
         <li className="border-b border-edition-hairline-soft">
           <Link
-            href="/"
-              className={cn(
+            to="/"
+            className={cn(
               "type-nav-link inline-flex py-2.5 edition-interactive-transition hover:text-edition-ink",
               !hasFilters && "nav-current",
             )}
@@ -52,7 +47,10 @@ export function CatalogFiltersBar({ fields, hasFilters }: CatalogFiltersBarProps
                   className="border-b border-edition-hairline-soft"
                 >
                   <Link
-                    href={fieldHref(fields, field.name, active ? "" : value)}
+                    to="/"
+                    search={buildCatalogFilterSearch(fields, {
+                      [field.name]: active ? "" : value,
+                    })}
                     className={cn(
                       "type-nav-link inline-flex py-2.5 normal-case tracking-[0.04em] edition-interactive-transition hover:text-edition-ink",
                       active && "nav-current",

@@ -1,21 +1,16 @@
+import eslint from "@eslint/js";
 import { defineConfig, globalIgnores } from "eslint/config";
-import nextVitals from "eslint-config-next/core-web-vitals";
-import nextTs from "eslint-config-next/typescript";
+import tseslint from "typescript-eslint";
 
-const eslintConfig = defineConfig([
-  ...nextVitals,
-  ...nextTs,
-  // Override default ignores of eslint-config-next.
+export default defineConfig(
   globalIgnores([
-    ".next/**",
-    ".open-next/**",
+    ".cloudflare/output/**",
+    "dist/**",
     "drizzle/**",
-    "out/**",
-    "build/**",
-    "next-env.d.ts",
-    "cloudflare-env.d.ts",
+    "src/routeTree.gen.ts",
+    "scripts/**",
     "tools/**",
   ]),
-]);
-
-export default eslintConfig;
+  eslint.configs.recommended,
+  ...tseslint.configs.recommended,
+);

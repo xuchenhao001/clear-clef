@@ -1,12 +1,12 @@
 ---
 description: Verovio score viewer — client-only, paginated SVG
-globs: components/score/**,app/**/scores/**,**/ScoreViewer*
+globs: components/score/**,src/routes/**/scores*,**/ScoreViewer*
 alwaysApply: false
 ---
 
 # Score viewer
 
-- Load Verovio only in Client Components via `ScoreViewerLoader` (`next/dynamic` + `ssr: false`).
+- Load Verovio only on the client via `ScoreViewerLoader` (`React.lazy` + `Suspense`).
 - Prefer `verovio/wasm` + `VerovioToolkit`: `loadZipDataBuffer` / `loadData` → `renderToSVG` per page.
 - Embedded reflow: `embeddedLayoutOptions(width)` only (width-only, `adjustPageHeight: true`). Practice reflow: `practiceLayoutOptions(width, height)`. Ingest previews use fixed `VEROVIO_PREVIEW_OPTIONS` only. Guard with `shouldReflowLayout` before `redoLayout()`.
 - Do not share raw page numbers between embedded viewer and practice overlay; restore position with `getPageWithElement(xml:id)`.

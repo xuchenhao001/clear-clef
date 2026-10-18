@@ -19,8 +19,8 @@ type CreateAuthOptions = {
   allowSignUp?: boolean;
 };
 
-// `next dev` silently moves to another port when the default one is busy, so a
-// stale BETTER_AUTH_URL in `.dev.vars` would otherwise fail every sign-in with
+// Vite may bind another port when 3000 is busy, so a stale BETTER_AUTH_URL in
+// `.dev.vars` would otherwise fail every sign-in with
 // "Invalid origin". Only loopback base URLs get the extra dev ports; deployed
 // environments keep Better Auth's strict single-origin check.
 const LOOPBACK_DEV_ORIGINS = [
@@ -54,6 +54,19 @@ export function createAuth(
 ) {
   const { secret, baseURL } = authEnv ?? resolveAuthEnv();
 
+  const trustedOrigins = trustedOriginsFor(baseURL);
+  if (
+    process.env.NODE_ENV === "development" &&
+    trustedOrigins.length === 0 &&
+    baseURL.startsWith("http")
+  ) {
+    const hint =
+      "BETTER_AUTH_URL looks like a deployed origin while trustedOrigins is empty. " +
+      "Use ctx.mode === \"development\" → http://localhost:3000 in cloudflare.config.ts " +
+      "(bindings.text is not overridden by .dev.vars).";
+    console.error(`[ClearClef auth] ${hint} Current baseURL: ${baseURL}`);
+  }
+
   return betterAuth({
     database: drizzleAdapter(db, {
       provider: "sqlite",
@@ -61,7 +74,7 @@ export function createAuth(
     }),
     secret,
     baseURL,
-    trustedOrigins: trustedOriginsFor(baseURL),
+    trustedOrigins,
     emailAndPassword: {
       enabled: true,
       disableSignUp: !options.allowSignUp,

@@ -1,6 +1,5 @@
-"use client";
 
-import { useRouter } from "next/navigation";
+import { useNavigate, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { AdminField, AdminInput } from "@/components/admin/admin-field";
 import { adminFormErrorClassName } from "@/components/admin/admin-form-styles";
@@ -8,6 +7,7 @@ import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 
 export function AdminSetupForm() {
+  const navigate = useNavigate();
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -54,8 +54,8 @@ export function AdminSetupForm() {
       return;
     }
 
-    router.push("/admin");
-    router.refresh();
+    await router.invalidate();
+    navigate({ to: "/admin" });
   }
 
   return (

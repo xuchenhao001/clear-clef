@@ -1,11 +1,5 @@
-import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { env } from "cloudflare:workers";
 
-export async function getCloudflareEnv() {
-  const { env } = await getCloudflareContext({ async: true });
-  return env;
-}
-
-export async function getScoresBucket() {
-  const env = await getCloudflareEnv();
+export function getScoresBucket() {
   return env.SCORES_BUCKET;
 }

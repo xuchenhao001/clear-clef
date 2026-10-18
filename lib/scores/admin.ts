@@ -4,7 +4,7 @@ import { scores, type Score } from "@/lib/db/schema";
 import { IngestValidationError } from "@/lib/ingest/errors";
 import type { ScoreVisibility } from "@/lib/ingest/admin-form";
 import type { CatalogDb } from "@/lib/scores/queries";
-import { revalidateScorePaths } from "@/lib/scores/revalidate";
+import { purgePublicScore } from "@/lib/cache/public-pages";
 import { deleteScoreObjects } from "@/lib/scores/r2";
 import {
   attachTagsToRows,
@@ -122,7 +122,7 @@ export async function updateScoreMetadata(
   await database.update(scores).set(set).where(eq(scores.id, scoreId));
   await replaceTagsForScore(scoreId, input.tagList, database);
 
-  revalidateScorePaths(existing.slug);
+  await purgePublicScore(existing.slug);
 
   return { slug: existing.slug };
 }
@@ -144,7 +144,7 @@ export async function deleteScore(
   await deleteScoreObjects(scoreId);
   await database.delete(scores).where(eq(scores.id, scoreId));
 
-  revalidateScorePaths(existing.slug);
+  await purgePublicScore(existing.slug);
 
   return { slug: existing.slug };
 }

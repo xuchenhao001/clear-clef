@@ -56,7 +56,7 @@ Typical MusicXML sources:
 - `<credit>` — displayed credits
 - Part list, key, time signature from score header / first attributes
 
-Extract title, composer, optional catalog number (`work-number`), lyricist, key, time, parts → D1. Admin upload may override catalog number when the file is blank or wrong. Do **not** import ingest parsers into list/detail RSC pages.
+Extract title, composer, optional catalog number (`work-number`), lyricist, key, time, parts → D1. Admin upload may override catalog number when the file is blank or wrong. Do **not** import ingest parsers into public catalog route loaders.
 
 ## License (required)
 

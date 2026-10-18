@@ -1,15 +1,15 @@
-"use client";
 
-import { useRouter } from "next/navigation";
+import { useNavigate, useRouter } from "@tanstack/react-router";
 import { authClient } from "@/lib/auth-client";
 
 export function AdminSignOutButton() {
+  const navigate = useNavigate();
   const router = useRouter();
 
   async function onSignOut() {
     await authClient.signOut();
-    router.push("/admin/login");
-    router.refresh();
+    navigate({ to: "/admin/login" });
+    await router.invalidate();
   }
 
   return (

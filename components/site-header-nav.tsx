@@ -1,12 +1,7 @@
-"use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { cn } from "cn";
 
-// A menu is a value ladder: the current item is bone, everything else sits back
-// in the muted tone and lifts on hover. Selection is a change of value, not a
-// chip — the game never draws a background behind the current entry.
 function navLinkClassName(active: boolean) {
   return cn(
     "type-nav-link edition-interactive-transition",
@@ -15,12 +10,12 @@ function navLinkClassName(active: boolean) {
 }
 
 export function CatalogNavLink() {
-  const pathname = usePathname();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
   const onCatalog = pathname === "/";
 
   return (
     <Link
-      href="/"
+      to="/"
       className={navLinkClassName(onCatalog)}
       aria-current={onCatalog ? "page" : undefined}
     >
@@ -30,12 +25,12 @@ export function CatalogNavLink() {
 }
 
 export function AdminNavLink() {
-  const pathname = usePathname();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
   const onAdmin = pathname.startsWith("/admin");
 
   return (
     <Link
-      href="/admin"
+      to="/admin"
       className={navLinkClassName(onAdmin)}
       aria-current={onAdmin ? "page" : undefined}
     >

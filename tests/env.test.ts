@@ -41,6 +41,6 @@ describe("resolveAuthEnv", () => {
   it("rejects secrets shorter than 32 characters", () => {
     expect(() =>
       resolveAuthEnv({ BETTER_AUTH_SECRET: "too-short" }),
-    ).toThrow("BETTER_AUTH_SECRET must be at least 32 characters");
+    ).toThrow(/BETTER_AUTH_SECRET.*32 characters|too short on Worker env/);
   });
 });

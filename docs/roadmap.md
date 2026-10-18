@@ -4,17 +4,16 @@ Implementation order for ClearClef.
 
 ## Phase 1 — Scaffold (done)
 
-- Next.js App Router + TypeScript
-- OpenNext Cloudflare (`@opennextjs/cloudflare`)
-- Wrangler: D1 `clear-clef` + one R2 bucket `clear-clef` (scores + OpenNext ISR prefixes)
+- TanStack Start + TanStack Router + TypeScript (`src/routes/`, Vite 8)
+- Cloudflare Workers deploy (`cf deploy`, config in `cloudflare.config.ts`)
+- D1 `clear-clef` + R2 bucket `clear-clef` (`scores/` prefix only); `cf` CLI for deploy and migrations
 - Drizzle ORM against D1 (`lib/db`, `drizzle/0000_init.sql`)
 - Tailwind + shadcn/ui baseline
-- `initOpenNextCloudflareForDev()` for local bindings
 - Better Auth on D1 (`drizzle/0001_auth.sql`), first-boot `/admin/setup`, `/admin/login`
 
 ## Phase 2 — Public catalog (done)
 
-- List + detail as Server Components querying D1
+- List + detail via route loaders + `createServerFn` querying D1
 - SEO-friendly HTML (title, composer, license)
 - No WASM on these pages
 - Filter `visibility = 'public'`

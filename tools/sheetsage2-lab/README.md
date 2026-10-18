@@ -1,6 +1,6 @@
 # SheetSage2 trial lab
 
-Standalone **local GPU** workspace to try [SheetSage2](https://huggingface.co/m-a-p/SheetSage2): full-length audio → ABC/MIDI/events, ABC → MusicXML/MXL, and a MIDI audio preview in Gradio. **Not** part of the ClearClef Next.js app.
+Standalone **local GPU** workspace to try [SheetSage2](https://huggingface.co/m-a-p/SheetSage2): full-length audio → ABC/MIDI/events, ABC → MusicXML/MXL, and a MIDI audio preview in Gradio. **Not** part of the ClearClef TanStack Start app.
 
 ## What it does
 

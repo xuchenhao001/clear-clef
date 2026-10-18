@@ -1,0 +1,22 @@
+@import "@fontsource/bitter/400.css";
+@import "@fontsource/bitter/500.css";
+@import "@fontsource/bitter/600.css";
+@import "@fontsource/bitter/700.css";
+@import "@fontsource/bitter/900.css";
+@import "@fontsource/geist-mono/400.css";
+
+@font-face {
+  font-family: "EB Garamond";
+  src: url("/fonts/eb-garamond.woff2") format("woff2");
+  font-weight: 400 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font-bitter: "Bitter", ui-serif, Georgia, serif;
+  --font-geist-mono: "Geist Mono", ui-monospace, monospace;
+  --font-garamond:
+    "EB Garamond", "Songti SC", "SimSun", "Noto Serif CJK SC",
+    "Source Han Serif SC", ui-serif, Georgia, serif;
+}

@@ -1,12 +1,8 @@
-"use client";
 
-import dynamic from "next/dynamic";
+import { lazy, Suspense } from "react";
 import { ViewerSkeleton } from "@/components/score/viewer-skeleton";
 
-const ScoreViewer = dynamic(() => import("@/components/score/ScoreViewer"), {
-  ssr: false,
-  loading: () => <ViewerSkeleton />,
-});
+const ScoreViewer = lazy(() => import("@/components/score/ScoreViewer"));
 
 type ScoreViewerLoaderProps = {
   fileUrl: string;
@@ -15,5 +11,9 @@ type ScoreViewerLoaderProps = {
 };
 
 export function ScoreViewerLoader(props: ScoreViewerLoaderProps) {
-  return <ScoreViewer {...props} />;
+  return (
+    <Suspense fallback={<ViewerSkeleton />}>
+      <ScoreViewer {...props} />
+    </Suspense>
+  );
 }

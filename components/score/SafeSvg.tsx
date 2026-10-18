@@ -1,4 +1,3 @@
-"use client";
 
 import { sanitizeVerovioSvg } from "@/lib/viewer/sanitize-svg";
 

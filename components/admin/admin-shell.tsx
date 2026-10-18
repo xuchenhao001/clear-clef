@@ -4,7 +4,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SkipToContent } from "@/components/skip-to-content";
 import { ThemeMenu } from "@/components/theme-menu";
 import { Wordmark } from "@/components/wordmark";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 
 type AdminShellProps = {
   email: string;
@@ -23,7 +23,7 @@ export function AdminShell({ email, children }: AdminShellProps) {
         <div className="mx-auto flex h-14 w-full max-w-[1200px] items-center justify-between gap-4 px-6">
           <Wordmark href="/admin" />
           <div className="flex items-center gap-4">
-            <Link href="/" className="type-nav-link hidden hover:text-edition-ink sm:inline">
+            <Link to="/" className="type-nav-link hidden hover:text-edition-ink sm:inline">
               Catalogue
             </Link>
             <ThemeMenu />

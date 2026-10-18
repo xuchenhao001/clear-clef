@@ -8,7 +8,7 @@ web
 
 ## Stack
 
-Next.js (App Router) on Cloudflare via OpenNext; D1 for metadata; R2 for score files and previews; Better Auth for admin; Verovio WASM in the browser for engraving. Package manager: **pnpm**.
+TanStack Start on Cloudflare Workers; D1 for metadata; R2 for score files and previews; Better Auth for admin; Verovio WASM in the browser for engraving. Package manager: **pnpm**.
 
 ## Users
 
@@ -38,7 +38,7 @@ A **score catalog in an archive finding-aid register**: reading-room chrome (lig
 
 ## Accessibility
 
-WCAG AA target: keyboard navigation, visible focus, semantic landmarks, reduced-motion respect, contrast-safe `edition-*` tokens. Primary controls are **40px** on fine pointers (design density) and **44px minimum** on coarse pointers (`coarse:` variant in `app/globals.css`).
+WCAG AA target: keyboard navigation, visible focus, semantic landmarks, reduced-motion respect, contrast-safe `edition-*` tokens. Primary controls are **40px** on fine pointers (design density) and **44px minimum** on coarse pointers (`coarse:` variant in `src/styles/globals.css`).
 
 ## Open decisions
 

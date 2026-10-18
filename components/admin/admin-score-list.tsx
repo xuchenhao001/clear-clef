@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import { formatCatalogLine } from "@/lib/scores/catalog-line";
 import type { AdminCatalogScore } from "@/lib/scores/admin";
 
@@ -49,7 +49,6 @@ export function AdminScoreList({
           const metadataLine = formatCatalogLine({
             catalogNumber: score.catalogNumber,
           });
-          const editHref = `/admin/scores/${score.id}`;
           const aside = [
             visibilityLabel[score.visibility] ?? score.visibility,
             compact ? null : score.license,
@@ -63,7 +62,8 @@ export function AdminScoreList({
             <li key={score.id} className="border-b border-edition-hairline-soft">
               <div className="flex items-baseline justify-between gap-4 py-3.5">
                 <Link
-                  href={editHref}
+                  to="/admin/scores/$id"
+                  params={{ id: score.id }}
                   className="min-w-0 flex-1 outline-none focus-visible:ring-3 focus-visible:ring-edition-focus-ring"
                 >
                   <span className="flex items-baseline gap-3">
@@ -82,7 +82,8 @@ export function AdminScoreList({
                 <span className="flex shrink-0 items-center gap-4">
                   {score.visibility === "public" ? (
                     <Link
-                      href={`/scores/${score.slug}`}
+                      to="/scores/$slug"
+                      params={{ slug: score.slug }}
                       className="type-hint hover:text-edition-gilt"
                       target="_blank"
                       rel="noopener noreferrer"
@@ -96,7 +97,11 @@ export function AdminScoreList({
                   >
                     File
                   </a>
-                  <Link href={editHref} className="type-hint text-edition-gilt hover:text-edition-ink">
+                  <Link
+                    to="/admin/scores/$id"
+                    params={{ id: score.id }}
+                    className="type-hint text-edition-gilt hover:text-edition-ink"
+                  >
                     Edit
                   </Link>
                 </span>

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import { buttonVariants } from "@/components/ui/button";
 import { Plate, PlateHead } from "@/components/ui/plate";
 
@@ -24,7 +24,7 @@ export function AdminScoreEditSidebar({
           <div className="p-4">
             <div className="rounded-md border border-edition-hairline-strong bg-edition-surface-strong p-1">
               <div className="overflow-hidden rounded-sm bg-edition-surface-page p-1">
-                {/* eslint-disable-next-line @next/next/no-img-element -- admin-only SVG from session-gated API */}
+                {/* Admin-only SVG from session-gated API */}
                 <img
                   src={`/api/admin/scores/${scoreId}/preview`}
                   alt=""
@@ -54,7 +54,8 @@ export function AdminScoreEditSidebar({
             </a>
             {visibility === "public" ? (
               <Link
-                href={`/scores/${slug}`}
+                to="/scores/$slug"
+                params={{ slug }}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={buttonVariants({ variant: "outline" })}

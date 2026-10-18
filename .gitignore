@@ -6,28 +6,31 @@ yarn.lock
 bun.lock
 bun.lockb
 
-# Next.js / OpenNext
+# Legacy Next / OpenNext (pre–TanStack Start)
 .next/
 .open-next/
 out/
 next-env.d.ts
 
-# Cloudflare / Wrangler (local state only)
+# Vite / TanStack Start + Cloudflare build output
+dist/
+
+# Cloudflare local state / build artifacts
 .wrangler/
+.cloudflare/output/
+.cloudflare/state/
 .mf/
 .dev.vars
 .dev.vars.*
 !.dev.vars.example
 
-# Env / secrets
+# Env / secrets (local Worker vars: `.dev.vars` from `.dev.vars.example`)
 .env
 .env.*
 .env*.local
-!.env.example
 *.pem
 
 # Build / cache
-dist/
 build/
 *.tsbuildinfo
 .turbo/

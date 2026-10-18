@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import { cn } from "cn";
 
 export type AdminBreadcrumbItem = {
@@ -26,7 +26,7 @@ export function AdminBreadcrumbs({ items }: AdminBreadcrumbsProps) {
               ) : null}
               {item.href && !isLast ? (
                 <Link
-                  href={item.href}
+                  to={item.href}
                   className="edition-interactive-transition hover:text-edition-ink"
                 >
                   {item.label}

@@ -1,6 +1,5 @@
-"use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { EditionSelect } from "@/components/ui/edition-select";
 import {
@@ -14,13 +13,11 @@ type AdminScoresFiltersProps = {
   current: AdminScoreListFilters;
 };
 
-/**
- * Search and visibility for the register. A live value keeps the rubric rule.
- * Auto-submits on change.
- */
 export function AdminScoresFilters({ current }: AdminScoresFiltersProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  const navigate = useNavigate();
+  const searchStr = useRouterState({
+    select: (state) => state.location.searchStr,
+  });
   const [q, setQ] = useState(current.q ?? "");
   const [visibility, setVisibility] = useState<string>(current.visibility ?? "");
 
@@ -32,56 +29,49 @@ export function AdminScoresFilters({ current }: AdminScoresFiltersProps) {
       });
       const existingPath = formatAdminScoresSearchPath({
         visibility: normalizeAdminVisibilityFilter(
-          searchParams.get("visibility") ?? "",
+          new URLSearchParams(searchStr).get("visibility") ?? "",
         ),
-        q: searchParams.get("q") ?? "",
+        q: new URLSearchParams(searchStr).get("q") ?? "",
       });
       if (nextPath !== existingPath) {
-        router.push(nextPath);
+        navigate({ href: nextPath });
       }
     }, 300);
 
     return () => window.clearTimeout(timeout);
-  }, [q, visibility, router, searchParams]);
+  }, [q, visibility, navigate, searchStr]);
 
   const hasFilters = Boolean(visibility || q.trim());
   const searchLive = q.trim().length > 0;
 
   return (
     <form
-      className="flex flex-wrap items-end gap-x-6 gap-y-4 border-b border-edition-hairline pb-5"
+      className="flex flex-col gap-4 border-b border-edition-hairline pb-6 sm:flex-row sm:flex-wrap sm:items-end"
       onSubmit={(event) => event.preventDefault()}
     >
-      <div className="flex min-w-[7rem] flex-1 flex-col gap-1 sm:max-w-[20rem]">
-        <label htmlFor="admin-score-search" className="type-label">
+      <div className="min-w-[12rem] flex-1">
+        <label htmlFor="admin-scores-q" className="type-label">
           Search
         </label>
-        <div
+        <input
+          id="admin-scores-q"
+          type="search"
+          value={q}
+          onChange={(event) => setQ(event.target.value)}
+          placeholder="Title, composer, catalogue…"
           className={cn(
-            "relative border-b border-edition-field-border",
-            searchLive && "seal-live border-b-edition-rubric",
+            "mt-1.5 w-full border-b border-edition-hairline bg-transparent py-2 type-body-sm text-edition-ink outline-none",
+            "placeholder:text-edition-muted focus-visible:border-edition-gilt",
           )}
-        >
-          <input
-            id="admin-score-search"
-            type="search"
-            value={q}
-            onChange={(event) => setQ(event.target.value)}
-            placeholder="Title or composer"
-            className="min-h-11 w-full border-0 bg-transparent px-0 py-2 text-[0.9375rem] text-edition-ink edition-interactive-transition outline-none placeholder:text-edition-placeholder focus-visible:ring-3 focus-visible:ring-edition-focus-ring"
-          />
-        </div>
+          aria-live={searchLive ? "polite" : undefined}
+        />
       </div>
-      <div className="flex items-end gap-4">
+      <div className="w-full sm:w-auto sm:min-w-[10rem]">
         <EditionSelect
-          name="visibility"
           label="Visibility"
           value={visibility}
-          triggerVariant="hairline"
-          labelVariant="filter"
           placeholder="All"
           items={[
-            { label: "All", value: "" },
             { label: "Public", value: "public" },
             { label: "Unlisted", value: "unlisted" },
             { label: "Private", value: "private" },
@@ -97,7 +87,7 @@ export function AdminScoresFilters({ current }: AdminScoresFiltersProps) {
             onClick={() => {
               setQ("");
               setVisibility("");
-              router.push("/admin/scores");
+              navigate({ to: "/admin/scores" });
             }}
           >
             Clear

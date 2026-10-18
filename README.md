@@ -1,6 +1,6 @@
 # ClearClef
 
-Public catalog of Common Western Musical Notation scores. **MusicXML** is the canonical interchange format; scores render in the browser with Verovio; metadata and files live on **Next.js** plus **Cloudflare** (D1 + R2).
+Public catalog of Common Western Musical Notation scores. **MusicXML** is the canonical interchange format; scores render in the browser with Verovio; metadata and files live on **TanStack Start** plus **Cloudflare** (D1 + R2).
 
 Anyone can browse. Uploads are admin-only in v1 (Better Auth email/password; public sign-up disabled).
 
@@ -12,39 +12,40 @@ Anyone can browse. Uploads are admin-only in v1 (Better Auth email/password; pub
 
 | Layer | Choice |
 | --- | --- |
-| App | Next.js App Router + TypeScript |
+| App | [TanStack Start](https://tanstack.com/start) + TypeScript |
 | Package manager | pnpm 11 (Corepack) |
-| Deploy | [@opennextjs/cloudflare](https://opennext.js.org/cloudflare) |
+| Deploy | `cf build` + `cf deploy --prebuilt`; config in `cloudflare.config.ts` |
 | UI | Tailwind + shadcn/ui |
 | Auth | Better Auth + D1 (admin plugin; email/password) |
 | Score files | R2 bucket `clear-clef` (`SCORES_BUCKET`, keys under `scores/`) |
-| Next ISR cache | Same bucket (`NEXT_INC_CACHE_R2_BUCKET`, keys under `incremental-cache/`) |
+| Public page cache | `Cache-Control` + Workers Cache API purge on admin writes |
 | Catalog metadata | D1 database `clear-clef` (`DB`) + Drizzle ORM |
 | Engraving | Verovio (WASM → SVG), client-only |
 
 ## Local development
 
-Requires Node 20+, [pnpm](https://pnpm.io) 11 (via Corepack), and a logged-in Cloudflare CLI session (`pnpm exec cf auth login`, then `pnpm exec cf auth whoami`). D1 migrations use [`cf`](https://developers.cloudflare.com/cf/). The Worker is still built and deployed by OpenNext through Wrangler (`pnpm preview`, `pnpm deploy`).
+Requires Node **24** (LTS), [pnpm](https://pnpm.io) 11 (via Corepack), and a logged-in Cloudflare CLI session (`pnpm exec cf auth login`). See [docs/cloudflare.md](docs/cloudflare.md) and [docs/local-dev.md](docs/local-dev.md).
 
 ```bash
 corepack enable
 cp .dev.vars.example .dev.vars
 pnpm install
-pnpm db:migrate:local
-pnpm cf-typegen                  # after wrangler.jsonc changes; Env types are committed
+pnpm db:migrate:local   # once after clone; again after pull when drizzle/*.sql changes
+pnpm cf-typegen                  # after cloudflare.config.ts changes; writes .cloudflare/types
 pnpm dev
 ```
 
 On first run, open `/admin/setup` to create the admin account.
 
-- `pnpm dev` — Next.js + local Cloudflare bindings via `initOpenNextCloudflareForDev()` (`wrangler.dev.jsonc` omits `WORKER_SELF_REFERENCE`, which is only needed in the Workers runtime)
+- `pnpm dev` — `cf dev` (Vite + Workers bindings, `development` mode); does **not** run D1 migrations (use `pnpm db:migrate:local` or `pnpm db:ensure:local` when schema changes)
 - `pnpm test` — Vitest unit tests (in-memory SQLite; no remote D1)
 - `pnpm typecheck` — TypeScript without emit
-- `pnpm preview` — build with OpenNext and run in the Workers runtime
-- `pnpm db:migrate:remote` — apply Drizzle SQL to the remote D1 database
-- `pnpm deploy` — OpenNext build + deploy the Worker (not required for local work)
+- `pnpm preview` — `cf build` then Vite preview
+- `pnpm db:migrate:remote` — apply Drizzle SQL to remote D1
+- `pnpm deploy` — `cf build` + `cf deploy --prebuilt`
+- `pnpm deploy:staging` — same with `--mode staging` (`clear-clef-staging`)
 
-Do not commit `.dev.vars` or `.env.local`. Copy from [`.dev.vars.example`](.dev.vars.example) (Wrangler/Cloudflare `env`) and optionally [`.env.example`](.env.example) (Next.js `process.env` mirror).
+Local **secrets** live in **`.dev.vars`** (see [`.dev.vars.example`](.dev.vars.example)); do not commit it. `BETTER_AUTH_URL` is **not** in `.dev.vars` — `cloudflare.config.ts` sets it from Vite/cf `mode` (`development` → `http://localhost:3000`, deploy → workers.dev). Production secrets use `cf` / the dashboard.
 
 ## Docs
 

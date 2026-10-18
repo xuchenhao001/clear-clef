@@ -2,7 +2,7 @@
 
 Visual reference for the public catalog, the score, and the register. Taken from the Red Dead Redemption menus: type sits on a near-black ground, the current item is brass, and paper appears only when the content is a document.
 
-Tokens live in `app/globals.css`. If this document and the stylesheet disagree, the stylesheet wins. Update this file in the same change.
+Tokens live in `src/styles/globals.css`. Font faces are declared in `src/styles/fonts.css` (`@fontsource` Bitter and Geist Mono; self-hosted EB Garamond at `public/fonts/eb-garamond.woff2`, Latin subset). If this document and the stylesheet disagree, the stylesheet wins. Update this file in the same change.
 
 ## The rule
 

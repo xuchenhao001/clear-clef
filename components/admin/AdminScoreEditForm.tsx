@@ -1,6 +1,5 @@
-"use client";
 
-import { useRouter } from "next/navigation";
+import { useNavigate, useRouter } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { AdminDangerZone } from "@/components/admin/admin-danger-zone";
 import { AdminField, AdminInput } from "@/components/admin/admin-field";
@@ -69,6 +68,7 @@ export function AdminScoreEditForm({
   initialVisibility,
   hasPreview,
 }: AdminScoreEditFormProps) {
+  const navigate = useNavigate();
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState(initial);
@@ -125,7 +125,7 @@ export function AdminScoreEditForm({
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
-      router.refresh();
+      await router.invalidate();
     } catch (submitError) {
       setError(
         submitError instanceof Error ? submitError.message : "Save failed",
@@ -152,8 +152,8 @@ export function AdminScoreEditForm({
       if (!response.ok) {
         throw new Error(json.error ?? "Delete failed");
       }
-      router.push("/admin/scores");
-      router.refresh();
+      navigate({ to: "/admin/scores" });
+      await router.invalidate();
     } catch (deleteError) {
       setError(
         deleteError instanceof Error ? deleteError.message : "Delete failed",

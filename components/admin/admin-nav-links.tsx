@@ -1,26 +1,24 @@
-"use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { cn } from "cn";
 
 const ENTRIES = [
-  { href: "/admin", label: "Overview", match: (path: string) => path === "/admin" },
+  { to: "/admin", label: "Overview", match: (path: string) => path === "/admin" },
   {
-    href: "/admin/scores",
+    to: "/admin/scores",
     label: "Scores",
     match: (path: string) =>
       path === "/admin/scores" || path.startsWith("/admin/scores/"),
   },
   {
-    href: "/admin/upload",
+    to: "/admin/upload",
     label: "Upload",
     match: (path: string) => path.startsWith("/admin/upload"),
   },
 ] as const;
 
 export function AdminNavLinks() {
-  const pathname = usePathname();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
 
   return (
     <nav aria-label="Register" className="lg:sticky lg:top-20">
@@ -29,9 +27,9 @@ export function AdminNavLinks() {
         {ENTRIES.map((entry) => {
           const active = entry.match(pathname);
           return (
-            <li key={entry.href} className="border-b border-edition-hairline-soft">
+            <li key={entry.to} className="border-b border-edition-hairline-soft">
               <Link
-                href={entry.href}
+                to={entry.to}
                 className={cn(
                   "type-nav-link inline-flex py-2.5 edition-interactive-transition hover:text-edition-ink",
                   active && "nav-current",

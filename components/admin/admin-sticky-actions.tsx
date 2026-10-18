@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "cn";
 
@@ -23,7 +23,7 @@ export function AdminStickyActions({
           {pending ? pendingLabel : submitLabel}
         </Button>
         <Link
-          href={backHref}
+          to={backHref}
           className={cn(buttonVariants({ variant: "outline" }), "w-fit")}
         >
           Cancel

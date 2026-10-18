@@ -1,4 +1,3 @@
-"use client";
 
 import { SafeSvg } from "@/components/score/SafeSvg";
 import type { LayoutMode } from "@/lib/viewer/spreads";

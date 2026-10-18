@@ -1,12 +1,12 @@
 ---
 description: ClearClef visual design tokens and edition-quality catalog UI
-globs: app/**/*.tsx,components/**/*.tsx,app/globals.css
+globs: src/**/*.tsx,components/**/*.tsx,src/styles/*.css
 alwaysApply: false
 ---
 
 # ClearClef design
 
-Read [docs/design.md](../docs/design.md) before changing catalog, viewer, or register styling. If that document and `app/globals.css` disagree, the stylesheet wins, then update the document.
+Read [docs/design.md](../docs/design.md) before changing catalog, viewer, or register styling. If that document and `src/styles/globals.css` disagree, the stylesheet wins, then update the document.
 
 ## Surfaces
 

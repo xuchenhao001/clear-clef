@@ -12,7 +12,7 @@ import {
 } from "@/lib/ingest/mxl";
 import { extractScoreMetadata } from "@/lib/ingest/metadata";
 import { sanitizeMusicXml, XmlSecurityError } from "@/lib/ingest/xml";
-import { revalidateScorePaths } from "@/lib/scores/revalidate";
+import { purgePublicScore } from "@/lib/cache/public-pages";
 import {
   deleteR2Object,
   putScoreMusicXmlObjects,
@@ -97,7 +97,7 @@ export async function uploadScore(
     await attachTagsToScore(id, input.tagList);
   }
 
-  revalidateScorePaths(slug);
+  await purgePublicScore(slug);
 
   return { id, slug, title: metadata.title };
 }

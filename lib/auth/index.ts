@@ -1,5 +1,4 @@
-import { headers } from "next/headers";
-import { cache } from "react";
+import { getRequestHeaders } from "@tanstack/react-start/server";
 import { createAuth } from "@/lib/auth/create-auth";
 import { getAuthDb } from "@/lib/auth/db";
 import { hasAdminUser } from "@/lib/auth/setup";
@@ -9,15 +8,15 @@ function isAdminRole(role: string | null | undefined): boolean {
   return role === "admin";
 }
 
-export const getAuth = cache(async () => {
-  const { db, env } = await getAuthDb();
+export async function getAuth() {
+  const { db, env } = getAuthDb();
   return createAuth(db, {}, resolveAuthEnv(env));
-});
+}
 
 export async function getSession() {
   const auth = await getAuth();
   return auth.api.getSession({
-    headers: await headers(),
+    headers: getRequestHeaders(),
   });
 }
 
@@ -31,6 +30,6 @@ export async function requireAdminSession() {
 }
 
 export async function needsAdminSetup(): Promise<boolean> {
-  const { db } = await getAuthDb();
+  const { db } = getAuthDb();
   return !(await hasAdminUser(db));
 }
