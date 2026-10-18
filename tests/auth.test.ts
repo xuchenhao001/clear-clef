@@ -138,10 +138,16 @@ describe("trustedOriginsFor", () => {
     expect(origins).toContain("http://127.0.0.1:3000");
   });
 
-  it("keeps deployed base URLs strict", () => {
+  it("trusts alternate public origins when base URL is the canonical domain", () => {
+    expect(trustedOriginsFor("https://clearclef.dedog.top")).toEqual([
+      "https://clear-clef.xu-chenhao.workers.dev",
+    ]);
+  });
+
+  it("does not duplicate the primary origin in trustedOrigins", () => {
     expect(
       trustedOriginsFor("https://clear-clef.xu-chenhao.workers.dev"),
-    ).toEqual([]);
+    ).toEqual(["https://clearclef.dedog.top"]);
   });
 
   it("returns no origins for an unparseable base URL", () => {

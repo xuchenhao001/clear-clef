@@ -32,7 +32,7 @@ ClearClef uses the native **`cf`** workflow: one **`cloudflare.config.ts`**, no 
 | Mode | Typical command | Worker | `BETTER_AUTH_URL` |
 | --- | --- | --- | --- |
 | `development` | `pnpm dev` | `clear-clef` | `http://localhost:3000` |
-| `production` | `pnpm deploy` | `clear-clef` | `https://clear-clef.xu-chenhao.workers.dev` |
+| `production` | `pnpm deploy` | `clear-clef` | `https://clearclef.dedog.top` (workers.dev alias still works) |
 
 ## Deploy secrets
 

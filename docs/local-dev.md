@@ -22,6 +22,7 @@
 | --- | --- | --- |
 | `BETTER_AUTH_SECRET must be at least 32 characters` | Secret missing from `env` | `bindings.secret()` in config + `.dev.vars` |
 | `Invalid origin: http://localhost:3000` | `BETTER_AUTH_URL` still production URL | `development` mode → localhost in `cloudflare.config.ts` |
+| `Invalid origin: https://clearclef.dedog.top` | Production `BETTER_AUTH_URL` still workers.dev | Set canonical URL in `lib/worker-bindings.ts` + redeploy |
 | Catalog SQL / missing column | Local D1 not migrated | `pnpm db:migrate:local` |
 | Secret works in wrangler folder but not in dev | Migrations/data under `.wrangler` vs `.cloudflare` | Migrate with `--persist-to .cloudflare/state` |
 

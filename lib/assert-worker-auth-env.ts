@@ -1,5 +1,8 @@
 import type { RuntimeEnvSource } from "@/lib/env";
-import { BETTER_AUTH_URL_DEVELOPMENT } from "@/lib/worker-bindings";
+import {
+  BETTER_AUTH_URL_DEVELOPMENT,
+  publicSiteOrigins,
+} from "@/lib/worker-bindings";
 
 const DOCS = "docs/local-dev.md";
 
@@ -25,10 +28,13 @@ export function assertWorkerAuthEnv(runtime: RuntimeEnvSource): void {
     );
   }
 
+  const isDeployedPublicOrigin = publicSiteOrigins().some((origin) =>
+    baseURL.startsWith(origin),
+  );
   if (
     process.env.NODE_ENV === "development" &&
     !baseURL.startsWith(BETTER_AUTH_URL_DEVELOPMENT) &&
-    (baseURL.includes("workers.dev") || baseURL.startsWith("https://clear-clef"))
+    isDeployedPublicOrigin
   ) {
     throw new Error(
       `BETTER_AUTH_URL is "${baseURL}" but pnpm dev expects a loopback URL ` +

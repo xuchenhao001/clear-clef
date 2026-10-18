@@ -44,7 +44,7 @@ On first run, open `/admin/setup` to create the admin account.
 - `pnpm db:migrate:remote` — apply Drizzle SQL to remote D1
 - `pnpm deploy` — `cf build` + `cf deploy --prebuilt` (`clear-clef` Worker)
 
-Local **secrets** live in **`.dev.vars`** (see [`.dev.vars.example`](.dev.vars.example)); do not commit it. `BETTER_AUTH_URL` is **not** in `.dev.vars` — `cloudflare.config.ts` sets it from Vite/cf `mode` (`development` → `http://localhost:3000`, deploy → workers.dev). Production secrets use `cf` / the dashboard.
+Local **secrets** live in **`.dev.vars`** (see [`.dev.vars.example`](.dev.vars.example)); do not commit it. `BETTER_AUTH_URL` is **not** in `.dev.vars` — `cloudflare.config.ts` sets it from Vite/cf `mode` (`development` → `http://localhost:3000`, deploy → `https://clearclef.dedog.top`). Production secrets use `cf` / the dashboard.
 
 ## Docs
 

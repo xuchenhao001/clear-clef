@@ -6,6 +6,7 @@ import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import type { DrizzleD1Database } from "drizzle-orm/d1";
 import type { AuthEnvConfig } from "@/lib/env";
 import { resolveAuthEnv } from "@/lib/env";
+import { publicSiteOrigins } from "@/lib/worker-bindings";
 import * as authSchema from "@/lib/db/auth-schema";
 import * as catalogSchema from "@/lib/db/schema";
 
@@ -41,7 +42,7 @@ export function trustedOriginsFor(baseURL: string): string[] {
   const isLoopback =
     url.hostname === "localhost" || url.hostname === "127.0.0.1";
   if (!isLoopback) {
-    return [];
+    return publicSiteOrigins().filter((origin) => origin !== url.origin);
   }
 
   return [...new Set([url.origin, ...LOOPBACK_DEV_ORIGINS])];

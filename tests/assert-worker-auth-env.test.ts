@@ -22,7 +22,7 @@ describe("assertWorkerAuthEnv", () => {
     expect(() =>
       assertWorkerAuthEnv({
         BETTER_AUTH_SECRET: validSecret,
-        BETTER_AUTH_URL: "https://clear-clef.xu-chenhao.workers.dev",
+        BETTER_AUTH_URL: "https://clearclef.dedog.top",
       }),
     ).toThrow(/pnpm dev expects a loopback URL/);
     process.env.NODE_ENV = prev;

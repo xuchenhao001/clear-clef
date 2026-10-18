@@ -1,5 +1,5 @@
-import { env } from "cloudflare:workers";
 import { publicDocumentRequest, publicPageCacheControl } from "@/lib/cache/public-document";
+import { publicSiteOrigins } from "@/lib/worker-bindings";
 
 export { PUBLIC_PAGE_REVALIDATE_SECONDS } from "@/lib/cache/constants";
 export { publicDocumentRequest, publicPageCacheControl } from "@/lib/cache/public-document";
@@ -32,12 +32,12 @@ export async function storePublicDocument(request: Request, response: Response) 
 
 /**
  * Drop cached HTML for `/` and `/scores/:slug` on the public origin.
- * Keys match `publicDocumentRequest` when the request host equals `env.BETTER_AUTH_URL`
- * (localhost in `vite dev`, workers.dev URL in deploy).
+ * Keys use each request's origin (`publicDocumentRequest`); purge every public host.
  */
 export async function purgePublicScore(slug: string) {
-  const origin = env.BETTER_AUTH_URL.replace(/\/$/, "");
   const cache = workerCache();
-  await cache.delete(new Request(`${origin}/`));
-  await cache.delete(new Request(`${origin}/scores/${slug}`));
+  for (const origin of publicSiteOrigins()) {
+    await cache.delete(new Request(`${origin}/`));
+    await cache.delete(new Request(`${origin}/scores/${slug}`));
+  }
 }
