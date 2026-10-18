@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
-import { createAuth } from "@/lib/auth/create-auth";
+import { createAuth, trustedOriginsFor } from "@/lib/auth/create-auth";
 import {
   createFirstAdmin,
   hasAdminUser,
@@ -124,5 +124,27 @@ describe("auth", () => {
     }).catch((error: unknown) => ({ error }));
 
     expect(result).toHaveProperty("error");
+  });
+});
+
+// Better Auth skips origin validation under NODE_ENV=test, so the middleware
+// itself cannot be exercised here; only the trusted-origin list is testable.
+describe("trustedOriginsFor", () => {
+  it("adds the loopback dev ports to a loopback base URL", () => {
+    const origins = trustedOriginsFor("http://localhost:3001");
+
+    expect(origins).toContain("http://localhost:3001");
+    expect(origins).toContain("http://localhost:3000");
+    expect(origins).toContain("http://127.0.0.1:3000");
+  });
+
+  it("keeps deployed base URLs strict", () => {
+    expect(
+      trustedOriginsFor("https://clear-clef.xu-chenhao.workers.dev"),
+    ).toEqual([]);
+  });
+
+  it("returns no origins for an unparseable base URL", () => {
+    expect(trustedOriginsFor("not a url")).toEqual([]);
   });
 });

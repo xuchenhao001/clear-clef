@@ -19,6 +19,34 @@ type CreateAuthOptions = {
   allowSignUp?: boolean;
 };
 
+// `next dev` silently moves to another port when the default one is busy, so a
+// stale BETTER_AUTH_URL in `.dev.vars` would otherwise fail every sign-in with
+// "Invalid origin". Only loopback base URLs get the extra dev ports; deployed
+// environments keep Better Auth's strict single-origin check.
+const LOOPBACK_DEV_ORIGINS = [
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "http://127.0.0.1:3000",
+  "http://127.0.0.1:3001",
+];
+
+export function trustedOriginsFor(baseURL: string): string[] {
+  let url: URL;
+  try {
+    url = new URL(baseURL);
+  } catch {
+    return [];
+  }
+
+  const isLoopback =
+    url.hostname === "localhost" || url.hostname === "127.0.0.1";
+  if (!isLoopback) {
+    return [];
+  }
+
+  return [...new Set([url.origin, ...LOOPBACK_DEV_ORIGINS])];
+}
+
 export function createAuth(
   db: AuthDatabase,
   options: CreateAuthOptions = {},
@@ -33,6 +61,7 @@ export function createAuth(
     }),
     secret,
     baseURL,
+    trustedOrigins: trustedOriginsFor(baseURL),
     emailAndPassword: {
       enabled: true,
       disableSignUp: !options.allowSignUp,
