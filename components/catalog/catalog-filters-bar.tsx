@@ -34,7 +34,7 @@ export function CatalogFiltersBar({ fields, hasFilters }: CatalogFiltersBarProps
 
   return (
     <form
-      className="archive-filter-strip flex flex-wrap items-end gap-x-6 gap-y-4"
+      className="archive-filter-strip surface-leaf shadow-leaf flex flex-wrap items-end gap-x-6 gap-y-4"
       onSubmit={(event) => event.preventDefault()}
     >
       {fields.map((field) => (

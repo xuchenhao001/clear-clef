@@ -32,7 +32,7 @@ export function ContentsRow({ score }: ContentsRowProps) {
         <div className="min-w-0 flex-1 space-y-2">
           <h3 className="type-work-title">{score.title}</h3>
           {metadataLine ? (
-            <p className="type-caption-mono">{metadataLine}</p>
+            <p className="type-shelf">{metadataLine}</p>
           ) : null}
           <div className="flex flex-wrap items-center gap-2">
             {score.difficulty ? (

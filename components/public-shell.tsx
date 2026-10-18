@@ -12,7 +12,7 @@ const mainFocusClassName =
 
 export function PublicShell({ children, mainClassName }: PublicShellProps) {
   return (
-    <div className="flex min-h-full flex-col bg-edition-canvas text-edition-ink">
+    <div className="surface-paper flex min-h-full flex-col text-edition-ink">
       <SkipToContent />
       <SiteHeader />
       <main
@@ -22,6 +22,14 @@ export function PublicShell({ children, mainClassName }: PublicShellProps) {
       >
         {children}
       </main>
+      <footer className="surface-board on-board border-t border-edition-board-line">
+        <div className="mx-auto flex w-full max-w-[1200px] flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-6 py-6">
+          <p className="type-running-head">
+            Set in Cormorant Garamond, EB Garamond and Public Sans
+          </p>
+          <p className="type-running-head">ClearClef, MMXXVI</p>
+        </div>
+      </footer>
     </div>
   );
 }

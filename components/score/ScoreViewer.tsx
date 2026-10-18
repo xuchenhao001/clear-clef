@@ -312,12 +312,14 @@ export default function ScoreViewer({
             </Button>
           </div>
         </div>
-        <div ref={pageSlotRef} className="bg-edition-surface-page p-4">
-          <SafeSvg
-            svg={currentSvg}
-            preSanitized
-            className="flex w-full items-start justify-center [&_svg]:mx-auto [&_svg]:h-auto [&_svg]:max-w-full [&_svg]:w-full"
-          />
+        <div className="p-3 sm:p-4">
+          <div ref={pageSlotRef} className="bg-edition-surface-page p-4 shadow-leaf">
+            <SafeSvg
+              svg={currentSvg}
+              preSanitized
+              className="flex w-full items-start justify-center [&_svg]:mx-auto [&_svg]:h-auto [&_svg]:max-w-full [&_svg]:w-full"
+            />
+          </div>
         </div>
         <p className="sr-only" aria-live="polite" aria-atomic="true">
           {pageLabel}

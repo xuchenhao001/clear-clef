@@ -51,16 +51,14 @@ export default async function ScoreDetailPage({ params }: ScorePageProps) {
         <BackToCatalog />
         <header className="space-y-2">
           {score.composer ? (
-            <p className="type-body-sm text-edition-muted">{score.composer}</p>
+            <p className="type-group-label">{score.composer}</p>
           ) : null}
           <h1 className="type-work-title-detail">{score.title}</h1>
           {score.lyricist ? (
-            <p className="type-body-sm text-edition-muted">
-              Lyrics by {score.lyricist}
-            </p>
+            <p className="type-imprint">Lyrics by {score.lyricist}</p>
           ) : null}
           {metadataLine ? (
-            <p className="type-caption-mono">{metadataLine}</p>
+            <p className="type-shelf">{metadataLine}</p>
           ) : null}
         </header>
         {score.difficulty ? (

@@ -50,7 +50,7 @@ Implementation order for ClearClef.
 ## Phase 6 — Contents-list catalog UI (done)
 
 - Credit-grouped contents list (replaces card grid)
-- Spectral 600 for catalog H1 and work titles; Public Sans chrome; Geist Mono metadata
+- Cormorant Garamond display over EB Garamond text (both self-hosted, Latin subset, real small caps); Public Sans chrome; Geist Mono only for technical strings
 - Archive reading-room chrome (unified parchment light theme); white notation invariant; theme menu (Light / Dark / System)
 - Optional `catalog_number` (thematic/opus from MusicXML `<work-number>` or admin override)
 - Sparse metadata line (`catalog_number · key · time`) on list and detail

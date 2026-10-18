@@ -10,7 +10,10 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-public-sans);
   --font-mono: var(--font-geist-mono);
-  --font-display: var(--font-spectral);
+  --font-display: var(--font-cormorant), "Songti SC", "SimSun", "Noto Serif CJK SC",
+    "Source Han Serif SC", ui-serif, Georgia, serif;
+  --font-text: var(--font-garamond), "Songti SC", "SimSun", "Noto Serif CJK SC",
+    "Source Han Serif SC", ui-serif, Georgia, serif;
   --font-heading: var(--font-public-sans);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -61,6 +64,10 @@
   --color-edition-hover: var(--edition-hover);
   --color-edition-locator: var(--edition-locator);
   --color-edition-on-locator: var(--edition-on-locator);
+  --color-edition-board: var(--edition-board);
+  --color-edition-board-ink: var(--edition-board-ink);
+  --color-edition-board-muted: var(--edition-board-muted);
+  --color-edition-board-line: var(--edition-board-line);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -74,27 +81,45 @@
   color-scheme: light;
   accent-color: var(--edition-ink);
   --radius: 0.5rem;
-  --edition-canvas: #f1ece4;
-  --edition-ink: #121a15;
-  --edition-body: #3a3835;
-  --edition-muted: #4d4a46;
-  --edition-muted-soft: #5f5b56;
-  --edition-placeholder: #4a4744;
-  --edition-field-border: #4a4744;
-  --edition-focus-ring: #121a15;
-  --edition-hairline: #d4ccc2;
-  --edition-hairline-soft: #e5ddd4;
-  --edition-hairline-strong: #b5a99c;
+  /* Calf binding: aged paper leaf, leather boards, rust rubric */
+  --edition-canvas: #efe8da;
+  --edition-ink: #1d1a15;
+  --edition-body: #3a352c;
+  --edition-muted: #4e483d;
+  --edition-muted-soft: #5f574a;
+  --edition-placeholder: #4e483d;
+  --edition-field-border: #4e483d;
+  --edition-focus-ring: #1d1a15;
+  --edition-hairline: #cfc3ad;
+  --edition-hairline-soft: #ded5c3;
+  --edition-hairline-strong: #a99c86;
   --edition-surface-page: #ffffff;
-  --edition-surface-card: #f6f1e6;
-  --edition-surface-strong: #e5dccf;
-  --edition-primary: #121a15;
-  --edition-on-primary: #f6f1e6;
-  --edition-locator: #9f1239;
-  --edition-on-locator: #ffffff;
+  --edition-surface-card: #f6f0e3;
+  --edition-surface-strong: #e3d9c6;
+  --edition-primary: #1d1a15;
+  --edition-on-primary: #f6f0e3;
+  --edition-locator: #8f3418;
+  --edition-on-locator: #f6f0e3;
+  --edition-board: #241a14;
+  --edition-board-ink: #e2d6c4;
+  --edition-board-muted: #a08b73;
+  --edition-board-line: #4a3626;
+  /* Marbled endpaper: the one surface a fine binding has that the catalog does not */
+  --marble-ground: #e6dcc6;
+  --marble-1: #8f3418;
+  --marble-2: #6b4a23;
+  --marble-3: #4a5340;
+  --marble-4: #3a352c;
+  --marble-5: #a8763a;
   --edition-semantic-success: #15803d;
-  --edition-semantic-error: #b91c1c;
+  --edition-semantic-error: #a8321a;
   --edition-hover: color-mix(in srgb, var(--edition-ink) 8%, transparent);
+  /* Texture recipes: one token per material so a scanned tile can replace
+     any of them without touching a call site. */
+  --grain-fine: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.28'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='120' height='120' filter='url%28%23n%29'/%3E%3C/svg%3E");
+  --flecks: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='1' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='table' tableValues='0 0 0 0 0 0 0 0 0 0 0 1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='200' height='200' filter='url%28%23n%29'/%3E%3C/svg%3E");
+  --pore: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.5'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='200' height='200' filter='url%28%23n%29'/%3E%3C/svg%3E");
+  --blotch: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.008' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.85'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='600' height='600' filter='url%28%23n%29'/%3E%3C/svg%3E");
   --background: var(--edition-canvas);
   --foreground: var(--edition-ink);
   --card: var(--edition-surface-card);
@@ -131,24 +156,34 @@
 .dark {
   color-scheme: dark;
   accent-color: var(--edition-ink);
-  --edition-canvas: #121816;
-  --edition-ink: #e8ebe9;
-  --edition-body: #c5ccc8;
-  --edition-muted: #9aa8a1;
-  --edition-muted-soft: #6f7a74;
-  --edition-placeholder: #9aa8a1;
-  --edition-field-border: #9aa8a1;
-  --edition-focus-ring: #e8ebe9;
-  --edition-hairline: #2e3632;
-  --edition-hairline-soft: #1f2623;
-  --edition-hairline-strong: #3d4843;
+  --edition-canvas: #17120e;
+  --edition-ink: #e9e2d5;
+  --edition-body: #d5cbb8;
+  --edition-muted: #a89f8e;
+  --edition-muted-soft: #8a8171;
+  --edition-placeholder: #a89f8e;
+  --edition-field-border: #a89f8e;
+  --edition-focus-ring: #e9e2d5;
+  --edition-hairline: #33291f;
+  --edition-hairline-soft: #241c15;
+  --edition-hairline-strong: #4a3b2b;
   --edition-surface-page: #ffffff;
-  --edition-surface-card: #1c211e;
-  --edition-surface-strong: #262b28;
-  --edition-primary: #e8ebe9;
-  --edition-on-primary: #121816;
-  --edition-locator: #fb7185;
-  --edition-on-locator: #121816;
+  --edition-surface-card: #1f1811;
+  --edition-surface-strong: #2a2118;
+  --edition-primary: #e9e2d5;
+  --edition-on-primary: #17120e;
+  --edition-locator: #e0916a;
+  --edition-on-locator: #17120e;
+  --edition-board: #0f0b08;
+  --edition-board-ink: #d8cbb6;
+  --edition-board-muted: #8a7862;
+  --edition-board-line: #33261a;
+  --marble-ground: #241c15;
+  --marble-1: #7a3d24;
+  --marble-2: #5f4a2a;
+  --marble-3: #454c3c;
+  --marble-4: #6a6257;
+  --marble-5: #8a6b42;
   --edition-hover: color-mix(in srgb, var(--edition-ink) 8%, transparent);
   --edition-semantic-success: #4ade80;
   --edition-semantic-error: #f87171;
@@ -207,31 +242,61 @@
 
 @layer utilities {
   .font-display {
-    font-family: var(--font-spectral), ui-serif, Georgia, serif;
+    font-family:
+      var(--font-cormorant), "Songti SC", "SimSun", "Noto Serif CJK SC",
+      "Source Han Serif SC", ui-serif, Georgia, serif;
   }
 
+  .font-text {
+    font-family:
+      var(--font-garamond), "Songti SC", "SimSun", "Noto Serif CJK SC",
+      "Source Han Serif SC", ui-serif, Georgia, serif;
+  }
+
+  /* Cormorant is a fine-press face with a small x-height: it wants size, so it
+     is the title page, the wordmark and the page headings only. Everything at
+     reading size is EB Garamond. */
   .type-catalog-h1 {
-    @apply font-display text-[2.5rem] font-semibold leading-[1.1] tracking-[-0.02em] text-edition-ink md:text-[2.75rem];
+    @apply font-display text-[3rem] font-semibold leading-[1.02] tracking-[-0.015em] text-edition-ink md:text-[3.75rem];
   }
 
   .type-work-title {
-    @apply font-display text-[1.375rem] font-semibold leading-[1.25] text-edition-ink;
+    @apply font-text text-[1.375rem] font-semibold leading-[1.25] text-edition-ink;
   }
 
   .type-work-title-detail {
-    @apply font-display text-[1.75rem] font-semibold leading-[1.15] tracking-[-0.01em] text-edition-ink md:text-[2rem];
+    @apply font-display text-[2rem] font-semibold leading-[1.1] tracking-[-0.01em] text-edition-ink md:text-[2.5rem];
   }
 
   .type-page-h1 {
-    @apply text-[2rem] font-medium leading-[1.15] tracking-tight text-edition-ink md:text-[2.25rem];
+    @apply font-display text-[2.25rem] font-semibold leading-[1.15] tracking-[-0.01em] text-edition-ink md:text-[2.5rem];
+  }
+
+  /* Real small capitals from the self-hosted files, not scaled capitals. */
+  .type-running-head {
+    @apply font-text text-[1rem] font-semibold tracking-[0.12em] text-edition-muted;
+    font-variant-caps: small-caps;
   }
 
   .type-group-label {
-    @apply text-sm font-semibold uppercase leading-[1.35] tracking-[0.06em] text-edition-muted;
+    @apply font-text text-[1.1875rem] font-semibold leading-[1.35] tracking-[0.05em] text-edition-muted;
+    font-variant-caps: small-caps;
+  }
+
+  .type-imprint {
+    @apply font-text text-xs font-semibold tracking-[0.18em] text-edition-muted;
+    font-variant-caps: small-caps;
   }
 
   .type-extent {
-    @apply font-mono text-xs font-normal normal-case tracking-normal text-edition-muted-soft;
+    @apply font-text text-[0.9375rem] font-normal tracking-[0.02em] text-edition-muted-soft;
+    font-variant-numeric: oldstyle-nums;
+  }
+
+  /* Catalogue entries: a printed shelf mark rather than a terminal readout.
+     Technical strings (ids, byte sizes, page counters) stay in mono. */
+  .type-shelf {
+    @apply font-text text-[0.8125rem] leading-normal tracking-[0.03em] text-edition-muted-soft;
   }
 
   .type-body-md {
@@ -262,15 +327,167 @@
     }
   }
 
+  /* Material system: paper leaf, leather boards, blind tooling, marbled endpaper.
+     Every recipe is a token plus gradients, so a scanned tile can replace any
+     layer later without touching a call site. */
+
+  .surface-paper {
+    /* The floor: cotton-rag paper. Fine grain under fibre flecks, then the laid
+       and chain lines of a handmade sheet, then the ageing vignette. */
+    background-color: var(--edition-canvas);
+    background-image:
+      var(--flecks),
+      var(--grain-fine),
+      repeating-linear-gradient(
+        90deg,
+        color-mix(in srgb, #3a2a18 2.5%, transparent) 0 1px,
+        transparent 1px 6px
+      ),
+      repeating-linear-gradient(
+        0deg,
+        color-mix(in srgb, #3a2a18 1.5%, transparent) 0 1px,
+        transparent 1px 26px
+      ),
+      radial-gradient(135% 90% at 50% -12%, color-mix(in srgb, #fff 12%, transparent), transparent 58%),
+      radial-gradient(150% 120% at 50% 50%, transparent 62%, color-mix(in srgb, #3a2a18 13%, transparent));
+    background-blend-mode: multiply, soft-light, multiply, multiply, normal, normal;
+  }
+
+  .surface-board {
+    /* Boards: pore over an uneven dye lot, a raking sheen, and wear where the
+       bar meets the edges. */
+    background-color: var(--edition-board);
+    background-image:
+      var(--pore),
+      var(--blotch),
+      radial-gradient(60% 130% at 0% 50%, color-mix(in srgb, #ffecd0 10%, transparent), transparent 60%),
+      radial-gradient(60% 130% at 100% 50%, color-mix(in srgb, #ffecd0 8%, transparent), transparent 60%),
+      radial-gradient(95% 130% at 74% -12%, color-mix(in srgb, #fff5e4 20%, transparent), transparent 58%),
+      linear-gradient(
+        115deg,
+        color-mix(in srgb, #fff 5%, transparent),
+        transparent 40%,
+        color-mix(in srgb, #000 46%, transparent)
+      );
+    background-blend-mode: overlay, multiply, normal, normal, normal, normal;
+    color: var(--edition-board-ink);
+  }
+
+  .on-board {
+    --edition-ink: var(--edition-board-ink);
+    --edition-body: var(--edition-board-ink);
+    --edition-muted: var(--edition-board-muted);
+    --edition-muted-soft: var(--edition-board-muted);
+    --edition-hairline: var(--edition-board-line);
+    --edition-hairline-strong: var(--edition-board-line);
+    --edition-focus-ring: var(--edition-board-ink);
+    --edition-hover: color-mix(in srgb, var(--edition-board-ink) 14%, transparent);
+  }
+
+  .surface-leaf {
+    /* Leaves: the quietest surface, because text sits on it. Fine grain, a
+       light dusting of flecks, and four warm corners so each leaf ages on its
+       own instead of the whole viewport carrying one flat tint. */
+    background-color: var(--edition-surface-card);
+    background-image:
+      var(--grain-fine),
+      radial-gradient(72% 72% at 0% 0%, color-mix(in srgb, #54391e 9%, transparent), transparent 62%),
+      radial-gradient(72% 72% at 100% 0%, color-mix(in srgb, #54391e 7%, transparent), transparent 62%),
+      radial-gradient(72% 72% at 0% 100%, color-mix(in srgb, #54391e 8%, transparent), transparent 62%),
+      radial-gradient(72% 72% at 100% 100%, color-mix(in srgb, #54391e 10%, transparent), transparent 62%);
+    background-blend-mode: soft-light, normal, normal, normal, normal;
+  }
+
+  .shadow-leaf {
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, #fff 45%, transparent),
+      0 14px 30px -18px color-mix(in srgb, #2e2013 62%, transparent),
+      0 2px 4px color-mix(in srgb, #2e2013 16%, transparent);
+  }
+
+  .rule-tooled {
+    border-bottom: 1px solid var(--edition-board-line);
+    box-shadow:
+      inset 0 -1px 0 color-mix(in srgb, #000 45%, transparent),
+      0 1px 0 color-mix(in srgb, #fff 8%, transparent);
+  }
+
+  .rule-printed {
+    border-bottom: 1px solid var(--edition-hairline-strong);
+    box-shadow: 0 1px 0 color-mix(in srgb, #fff 55%, transparent);
+  }
+
+  /* Inked rather than filled: speckle under a dark bed and a light catch, so a
+     rust rule reads as printed on the sheet. */
+  .rule-inked {
+    background-color: var(--edition-locator);
+    background-image: var(--grain-fine);
+    background-blend-mode: screen;
+    box-shadow:
+      0 1px 0 color-mix(in srgb, #000 32%, transparent),
+      0 -1px 0 color-mix(in srgb, #fff 22%, transparent);
+  }
+
+  .surface-marbled {
+    background-color: var(--marble-ground);
+  }
+
+  .marble-v1 {
+    stroke: var(--marble-1);
+  }
+
+  .marble-v2 {
+    stroke: var(--marble-2);
+  }
+
+  .marble-v3 {
+    stroke: var(--marble-3);
+  }
+
+  .marble-v4 {
+    stroke: var(--marble-4);
+  }
+
+  .marble-v5 {
+    stroke: var(--marble-5);
+  }
+
   .skip-to-content {
     @apply sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded-md focus:border focus:border-edition-field-border focus:bg-edition-surface-card focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-edition-ink focus:outline-none focus:ring-3 focus:ring-edition-focus-ring;
   }
 
   .archive-filter-strip {
-    @apply rounded-lg border border-edition-hairline bg-edition-surface-card px-4 py-4 shadow-md;
+    @apply rounded-lg border border-edition-hairline px-4 py-4;
   }
 
   .archive-locator-active {
-    @apply border-edition-locator text-edition-ink ring-2 ring-edition-locator/25;
+    position: relative;
+    @apply border-edition-locator text-edition-ink;
+  }
+
+  /* The locator on an active filter: a woven ribbon, notched at the foot. */
+  .archive-locator-active::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0.5rem;
+    width: 0.5625rem;
+    height: 0.8125rem;
+    background-color: var(--edition-locator);
+    background-image:
+      repeating-linear-gradient(
+        90deg,
+        color-mix(in srgb, #000 14%, transparent) 0 1px,
+        transparent 1px 3px
+      ),
+      linear-gradient(
+        90deg,
+        color-mix(in srgb, #000 24%, transparent),
+        transparent 30%,
+        transparent 70%,
+        color-mix(in srgb, #000 24%, transparent)
+      );
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%);
+    box-shadow: 0 1px 2px color-mix(in srgb, #000 30%, transparent);
   }
 }

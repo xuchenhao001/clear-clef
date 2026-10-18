@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
-import { Geist_Mono, Public_Sans, Spectral } from "next/font/google";
+import { Geist_Mono, Public_Sans } from "next/font/google";
+import localFont from "next/font/local";
 import { ThemeInit } from "@/components/theme-init";
 import "./globals.css";
 
@@ -15,11 +16,45 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const spectral = Spectral({
-  variable: "--font-spectral",
-  subsets: ["latin"],
-  weight: ["600"],
-  adjustFontFallback: true,
+// The serifs are self-hosted rather than pulled from the Google subset, which
+// strips the OpenType features we rely on: real small capitals (smcp/c2sc) for
+// running heads, credit labels and the colophon, and discretionary ligatures.
+// The files are subset to Latin, so other scripts fall back to the stack below.
+// next/font requires these values to be written literally at each call.
+const ebGaramond = localFont({
+  src: "./fonts/eb-garamond.woff2",
+  variable: "--font-garamond",
+  weight: "400 600",
+  style: "normal",
+  display: "swap",
+  adjustFontFallback: "Times New Roman",
+  fallback: [
+    "Songti SC",
+    "SimSun",
+    "Noto Serif CJK SC",
+    "Source Han Serif SC",
+    "ui-serif",
+    "Georgia",
+    "serif",
+  ],
+});
+
+const cormorantGaramond = localFont({
+  src: "./fonts/cormorant-garamond.woff2",
+  variable: "--font-cormorant",
+  weight: "400 600",
+  style: "normal",
+  display: "swap",
+  adjustFontFallback: "Times New Roman",
+  fallback: [
+    "Songti SC",
+    "SimSun",
+    "Noto Serif CJK SC",
+    "Source Han Serif SC",
+    "ui-serif",
+    "Georgia",
+    "serif",
+  ],
 });
 
 export const metadata: Metadata = {
@@ -45,7 +80,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${publicSans.variable} ${geistMono.variable} ${spectral.variable} h-full antialiased`}
+      className={`${publicSans.variable} ${geistMono.variable} ${ebGaramond.variable} ${cormorantGaramond.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>

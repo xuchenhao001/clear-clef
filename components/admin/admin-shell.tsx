@@ -11,14 +11,14 @@ type AdminShellProps = {
 
 export function AdminShell({ email, children }: AdminShellProps) {
   return (
-    <div className="flex min-h-full flex-col bg-edition-canvas text-edition-ink">
+    <div className="surface-paper flex min-h-full flex-col text-edition-ink">
       <SkipToContent />
-      <header className="border-b border-edition-hairline-strong bg-edition-surface-card shadow-sm">
+      <header className="surface-board on-board rule-tooled">
         <div className="mx-auto flex min-h-14 w-full max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3 sm:h-14 sm:flex-nowrap sm:gap-4 sm:px-6 sm:py-0">
           <div className="flex min-w-0 flex-wrap items-center gap-4 sm:gap-6">
             <Link
               href="/"
-              className="font-mono text-sm font-medium tracking-tight text-edition-ink uppercase"
+              className="font-display text-[1.125rem] font-semibold tracking-[0.2em] text-edition-ink uppercase"
             >
               ClearClef
             </Link>
