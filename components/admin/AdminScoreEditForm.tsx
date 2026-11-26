@@ -12,7 +12,8 @@ import { adminFormErrorClassName } from "@/components/admin/admin-form-styles";
 import { AdminSection } from "@/components/admin/admin-section";
 import { AdminScoreEditSidebar } from "@/components/admin/admin-score-edit-sidebar";
 import { AdminStickyActions } from "@/components/admin/admin-sticky-actions";
-import { generatePreviewSvg } from "@/lib/verovio/generate-preview-svg";
+import { inspectFile } from "@/lib/ingest/inspect-client";
+import { renderPreviewFromFile } from "@/lib/verovio/preview-client";
 
 type ScoreFormState = {
   title: string;
@@ -42,6 +43,8 @@ function buildPatchFormData(
   license: string,
   visibility: ScoreVisibility,
   file: File | null,
+  canonicalXml?: string,
+  contentHash?: string,
 ): FormData {
   const formData = new FormData();
   formData.set("title", form.title);
@@ -57,6 +60,17 @@ function buildPatchFormData(
   formData.set("tags", form.tags);
   if (file) {
     formData.set("file", file);
+  }
+  if (canonicalXml) {
+    formData.set(
+      "canonical",
+      new File([canonicalXml], "canonical.musicxml", {
+        type: "application/xml",
+      }),
+    );
+  }
+  if (contentHash) {
+    formData.set("contentHash", contentHash);
   }
   return formData;
 }
@@ -92,9 +106,27 @@ export function AdminScoreEditForm({
     setError(null);
 
     const file = fileInputRef.current?.files?.[0] ?? null;
-    const formData = buildPatchFormData(form, license, formVisibility, file);
 
     try {
+      let canonicalXml: string | undefined;
+      let contentHash: string | undefined;
+      if (file && file.size > 0) {
+        const inspected = await inspectFile(file, { includeCanonical: true });
+        if (!inspected.canonicalXml) {
+          throw new Error("Could not prepare the canonical MusicXML");
+        }
+        canonicalXml = inspected.canonicalXml;
+        contentHash = inspected.contentHash;
+      }
+      const formData = buildPatchFormData(
+        form,
+        license,
+        formVisibility,
+        file,
+        canonicalXml,
+        contentHash,
+      );
+
       const patchResponse = await fetch(`/api/admin/scores/${scoreId}`, {
         method: "PATCH",
         body: formData,
@@ -106,7 +138,7 @@ export function AdminScoreEditForm({
       }
 
       if (file && file.size > 0) {
-        const previewSvg = await generatePreviewSvg(file);
+        const previewSvg = await renderPreviewFromFile(file);
         const previewResponse = await fetch(
           `/api/admin/scores/${scoreId}/preview`,
           {

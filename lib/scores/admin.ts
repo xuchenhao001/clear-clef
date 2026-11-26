@@ -1,5 +1,5 @@
 import { desc, eq } from "drizzle-orm";
-import { getDbAsync } from "@/lib/db";
+import { getDb } from "@/lib/db";
 import { scores, type Score } from "@/lib/db/schema";
 import { IngestValidationError } from "@/lib/ingest/errors";
 import type { ScoreVisibility } from "@/lib/ingest/admin-form";
@@ -22,12 +22,13 @@ export type AdminCatalogScore = {
   license: string;
   visibility: string;
   previewR2Key: string | null;
+  importId: string | null;
   createdAt: Date;
   tags: ScoreTagSummary[];
 };
 
 export async function listAdminScores(db?: CatalogDb): Promise<AdminCatalogScore[]> {
-  const database = db ?? await getDbAsync();
+  const database = db ?? getDb();
   const rows = await database
     .select({
       id: scores.id,
@@ -38,6 +39,7 @@ export async function listAdminScores(db?: CatalogDb): Promise<AdminCatalogScore
       license: scores.license,
       visibility: scores.visibility,
       previewR2Key: scores.previewR2Key,
+      importId: scores.importId,
       createdAt: scores.createdAt,
     })
     .from(scores)
@@ -54,7 +56,7 @@ export async function getAdminScoreById(
   id: string,
   db?: CatalogDb,
 ): Promise<AdminScoreDetail | null> {
-  const database = db ?? await getDbAsync();
+  const database = db ?? getDb();
   const score = await database.select().from(scores).where(eq(scores.id, id)).get();
 
   if (!score) {
@@ -92,7 +94,7 @@ export async function updateScoreMetadata(
     throw new IngestValidationError("Title is required");
   }
 
-  const database = db ?? await getDbAsync();
+  const database = db ?? getDb();
   const existing = await database
     .select()
     .from(scores)
@@ -131,7 +133,7 @@ export async function deleteScore(
   scoreId: string,
   db?: CatalogDb,
 ): Promise<{ slug: string } | null> {
-  const database = db ?? await getDbAsync();
+  const database = db ?? getDb();
   const existing = await database
     .select()
     .from(scores)

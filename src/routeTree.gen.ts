@@ -16,6 +16,7 @@ import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as AdminSetupRouteImport } from './routes/admin/setup'
 import { Route as SiteScoresSlugRouteImport } from './routes/_site/scores.$slug'
 import { Route as AdminProtectedIndexRouteImport } from './routes/admin/_protected/index'
+import { Route as AdminProtectedBatchUploadRouteImport } from './routes/admin/_protected/batch-upload'
 import { Route as AdminProtectedUploadRouteImport } from './routes/admin/_protected/upload'
 import { Route as ApiAdminSetupRouteImport } from './routes/api/admin/setup'
 import { Route as ApiAdminUploadRouteImport } from './routes/api/admin/upload'
@@ -23,8 +24,10 @@ import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AdminProtectedScoresIndexRouteImport } from './routes/admin/_protected/scores/index'
 import { Route as AdminProtectedScoresIdRouteImport } from './routes/admin/_protected/scores.$id'
 import { Route as ApiAdminScoresIdRouteImport } from './routes/api/admin/scores.$id'
+import { Route as ApiAdminUploadsPreflightRouteImport } from './routes/api/admin/uploads.preflight'
 import { Route as ApiScoresIdFileRouteImport } from './routes/api/scores.$id.file'
 import { Route as ApiScoresIdPreviewRouteImport } from './routes/api/scores.$id.preview'
+import { Route as ApiAdminImportsImportIdPublishRouteImport } from './routes/api/admin/imports.$importId.publish'
 import { Route as ApiAdminScoresIdFileRouteImport } from './routes/api/admin/scores.$id.file'
 import { Route as ApiAdminScoresIdPreviewRouteImport } from './routes/api/admin/scores.$id.preview'
 
@@ -62,6 +65,12 @@ const AdminProtectedIndexRoute = AdminProtectedIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminProtectedRouteRoute,
 } as any)
+const AdminProtectedBatchUploadRoute =
+  AdminProtectedBatchUploadRouteImport.update({
+    id: '/batch-upload',
+    path: '/batch-upload',
+    getParentRoute: () => AdminProtectedRouteRoute,
+  } as any)
 const AdminProtectedUploadRoute = AdminProtectedUploadRouteImport.update({
   id: '/upload',
   path: '/upload',
@@ -98,6 +107,12 @@ const ApiAdminScoresIdRoute = ApiAdminScoresIdRouteImport.update({
   path: '/api/admin/scores/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAdminUploadsPreflightRoute =
+  ApiAdminUploadsPreflightRouteImport.update({
+    id: '/api/admin/uploads/preflight',
+    path: '/api/admin/uploads/preflight',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiScoresIdFileRoute = ApiScoresIdFileRouteImport.update({
   id: '/api/scores/$id/file',
   path: '/api/scores/$id/file',
@@ -108,6 +123,12 @@ const ApiScoresIdPreviewRoute = ApiScoresIdPreviewRouteImport.update({
   path: '/api/scores/$id/preview',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAdminImportsImportIdPublishRoute =
+  ApiAdminImportsImportIdPublishRouteImport.update({
+    id: '/api/admin/imports/$importId/publish',
+    path: '/api/admin/imports/$importId/publish',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiAdminScoresIdFileRoute = ApiAdminScoresIdFileRouteImport.update({
   id: '/file',
   path: '/file',
@@ -125,6 +146,7 @@ export interface FileRoutesByFullPath {
   '/admin/login': typeof AdminLoginRoute
   '/admin/setup': typeof AdminSetupRoute
   '/scores/$slug': typeof SiteScoresSlugRoute
+  '/admin/batch-upload': typeof AdminProtectedBatchUploadRoute
   '/admin/upload': typeof AdminProtectedUploadRoute
   '/api/admin/setup': typeof ApiAdminSetupRoute
   '/api/admin/upload': typeof ApiAdminUploadRoute
@@ -132,9 +154,11 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminProtectedIndexRoute
   '/admin/scores/$id': typeof AdminProtectedScoresIdRoute
   '/api/admin/scores/$id': typeof ApiAdminScoresIdRouteWithChildren
+  '/api/admin/uploads/preflight': typeof ApiAdminUploadsPreflightRoute
   '/api/scores/$id/file': typeof ApiScoresIdFileRoute
   '/api/scores/$id/preview': typeof ApiScoresIdPreviewRoute
   '/admin/scores/': typeof AdminProtectedScoresIndexRoute
+  '/api/admin/imports/$importId/publish': typeof ApiAdminImportsImportIdPublishRoute
   '/api/admin/scores/$id/file': typeof ApiAdminScoresIdFileRoute
   '/api/admin/scores/$id/preview': typeof ApiAdminScoresIdPreviewRoute
 }
@@ -143,6 +167,7 @@ export interface FileRoutesByTo {
   '/admin/setup': typeof AdminSetupRoute
   '/': typeof SiteIndexRoute
   '/scores/$slug': typeof SiteScoresSlugRoute
+  '/admin/batch-upload': typeof AdminProtectedBatchUploadRoute
   '/admin/upload': typeof AdminProtectedUploadRoute
   '/api/admin/setup': typeof ApiAdminSetupRoute
   '/api/admin/upload': typeof ApiAdminUploadRoute
@@ -150,9 +175,11 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminProtectedIndexRoute
   '/admin/scores/$id': typeof AdminProtectedScoresIdRoute
   '/api/admin/scores/$id': typeof ApiAdminScoresIdRouteWithChildren
+  '/api/admin/uploads/preflight': typeof ApiAdminUploadsPreflightRoute
   '/api/scores/$id/file': typeof ApiScoresIdFileRoute
   '/api/scores/$id/preview': typeof ApiScoresIdPreviewRoute
   '/admin/scores': typeof AdminProtectedScoresIndexRoute
+  '/api/admin/imports/$importId/publish': typeof ApiAdminImportsImportIdPublishRoute
   '/api/admin/scores/$id/file': typeof ApiAdminScoresIdFileRoute
   '/api/admin/scores/$id/preview': typeof ApiAdminScoresIdPreviewRoute
 }
@@ -164,6 +191,7 @@ export interface FileRoutesById {
   '/admin/setup': typeof AdminSetupRoute
   '/_site/': typeof SiteIndexRoute
   '/_site/scores/$slug': typeof SiteScoresSlugRoute
+  '/admin/_protected/batch-upload': typeof AdminProtectedBatchUploadRoute
   '/admin/_protected/upload': typeof AdminProtectedUploadRoute
   '/api/admin/setup': typeof ApiAdminSetupRoute
   '/api/admin/upload': typeof ApiAdminUploadRoute
@@ -171,9 +199,11 @@ export interface FileRoutesById {
   '/admin/_protected/': typeof AdminProtectedIndexRoute
   '/admin/_protected/scores/$id': typeof AdminProtectedScoresIdRoute
   '/api/admin/scores/$id': typeof ApiAdminScoresIdRouteWithChildren
+  '/api/admin/uploads/preflight': typeof ApiAdminUploadsPreflightRoute
   '/api/scores/$id/file': typeof ApiScoresIdFileRoute
   '/api/scores/$id/preview': typeof ApiScoresIdPreviewRoute
   '/admin/_protected/scores/': typeof AdminProtectedScoresIndexRoute
+  '/api/admin/imports/$importId/publish': typeof ApiAdminImportsImportIdPublishRoute
   '/api/admin/scores/$id/file': typeof ApiAdminScoresIdFileRoute
   '/api/admin/scores/$id/preview': typeof ApiAdminScoresIdPreviewRoute
 }
@@ -185,6 +215,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/admin/setup'
     | '/scores/$slug'
+    | '/admin/batch-upload'
     | '/admin/upload'
     | '/api/admin/setup'
     | '/api/admin/upload'
@@ -192,9 +223,11 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/admin/scores/$id'
     | '/api/admin/scores/$id'
+    | '/api/admin/uploads/preflight'
     | '/api/scores/$id/file'
     | '/api/scores/$id/preview'
     | '/admin/scores/'
+    | '/api/admin/imports/$importId/publish'
     | '/api/admin/scores/$id/file'
     | '/api/admin/scores/$id/preview'
   fileRoutesByTo: FileRoutesByTo
@@ -203,6 +236,7 @@ export interface FileRouteTypes {
     | '/admin/setup'
     | '/'
     | '/scores/$slug'
+    | '/admin/batch-upload'
     | '/admin/upload'
     | '/api/admin/setup'
     | '/api/admin/upload'
@@ -210,9 +244,11 @@ export interface FileRouteTypes {
     | '/admin'
     | '/admin/scores/$id'
     | '/api/admin/scores/$id'
+    | '/api/admin/uploads/preflight'
     | '/api/scores/$id/file'
     | '/api/scores/$id/preview'
     | '/admin/scores'
+    | '/api/admin/imports/$importId/publish'
     | '/api/admin/scores/$id/file'
     | '/api/admin/scores/$id/preview'
   id:
@@ -223,6 +259,7 @@ export interface FileRouteTypes {
     | '/admin/setup'
     | '/_site/'
     | '/_site/scores/$slug'
+    | '/admin/_protected/batch-upload'
     | '/admin/_protected/upload'
     | '/api/admin/setup'
     | '/api/admin/upload'
@@ -230,9 +267,11 @@ export interface FileRouteTypes {
     | '/admin/_protected/'
     | '/admin/_protected/scores/$id'
     | '/api/admin/scores/$id'
+    | '/api/admin/uploads/preflight'
     | '/api/scores/$id/file'
     | '/api/scores/$id/preview'
     | '/admin/_protected/scores/'
+    | '/api/admin/imports/$importId/publish'
     | '/api/admin/scores/$id/file'
     | '/api/admin/scores/$id/preview'
   fileRoutesById: FileRoutesById
@@ -246,8 +285,10 @@ export interface RootRouteChildren {
   ApiAdminUploadRoute: typeof ApiAdminUploadRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiAdminScoresIdRoute: typeof ApiAdminScoresIdRouteWithChildren
+  ApiAdminUploadsPreflightRoute: typeof ApiAdminUploadsPreflightRoute
   ApiScoresIdFileRoute: typeof ApiScoresIdFileRoute
   ApiScoresIdPreviewRoute: typeof ApiScoresIdPreviewRoute
+  ApiAdminImportsImportIdPublishRoute: typeof ApiAdminImportsImportIdPublishRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -301,6 +342,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminProtectedIndexRouteImport
       parentRoute: typeof AdminProtectedRouteRoute
     }
+    '/admin/_protected/batch-upload': {
+      id: '/admin/_protected/batch-upload'
+      path: '/batch-upload'
+      fullPath: '/admin/batch-upload'
+      preLoaderRoute: typeof AdminProtectedBatchUploadRouteImport
+      parentRoute: typeof AdminProtectedRouteRoute
+    }
     '/admin/_protected/upload': {
       id: '/admin/_protected/upload'
       path: '/upload'
@@ -350,6 +398,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminScoresIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/admin/uploads/preflight': {
+      id: '/api/admin/uploads/preflight'
+      path: '/api/admin/uploads/preflight'
+      fullPath: '/api/admin/uploads/preflight'
+      preLoaderRoute: typeof ApiAdminUploadsPreflightRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/scores/$id/file': {
       id: '/api/scores/$id/file'
       path: '/api/scores/$id/file'
@@ -362,6 +417,13 @@ declare module '@tanstack/react-router' {
       path: '/api/scores/$id/preview'
       fullPath: '/api/scores/$id/preview'
       preLoaderRoute: typeof ApiScoresIdPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/imports/$importId/publish': {
+      id: '/api/admin/imports/$importId/publish'
+      path: '/api/admin/imports/$importId/publish'
+      fullPath: '/api/admin/imports/$importId/publish'
+      preLoaderRoute: typeof ApiAdminImportsImportIdPublishRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/admin/scores/$id/file': {
@@ -396,6 +458,7 @@ const SiteRouteRouteWithChildren = SiteRouteRoute._addFileChildren(
 )
 
 interface AdminProtectedRouteRouteChildren {
+  AdminProtectedBatchUploadRoute: typeof AdminProtectedBatchUploadRoute
   AdminProtectedUploadRoute: typeof AdminProtectedUploadRoute
   AdminProtectedIndexRoute: typeof AdminProtectedIndexRoute
   AdminProtectedScoresIdRoute: typeof AdminProtectedScoresIdRoute
@@ -403,6 +466,7 @@ interface AdminProtectedRouteRouteChildren {
 }
 
 const AdminProtectedRouteRouteChildren: AdminProtectedRouteRouteChildren = {
+  AdminProtectedBatchUploadRoute: AdminProtectedBatchUploadRoute,
   AdminProtectedUploadRoute: AdminProtectedUploadRoute,
   AdminProtectedIndexRoute: AdminProtectedIndexRoute,
   AdminProtectedScoresIdRoute: AdminProtectedScoresIdRoute,
@@ -434,8 +498,10 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAdminUploadRoute: ApiAdminUploadRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiAdminScoresIdRoute: ApiAdminScoresIdRouteWithChildren,
+  ApiAdminUploadsPreflightRoute: ApiAdminUploadsPreflightRoute,
   ApiScoresIdFileRoute: ApiScoresIdFileRoute,
   ApiScoresIdPreviewRoute: ApiScoresIdPreviewRoute,
+  ApiAdminImportsImportIdPublishRoute: ApiAdminImportsImportIdPublishRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

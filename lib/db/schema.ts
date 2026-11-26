@@ -4,6 +4,7 @@ import {
   primaryKey,
   sqliteTable,
   text,
+  uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 
 export const scores = sqliteTable(
@@ -28,11 +29,17 @@ export const scores = sqliteTable(
     defaultVisibleParts: text("default_visible_parts"),
     visibility: text("visibility").notNull().default("public"),
     ownerId: text("owner_id"),
+    contentHash: text("content_hash"),
+    uploadKey: text("upload_key"),
+    importId: text("import_id"),
     createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
   },
   (table) => [
     index("scores_visibility_idx").on(table.visibility),
     index("scores_created_at_idx").on(table.createdAt),
+    index("scores_content_hash_idx").on(table.contentHash),
+    uniqueIndex("scores_upload_key_idx").on(table.uploadKey),
+    index("scores_import_id_idx").on(table.importId),
   ],
 );
 

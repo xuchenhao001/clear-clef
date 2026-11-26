@@ -12,7 +12,7 @@ Read [docs/design.md](../docs/design.md) before changing catalog, viewer, or reg
 
 - **Ground** (`surface-ground`): navigation, indexes, chapter heads, hints, empty states. Both themes are dark.
 - **Folio** (`surface-folio` + `on-folio`): the engraved score only. Notation inside it stays `#ffffff`.
-- **Plate** (`Plate` / `surface-board`): forms only (sign-in, upload, edit) and floating popups.
+- **Plate** (`Plate` / `surface-board`): forms only (sign-in, upload, edit, batch settings) and floating popups (the batch file drawer).
 
 Do not put a list or a title on a plate. Do not reintroduce `surface-paper`, `MarbledPanel`, tag pills, or visibility chips.
 

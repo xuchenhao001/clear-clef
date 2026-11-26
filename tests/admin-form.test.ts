@@ -3,6 +3,7 @@ import {
   parseAdminPatchFormData,
   parseAdminUploadFormData,
   parseTagList,
+  readCanonicalField,
 } from "@/lib/ingest/admin-form";
 
 describe("admin form parsing", () => {
@@ -17,6 +18,8 @@ describe("admin form parsing", () => {
     formData.set("tags", "bach, etude");
     formData.set("catalogNumber", "BWV 1");
     formData.set("sourceUrl", "https://example.com");
+    formData.set("canonical", "<score-partwise/>");
+    formData.set("contentHash", "A".repeat(64));
 
     expect(parseAdminUploadFormData(formData)).toEqual({
       license: "CC0",
@@ -24,7 +27,30 @@ describe("admin form parsing", () => {
       tagList: ["bach", "etude"],
       catalogNumber: "BWV 1",
       sourceUrl: "https://example.com",
+      contentHash: "a".repeat(64),
     });
+  });
+
+  it("reads canonical XML from a File without line-ending changes", async () => {
+    const formData = new FormData();
+    formData.set(
+      "canonical",
+      new File(["<score-partwise>\r\n</score-partwise>"], "canonical.musicxml", {
+        type: "application/xml",
+      }),
+    );
+
+    await expect(readCanonicalField(formData)).resolves.toBe(
+      "<score-partwise>\r\n</score-partwise>",
+    );
+  });
+
+  it("reads canonical XML from a JSON/form string", async () => {
+    const formData = new FormData();
+    formData.set("canonical", "<score-partwise/>");
+    await expect(readCanonicalField(formData)).resolves.toBe(
+      "<score-partwise/>",
+    );
   });
 
   it("parses patch metadata fields", () => {

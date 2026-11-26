@@ -27,6 +27,12 @@ function AdminOverviewPage() {
               Upload score
             </Link>
             <Link
+              to="/admin/batch-upload"
+              className={cn(buttonVariants({ variant: "outline" }), "w-fit")}
+            >
+              Batch upload
+            </Link>
+            <Link
               to="/admin/scores"
               className={cn(buttonVariants({ variant: "outline" }), "w-fit")}
             >

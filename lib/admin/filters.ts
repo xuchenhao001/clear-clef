@@ -4,6 +4,7 @@ import type { AdminCatalogScore } from "@/lib/scores/admin";
 export type AdminScoreListFilters = {
   visibility?: ScoreVisibility | "";
   q?: string;
+  import?: string;
 };
 
 export function normalizeAdminVisibilityFilter(
@@ -26,6 +27,10 @@ export function formatAdminScoresSearchPath(filters: AdminScoreListFilters): str
   if (q) {
     params.set("q", q);
   }
+  const importId = filters.import?.trim();
+  if (importId) {
+    params.set("import", importId);
+  }
   const query = params.toString();
   return query ? `/admin/scores?${query}` : "/admin/scores";
 }
@@ -36,8 +41,12 @@ export function filterAdminScores(
 ): AdminCatalogScore[] {
   const query = filters.q?.trim().toLowerCase();
   const visibility = filters.visibility;
+  const importId = filters.import?.trim();
 
   return scores.filter((score) => {
+    if (importId && score.importId !== importId) {
+      return false;
+    }
     if (visibility && score.visibility !== visibility) {
       return false;
     }
@@ -57,7 +66,14 @@ export function parseAdminScoreListFilters(
   const visibilityRaw = typeof params.visibility === "string" ? params.visibility : "";
   const visibility = normalizeAdminVisibilityFilter(visibilityRaw);
 
-  const q = typeof params.q === "string" ? params.q : "";
+  const q = typeof params.q === "string" ? params.q.trim() : "";
+  const importRaw = typeof params.import === "string" ? params.import.trim() : "";
+  const importId =
+    /^[a-zA-Z0-9-]{8,64}$/.test(importRaw) ? importRaw : undefined;
 
-  return { visibility, q };
+  const filters: AdminScoreListFilters = {};
+  if (visibility) filters.visibility = visibility;
+  if (q) filters.q = q;
+  if (importId) filters.import = importId;
+  return filters;
 }

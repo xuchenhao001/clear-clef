@@ -5,7 +5,8 @@ import { AdminCatalogFields, AdminRightsFields, AdminScoreFileInput } from "@/co
 import { adminFormErrorClassName } from "@/components/admin/admin-form-styles";
 import { AdminSection } from "@/components/admin/admin-section";
 import { AdminStickyActions } from "@/components/admin/admin-sticky-actions";
-import { generatePreviewSvg } from "@/lib/verovio/generate-preview-svg";
+import { inspectFile } from "@/lib/ingest/inspect-client";
+import { renderPreviewFromFile } from "@/lib/verovio/preview-client";
 
 export function AdminUploadForm() {
   const navigate = useNavigate();
@@ -40,6 +41,18 @@ export function AdminUploadForm() {
     }
 
     try {
+      const inspected = await inspectFile(file, { includeCanonical: true });
+      if (!inspected.canonicalXml) {
+        throw new Error("Could not prepare the canonical MusicXML");
+      }
+      formData.set(
+        "canonical",
+        new File([inspected.canonicalXml], "canonical.musicxml", {
+          type: "application/xml",
+        }),
+      );
+      formData.set("contentHash", inspected.contentHash);
+
       const uploadResponse = await fetch("/api/admin/upload", {
         method: "POST",
         body: formData,
@@ -53,7 +66,7 @@ export function AdminUploadForm() {
         throw new Error(uploadJson.error ?? "Upload failed");
       }
 
-      const previewSvg = await generatePreviewSvg(file);
+      const previewSvg = await renderPreviewFromFile(file);
       const previewResponse = await fetch(
         `/api/admin/scores/${uploadJson.id}/preview`,
         {

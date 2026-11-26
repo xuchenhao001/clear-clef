@@ -52,7 +52,7 @@ Both themes are dark. Lamp (`:root`) is a warm brown-black. Night (`.dark`) is c
 - A register is `stat-row`: label left, value right, hairline underneath.
 - The page container is `max-w-[1200px]`.
 
-The catalog index filters by linking, one value at a time. Choosing the active value again clears it. Admin sections (Overview, Scores, Upload) use the same index, not a second top navigation.
+The catalog index filters by linking, one value at a time. Choosing the active value again clears it. Admin sections (Overview, Scores, Upload, Batch upload) use the same index, not a second top navigation.
 
 ## Viewer
 
@@ -60,4 +60,12 @@ The score controls and the page label sit on the ground. The sheet sits on the f
 
 ## What stays a plate
 
-Sign-in, upload, and edit. Popups that must float (a select menu) use `surface-board`. Everything else is type on the ground.
+Sign-in, upload, edit, and batch settings. Popups that must float (a select menu, the batch file drawer) use `surface-board`. Everything else is type on the ground.
+
+## Batch upload
+
+- The file queue is a register on the ground: title, composer (or “No composer in file (optional)”), path in mono, one text status, and a `Review` hint. No cards, no thumbnails in the queue.
+- **Batch settings** is a plate because it is a form: license (required, blank until chosen), visibility, tags, source default.
+- The **file drawer** is a floating `surface-board`: real page-1 preview, catalog fields, file facts, raw credits with “use as title/composer”, and skip/include/remove. An unreadable row offers “Try reading again” before removing. On a phone it is full-screen.
+- One sticky action bar on the ground carries the single filled action (`Upload N scores`, `Publish N scores`, `Retry failed`, `Retry reading`). Everything else is a word hint.
+- Status is a word in the register's voice, never colour alone.

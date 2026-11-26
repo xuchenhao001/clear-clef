@@ -5,9 +5,6 @@ export const VEROVIO_PREVIEW_OPTIONS = {
   header: "none",
 } as const;
 
-/** @deprecated Use VEROVIO_PREVIEW_OPTIONS */
-export const VEROVIO_DEFAULT_OPTIONS = VEROVIO_PREVIEW_OPTIONS;
-
 export const VEROVIO_SCALE = 40;
 
 /** Base viewer options; page dimensions are set per layout mode. */
@@ -56,9 +53,4 @@ export function practiceLayoutOptions(widthPx: number, heightPx: number) {
     adjustPageHeight: false,
     scale,
   };
-}
-
-/** @deprecated Use practiceLayoutOptions */
-export function viewerLayoutOptions(widthPx: number, heightPx: number) {
-  return practiceLayoutOptions(widthPx, heightPx);
 }

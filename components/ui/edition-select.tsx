@@ -14,6 +14,7 @@ type EditionSelectProps = {
   items: EditionSelectItem[];
   placeholder?: string;
   required?: boolean;
+  disabled?: boolean;
   triggerVariant?: "hairline" | "boxed";
   labelVariant?: "filter" | "form";
   onValueChange?: (value: string) => void;
@@ -43,6 +44,7 @@ export function EditionSelect({
   items,
   placeholder = "Any",
   required,
+  disabled = false,
   triggerVariant = "hairline",
   labelVariant = "filter",
   onValueChange,
@@ -64,6 +66,7 @@ export function EditionSelect({
       <Select.Root
         name={name}
         required={required}
+        disabled={disabled}
         items={items}
         value={value}
         onValueChange={(nextValue) => {
@@ -73,7 +76,7 @@ export function EditionSelect({
         <Select.Trigger
           aria-labelledby={labelId}
           className={cn(
-            "flex w-full items-center justify-between gap-2 text-left text-sm text-edition-ink edition-interactive-transition outline-none focus-visible:ring-3 focus-visible:ring-edition-focus-ring",
+            "flex w-full items-center justify-between gap-2 text-left text-sm text-edition-ink edition-interactive-transition outline-none focus-visible:ring-3 focus-visible:ring-edition-focus-ring disabled:cursor-not-allowed disabled:text-edition-muted-soft",
             triggerVariant === "hairline"
               ? "min-h-11 border-0 border-b border-edition-field-border bg-transparent px-0 py-2 focus-visible:border-edition-field-border"
               : "min-h-11 rounded-md border border-edition-field-border bg-edition-canvas/50 px-3 py-2 focus-visible:border-edition-gilt",

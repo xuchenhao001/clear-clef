@@ -33,20 +33,25 @@ export async function putScoreMusicXmlObjects(
   const canonicalR2Key = scoreCanonicalR2Key(scoreId);
   const bucket = await getScoresBucket();
 
-  await bucket.put(r2Key, bytes, {
-    httpMetadata: {
-      contentType:
-        originalExtension === "mxl"
-          ? MUSICXML_COMPRESSED_MIME
-          : MUSICXML_UNCOMPRESSED_MIME,
-    },
-  });
+  try {
+    await bucket.put(r2Key, bytes, {
+      httpMetadata: {
+        contentType:
+          originalExtension === "mxl"
+            ? MUSICXML_COMPRESSED_MIME
+            : MUSICXML_UNCOMPRESSED_MIME,
+      },
+    });
 
-  await bucket.put(canonicalR2Key, canonicalXml, {
-    httpMetadata: {
-      contentType: MUSICXML_UNCOMPRESSED_MIME,
-    },
-  });
+    await bucket.put(canonicalR2Key, canonicalXml, {
+      httpMetadata: {
+        contentType: MUSICXML_UNCOMPRESSED_MIME,
+      },
+    });
+  } catch (error) {
+    await Promise.allSettled([bucket.delete(r2Key), bucket.delete(canonicalR2Key)]);
+    throw error;
+  }
 
   return { r2Key, canonicalR2Key };
 }

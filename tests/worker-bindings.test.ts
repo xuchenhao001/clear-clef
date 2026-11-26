@@ -3,8 +3,6 @@ import {
   BETTER_AUTH_URL_DEVELOPMENT,
   BETTER_AUTH_URL_PRODUCTION,
   betterAuthUrlForMode,
-  workerNameForMode,
-  WORKER_NAME,
 } from "@/lib/worker-bindings";
 
 describe("betterAuthUrlForMode", () => {
@@ -16,13 +14,5 @@ describe("betterAuthUrlForMode", () => {
     expect(betterAuthUrlForMode("production")).toBe(BETTER_AUTH_URL_PRODUCTION);
     expect(betterAuthUrlForMode(undefined)).toBe(BETTER_AUTH_URL_PRODUCTION);
     expect(betterAuthUrlForMode("staging")).toBe(BETTER_AUTH_URL_PRODUCTION);
-  });
-});
-
-describe("workerNameForMode", () => {
-  it("always uses the production worker name", () => {
-    for (const mode of ["development", "production", "staging", undefined] as const) {
-      expect(workerNameForMode(mode)).toBe(WORKER_NAME);
-    }
   });
 });

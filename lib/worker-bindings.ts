@@ -20,10 +20,6 @@ export const BETTER_AUTH_URL_DEVELOPMENT = "http://localhost:3000";
 /** Local D1/R2 persist root (Vite `persistState` + `cf d1 migrations apply --persist-to`). */
 export const LOCAL_PERSIST_TO = ".cloudflare/state";
 
-export function workerNameForMode(_mode?: string): string {
-  return WORKER_NAME;
-}
-
 export function betterAuthUrlForMode(mode?: string): string {
   if (mode === "development") {
     return BETTER_AUTH_URL_DEVELOPMENT;

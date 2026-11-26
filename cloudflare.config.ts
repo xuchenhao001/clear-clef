@@ -2,7 +2,7 @@ import { bindings, defineConfig } from "cf/config";
 import {
   betterAuthUrlForMode,
   D1_DATABASE_ID,
-  workerNameForMode,
+  WORKER_NAME,
 } from "./worker-bindings.mjs";
 
 /**
@@ -13,7 +13,7 @@ import {
  */
 export default defineConfig((ctx) => ({
   worker: {
-    name: workerNameForMode(ctx.mode),
+    name: WORKER_NAME,
     compatibilityDate: "2026-09-05",
     compatibilityFlags: ["nodejs_compat", "global_fetch_strictly_public"],
     entrypoint: "@tanstack/react-start/server-entry",

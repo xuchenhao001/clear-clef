@@ -9,11 +9,12 @@ Use **pnpm** only (`packageManager` in `package.json`). Do not add `package-lock
 1. **Canonical format = MusicXML (target 4.x partwise).** v1 stores a sanitized copy at ingest (DOCTYPE stripped, BOM removed); prefer `.mxl` for originals on R2. Keep original + canonical. MIDI / MEI / ABC / MNX / PDF are not the store format (ABC may convert once on ingest later).
 2. **List/detail = route loaders + D1** (via `createServerFn`). Never load Verovio/WASM on catalog index pages.
 3. **Viewer = client-only** via `React.lazy` + `Suspense`. Paginate SVG; do not SSR engraved scores.
-4. **Writes are admin-only in v1.** Public read; protected `/admin/*` via Better Auth (email/password, admin role). First admin is created at `/admin/setup`; public sign-up stays disabled. Admins upload, list, edit, download originals, and delete scores at `/admin/scores`. Require a **license** on every score.
-5. **XXE:** Treat uploads as hostile. Strip external MusicXML DOCTYPE; reject ENTITY / internal subsets; non-validating parse; no DTD resolution.
+4. **Writes are admin-only in v1.** Public read; protected `/admin/*` via Better Auth (email/password, admin role). First admin is created at `/admin/setup`; public sign-up stays disabled. Admins add one score at `/admin/upload` or a folder at `/admin/batch-upload`, then list, edit, download originals, and delete at `/admin/scores`. Require a **license** on every score. Batch upload is client-orchestrated: inspect in a browser Web Worker, send one JSON catalog lookup, then per-file uploads with an idempotency key and canonical XML; never one huge server batch request.
+5. **XXE:** Treat uploads as hostile. Strip external MusicXML DOCTYPE; reject ENTITY / internal subsets; non-validating parse; no DTD resolution. Canonical XML prepared by the browser is re-sanitized and re-hashed on the server.
 6. **No per-request server engraving.** Page-1 preview SVG is generated at ingest and stored in R2.
 7. **R2:** one bucket (`clear-clef`). Scores under `scores/`. Public HTML cache uses `Cache-Control` + `purgePublicScore` (`lib/cache/public-pages.ts`), not a second R2 binding.
 8. Public queries use `visibility = 'public'`. `owner_id` is set on admin upload; `visibility` / `format` remain hooks for membership and MNX.
+9. **Worker CPU:** Workers Free is 10 ms per request. Do not add full-document MusicXML parsing/hashing to Worker routes; batch inspection belongs in the browser and metadata extraction is header-only. Uploads may carry canonical XML; the server's fast path must not unzip or full-parse the original.
 
 ## Cloudflare Worker `env`
 

@@ -16,7 +16,6 @@ describe("worker-bindings.mjs stays aligned with lib/worker-bindings.ts", () => 
 
     for (const mode of ["development", "production", "staging", undefined] as const) {
       expect(node.betterAuthUrlForMode(mode)).toBe(app.betterAuthUrlForMode(mode));
-      expect(node.workerNameForMode(mode)).toBe(app.workerNameForMode(mode));
     }
   });
 });

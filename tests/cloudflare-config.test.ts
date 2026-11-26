@@ -3,7 +3,7 @@ import cloudflareConfig from "../cloudflare.config";
 import { WORKER_ENV_KEYS } from "@/lib/worker-env-contract";
 import {
   betterAuthUrlForMode,
-  workerNameForMode,
+  WORKER_NAME,
 } from "@/lib/worker-bindings";
 
 type TextBinding = { type: "text"; value: string };
@@ -15,10 +15,10 @@ function textValue(binding: unknown): string {
 }
 
 describe("cloudflare.config.ts", () => {
-  it("maps worker name per mode", async () => {
+  it("uses the production worker name", async () => {
     for (const mode of ["development", "production", undefined] as const) {
       const config = await cloudflareConfig({ mode, isPreview: false });
-      expect(config.worker.name).toBe(workerNameForMode(mode));
+      expect(config.worker.name).toBe(WORKER_NAME);
     }
   });
 

@@ -4,9 +4,11 @@ import { fileURLToPath } from "node:url";
 import { D1_DATABASE_ID } from "../worker-bindings.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const pnpm = process.platform === "win32" ? "pnpm.cmd" : "pnpm";
+const pnpmShell = process.platform === "win32";
 
 execFileSync(
-  "pnpm",
+  pnpm,
   [
     "exec",
     "cf",
@@ -18,5 +20,5 @@ execFileSync(
     "drizzle",
     ...process.argv.slice(2),
   ],
-  { cwd: root, stdio: "inherit" },
+  { cwd: root, stdio: "inherit", shell: pnpmShell },
 );

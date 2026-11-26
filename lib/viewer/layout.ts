@@ -37,14 +37,4 @@ export function applyPracticeLayout(
   return layoutResult(toolkit, restoreXmlId);
 }
 
-/** @deprecated Use applyEmbeddedLayout or applyPracticeLayout */
-export function applyVerovioLayout(
-  toolkit: VerovioToolkitLike,
-  widthPx: number,
-  heightPx: number,
-  restoreXmlId: string | null,
-): { pageCount: number; page: number } {
-  return applyPracticeLayout(toolkit, widthPx, heightPx, restoreXmlId);
-}
-
 export const LAYOUT_DEBOUNCE_MS = 150;

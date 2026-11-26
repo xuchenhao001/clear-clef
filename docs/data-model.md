@@ -16,7 +16,7 @@ Keep the D1 schema small. Prefer nullable columns now for membership and format 
 | `lyricist` | text | Nullable |
 | `source_url` | text | Provenance (IMSLP, MuseScore, etc.) |
 | `license` | text | **Required** — see [ingest.md](ingest.md) |
-| `key` | text | e.g. `C major`, `a minor` |
+| `key` | text | e.g. `C major`, `a minor`; null when the file has no `<mode>` and the title does not say major/minor |
 | `time_signature` | text | e.g. `4/4` |
 | `difficulty` | text / int | Piano-oriented filter |
 | `instrument` | text | Default `piano` |
@@ -27,6 +27,9 @@ Keep the D1 schema small. Prefer nullable columns now for membership and format 
 | `default_visible_parts` | text / JSON | Part IDs extracted at ingest; stored for future viewer filtering (v1 renders all staves) |
 | `visibility` | text | `public` \| `unlisted` \| `private`; public catalog filters `public` |
 | `owner_id` | text | Nullable until auth; future member ownership |
+| `content_hash` | text | SHA-256 of the sanitized canonical MusicXML (server recomputes it; client preflight uses the same canonical text); exact duplicate detection |
+| `upload_key` | text unique | Client idempotency key for batch retries |
+| `import_id` | text | Groups the scores created by one batch session |
 | `created_at` | integer / text | ISO or unix |
 
 ### `tags`
@@ -59,6 +62,8 @@ Always constrain public list/detail:
 ```sql
 WHERE visibility = 'public'
 ```
+
+`getPublicScoreBySlug` selects a public projection; internal fields (`owner_id`, `content_hash`, `upload_key`, `import_id`, storage keys it does not need) must not ride along in public loader data.
 
 Unlisted may be reachable by slug later; private requires owner/auth.
 

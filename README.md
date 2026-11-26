@@ -2,11 +2,11 @@
 
 Public catalog of Common Western Musical Notation scores. **MusicXML** is the canonical interchange format; scores render in the browser with Verovio; metadata and files live on **TanStack Start** plus **Cloudflare** (D1 + R2).
 
-Anyone can browse. Uploads are admin-only in v1 (Better Auth email/password; public sign-up disabled).
+Anyone can browse. Uploads are admin-only in v1 (Better Auth email/password; public sign-up disabled). Admins can add one score or a whole folder from `/admin/batch-upload`.
 
 ## Status
 
-**Phases 1–6 are implemented.** Public catalog (contents list), admin upload, Verovio viewer, page-1 previews, tags, filters, and edition UI are in place. See [docs/roadmap.md](docs/roadmap.md).
+**Phases 1–9 are implemented.** Public catalog (contents list), admin upload, batch upload, Verovio viewer, page-1 previews, tags, filters, and edition UI are in place. Batch review and canonical preparation run in the browser so the app stays within the Workers Free CPU budget. See [docs/roadmap.md](docs/roadmap.md).
 
 ## Stack
 
@@ -40,6 +40,7 @@ On first run, open `/admin/setup` to create the admin account.
 - `pnpm dev` — `cf dev` (Vite + Workers bindings, `development` mode); does **not** run D1 migrations (use `pnpm db:migrate:local` or `pnpm db:ensure:local` when schema changes)
 - `pnpm test` — Vitest unit tests (in-memory SQLite; no remote D1)
 - `pnpm typecheck` — TypeScript without emit
+- `pnpm lint` — ESLint
 - `pnpm preview` — `cf build` then Vite preview
 - `pnpm db:migrate:remote` — apply Drizzle SQL to remote D1
 - `pnpm deploy` — `cf build` + `cf deploy --prebuilt` (`clear-clef` Worker)

@@ -1,6 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { requireAdminSession } from "@/lib/auth";
-import { parseAdminPatchFormData } from "@/lib/ingest/admin-form";
+import {
+  MAX_CANONICAL_BYTES,
+  MAX_UPLOAD_BYTES,
+} from "@/lib/ingest/constants";
+import {
+  parseAdminPatchFormData,
+  readCanonicalField,
+} from "@/lib/ingest/admin-form";
 import { mapIngestError, replaceScoreFile } from "@/lib/ingest/upload";
 import { deleteScore, updateScoreMetadata } from "@/lib/scores/admin";
 
@@ -15,15 +22,34 @@ export const Route = createFileRoute("/api/admin/scores/$id")({
 
         const { id } = params;
 
+        const declaredLength = Number(
+          request.headers.get("content-length") ?? "0",
+        );
+        if (
+          declaredLength >
+          MAX_UPLOAD_BYTES + MAX_CANONICAL_BYTES + 1024 * 1024
+        ) {
+          return Response.json(
+            { error: "Upload request is too large" },
+            { status: 413 },
+          );
+        }
+
         try {
           const formData = await request.formData();
           const file = formData.get("file");
           const fields = parseAdminPatchFormData(formData);
+          const canonical = await readCanonicalField(formData);
 
           let defaultVisibleParts: string | null | undefined;
           if (file instanceof File && file.size > 0) {
             const bytes = new Uint8Array(await file.arrayBuffer());
-            const replaced = await replaceScoreFile(id, file.name, bytes);
+            const replaced = await replaceScoreFile(
+              id,
+              file.name,
+              bytes,
+              canonical,
+            );
             defaultVisibleParts = replaced.defaultVisibleParts;
           }
 

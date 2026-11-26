@@ -32,11 +32,33 @@ function AdminScoresPage() {
           { label: "Scores" },
         ]}
         actions={
-          <Link to="/admin/upload" className={cn(buttonVariants(), "w-fit")}>
-            Upload score
-          </Link>
+          <>
+            <Link to="/admin/upload" className={cn(buttonVariants(), "w-fit")}>
+              Upload score
+            </Link>
+            <Link
+              to="/admin/batch-upload"
+              className={cn(buttonVariants({ variant: "outline" }), "w-fit")}
+            >
+              Batch upload
+            </Link>
+          </>
         }
       />
+
+      {filters.import ? (
+        <div className="flex flex-wrap items-center justify-between gap-3 border-y border-edition-hairline py-3">
+          <p className="type-body-sm text-edition-muted">
+            Showing scores from one batch import.
+          </p>
+          <Link
+            to="/admin/scores"
+            className="type-hint text-edition-gilt hover:text-edition-ink"
+          >
+            Clear import
+          </Link>
+        </div>
+      ) : null}
 
       {allScores.length === 0 ? (
         <AdminEmptyState

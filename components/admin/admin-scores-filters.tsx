@@ -26,12 +26,14 @@ export function AdminScoresFilters({ current }: AdminScoresFiltersProps) {
       const nextPath = formatAdminScoresSearchPath({
         visibility: normalizeAdminVisibilityFilter(visibility),
         q,
+        import: current.import,
       });
       const existingPath = formatAdminScoresSearchPath({
         visibility: normalizeAdminVisibilityFilter(
           new URLSearchParams(searchStr).get("visibility") ?? "",
         ),
         q: new URLSearchParams(searchStr).get("q") ?? "",
+        import: new URLSearchParams(searchStr).get("import") ?? "",
       });
       if (nextPath !== existingPath) {
         navigate({ href: nextPath });
@@ -39,7 +41,7 @@ export function AdminScoresFilters({ current }: AdminScoresFiltersProps) {
     }, 300);
 
     return () => window.clearTimeout(timeout);
-  }, [q, visibility, navigate, searchStr]);
+  }, [q, visibility, navigate, searchStr, current.import]);
 
   const hasFilters = Boolean(visibility || q.trim());
   const searchLive = q.trim().length > 0;
@@ -87,7 +89,11 @@ export function AdminScoresFilters({ current }: AdminScoresFiltersProps) {
             onClick={() => {
               setQ("");
               setVisibility("");
-              navigate({ to: "/admin/scores" });
+              navigate({
+                href: formatAdminScoresSearchPath({
+                  import: current.import,
+                }),
+              });
             }}
           >
             Clear

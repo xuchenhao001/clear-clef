@@ -68,10 +68,13 @@ flowchart TB
 ### Admin catalog writes (not public)
 
 1. First boot: create the admin at `/admin/setup` (one-time; public sign-up remains disabled).
-2. Protected `/admin` (overview), `/admin/upload`, `/admin/scores`, `/admin/scores/{id}` (Better Auth admin session; layout loader in `admin/_protected`).
-3. Create: API handler validates, extracts metadata, writes R2 objects, inserts D1 rows.
-4. Update: `PATCH` metadata and optional file replace; delete: D1 row + R2 prefix; download original via admin-only file route.
-5. Page-1 preview SVG is generated at ingest or file replace in the admin browser, not on every catalog request.
+2. Protected `/admin` (overview), `/admin/upload`, `/admin/batch-upload`, `/admin/scores`, `/admin/scores/{id}` (Better Auth admin session; layout loader in `admin/_protected`).
+3. Create: API handler validates, sanitizes the canonical MusicXML, writes R2 objects, inserts D1 rows. Batch upload inspects files in a browser Web Worker (unzip, metadata, hash), sends one JSON catalog lookup, then creates one score per request with an `upload_key` and `import_id`; the browser orchestrates two at a time. The upload includes the original file and canonical XML so the Worker does not unzip or full-parse a score.
+4. Update: `PATCH` metadata and optional file replace (the browser also prepares canonical XML); delete: D1 row + R2 prefix; download original via admin-only file route.
+5. Page-1 preview SVG is generated at ingest or file replace in the admin browser, not on every catalog request. Batch previews use one Verovio worker; failures are per-row and retryable.
+6. Batch publish moves that import's private scores to public and purges their HTML pages.
+
+The browser-first ingest path exists because Workers Free has a **10 ms CPU limit**. Full XML parsing and hashing in the Worker was the source of `exceededCpu` 503s during batch review. Worker routes now only perform duplicate lookups, sanitize/hash canonical text, and store objects.
 
 ## Cloudflare bindings (conceptual)
 

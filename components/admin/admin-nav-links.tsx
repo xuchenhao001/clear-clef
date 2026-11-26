@@ -15,6 +15,11 @@ const ENTRIES = [
     label: "Upload",
     match: (path: string) => path.startsWith("/admin/upload"),
   },
+  {
+    to: "/admin/batch-upload",
+    label: "Batch upload",
+    match: (path: string) => path.startsWith("/admin/batch-upload"),
+  },
 ] as const;
 
 export function AdminNavLinks() {

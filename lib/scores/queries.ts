@@ -1,7 +1,7 @@
 import { cache } from "react";
 import { and, desc, eq, type SQL } from "drizzle-orm";
 import type { DrizzleD1Database } from "drizzle-orm/d1";
-import { getDbAsync } from "@/lib/db";
+import { getDb } from "@/lib/db";
 import * as schema from "@/lib/db/schema";
 import { scoreTags, scores, tags } from "@/lib/db/schema";
 import {
@@ -45,7 +45,7 @@ const listPublicScoresCached = cache(async function listPublicScoresCached(
   db?: CatalogDb,
 ): Promise<PublicCatalogScore[]> {
   const filters = JSON.parse(filtersKey) as CatalogFilters;
-  const database = db ?? await getDbAsync();
+  const database = db ?? getDb();
   const conditions: SQL[] = [eq(scores.visibility, "public")];
 
   if (filters.key) {
@@ -95,13 +95,42 @@ export async function listPublicScores(
   return listPublicScoresCached(catalogFiltersCacheKey(filters), db);
 }
 
+export type PublicScoreDetail = {
+  id: string;
+  slug: string;
+  title: string;
+  composer: string | null;
+  catalogNumber: string | null;
+  lyricist: string | null;
+  sourceUrl: string | null;
+  license: string;
+  key: string | null;
+  timeSignature: string | null;
+  difficulty: string | null;
+  r2Key: string | null;
+  tags: { slug: string; label: string }[];
+};
+
 export const getPublicScoreBySlug = cache(async function getPublicScoreBySlug(
   slug: string,
   db?: CatalogDb,
-) {
-  const database = db ?? await getDbAsync();
+): Promise<PublicScoreDetail | null> {
+  const database = db ?? getDb();
   const score = await database
-    .select()
+    .select({
+      id: scores.id,
+      slug: scores.slug,
+      title: scores.title,
+      composer: scores.composer,
+      catalogNumber: scores.catalogNumber,
+      lyricist: scores.lyricist,
+      sourceUrl: scores.sourceUrl,
+      license: scores.license,
+      key: scores.key,
+      timeSignature: scores.timeSignature,
+      difficulty: scores.difficulty,
+      r2Key: scores.r2Key,
+    })
     .from(scores)
     .where(and(eq(scores.slug, slug), eq(scores.visibility, "public")))
     .get();
@@ -116,14 +145,14 @@ export const getPublicScoreBySlug = cache(async function getPublicScoreBySlug(
 });
 
 export async function getScoreById(id: string, db?: CatalogDb) {
-  const database = db ?? await getDbAsync();
+  const database = db ?? getDb();
   return database.select().from(scores).where(eq(scores.id, id)).get();
 }
 
 export const listFilterOptions = cache(async function listFilterOptions(
   db?: CatalogDb,
 ) {
-  const database = db ?? await getDbAsync();
+  const database = db ?? getDb();
   const publicScores = await database
     .select({
       key: scores.key,
@@ -153,7 +182,7 @@ export const listFilterOptions = cache(async function listFilterOptions(
 });
 
 export async function slugExists(slug: string, db?: CatalogDb) {
-  const database = db ?? await getDbAsync();
+  const database = db ?? getDb();
   const existing = await database
     .select({ id: scores.id })
     .from(scores)

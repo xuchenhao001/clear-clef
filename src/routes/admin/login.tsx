@@ -2,6 +2,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Suspense } from "react";
 import { AdminAuthShell } from "@/components/admin/AdminAuthShell";
 import { AdminLoginForm } from "@/components/admin/AdminLoginForm";
+import { safeAdminNextPath } from "@/lib/admin/redirects";
 import { checkNeedsAdminSetup } from "@/src/server/auth";
 
 type LoginSearch = {
@@ -31,7 +32,7 @@ function AdminLoginPage() {
       <Suspense
         fallback={<p className="type-body-sm text-edition-muted">Loading…</p>}
       >
-        <AdminLoginForm nextPath={next ?? "/admin"} />
+        <AdminLoginForm nextPath={safeAdminNextPath(next)} />
       </Suspense>
     </AdminAuthShell>
   );

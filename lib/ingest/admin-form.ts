@@ -22,7 +22,27 @@ export type AdminUploadFields = {
   sourceUrl: string | null;
   catalogNumber: string | null;
   tagList: string[];
+  title?: string;
+  composer?: string | null;
+  uploadKey?: string;
+  importId?: string;
+  allowDuplicate?: boolean;
+  contentHash?: string;
 };
+
+function optionalText(formData: FormData, name: string): string | undefined {
+  return formData.has(name) ? String(formData.get(name) ?? "").trim() : undefined;
+}
+
+function optionalNullableText(
+  formData: FormData,
+  name: string,
+): string | null | undefined {
+  if (!formData.has(name)) {
+    return undefined;
+  }
+  return String(formData.get(name) ?? "").trim() || null;
+}
 
 export function parseAdminUploadFormData(formData: FormData): AdminUploadFields {
   const visibility = parseScoreVisibility(String(formData.get("visibility") ?? "public"));
@@ -30,7 +50,7 @@ export function parseAdminUploadFormData(formData: FormData): AdminUploadFields 
     throw new IngestValidationError("Invalid visibility");
   }
 
-  return {
+  const fields: AdminUploadFields = {
     license: String(formData.get("license") ?? ""),
     visibility,
     sourceUrl: formData.get("sourceUrl") ? String(formData.get("sourceUrl")) : null,
@@ -39,6 +59,42 @@ export function parseAdminUploadFormData(formData: FormData): AdminUploadFields 
       : null,
     tagList: parseTagList(String(formData.get("tags") ?? "")),
   };
+
+  const title = optionalText(formData, "title");
+  if (title !== undefined) fields.title = title;
+  const composer = optionalNullableText(formData, "composer");
+  if (composer !== undefined) fields.composer = composer;
+  const uploadKey = optionalText(formData, "uploadKey");
+  if (uploadKey) fields.uploadKey = uploadKey;
+  const importId = optionalText(formData, "importId");
+  if (importId) fields.importId = importId;
+  const allowDuplicate = formData.get("allowDuplicate");
+  if (allowDuplicate === "1" || allowDuplicate === "true") {
+    fields.allowDuplicate = true;
+  }
+  const contentHash = optionalText(formData, "contentHash");
+  if (contentHash) fields.contentHash = contentHash.toLowerCase();
+
+  return fields;
+}
+
+/**
+ * Canonical XML is sent as a Blob/File so multipart text-field line-ending
+ * normalization cannot change the bytes that the client hashed.
+ */
+export async function readCanonicalField(
+  formData: FormData,
+): Promise<string | undefined> {
+  const value = formData.get("canonical");
+  if (value instanceof File) {
+    const text = (await value.text()).trim();
+    return text || undefined;
+  }
+  if (typeof value === "string") {
+    const text = value.trim();
+    return text || undefined;
+  }
+  return undefined;
 }
 
 export type AdminPatchFields = AdminUploadFields & {

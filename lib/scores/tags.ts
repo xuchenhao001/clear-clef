@@ -1,5 +1,5 @@
 import { and, eq } from "drizzle-orm";
-import { getDbAsync } from "@/lib/db";
+import { getDb } from "@/lib/db";
 import { scoreTags, tags } from "@/lib/db/schema";
 import type { CatalogDb } from "@/lib/scores/queries";
 
@@ -17,7 +17,7 @@ export async function attachTagsToScore(
   rawTags: string[],
   db?: CatalogDb,
 ) {
-  const database = db ?? await getDbAsync();
+  const database = db ?? getDb();
   const unique = [...new Set(rawTags.map((tag) => slugifyTag(tag)).filter(Boolean))];
 
   for (const slug of unique) {
@@ -28,19 +28,24 @@ export async function attachTagsToScore(
       .where(eq(tags.slug, slug))
       .get();
 
-    const tagId =
-      existing?.id ??
-      (
-        await database
-          .insert(tags)
-          .values({
-            id: crypto.randomUUID(),
-            slug,
-            label,
-          })
-          .returning({ id: tags.id })
-          .get()
-      )?.id;
+    let tagId = existing?.id;
+    if (!tagId) {
+      await database
+        .insert(tags)
+        .values({
+          id: crypto.randomUUID(),
+          slug,
+          label,
+        })
+        .onConflictDoNothing();
+
+      const inserted = await database
+        .select({ id: tags.id })
+        .from(tags)
+        .where(eq(tags.slug, slug))
+        .get();
+      tagId = inserted?.id;
+    }
 
     if (!tagId) {
       continue;
@@ -63,7 +68,7 @@ export async function replaceTagsForScore(
   rawTags: string[],
   db?: CatalogDb,
 ) {
-  const database = db ?? await getDbAsync();
+  const database = db ?? getDb();
   await database.delete(scoreTags).where(eq(scoreTags.scoreId, scoreId));
   if (rawTags.length > 0) {
     await attachTagsToScore(scoreId, rawTags, database);

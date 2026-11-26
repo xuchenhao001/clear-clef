@@ -1,7 +1,7 @@
-import { unzipSync } from "fflate";
+import { unzipSync, type UnzipFileInfo } from "fflate";
 import { MAX_UPLOAD_BYTES } from "@/lib/ingest/constants";
 import { IngestValidationError } from "@/lib/ingest/errors";
-import { decodeXmlText } from "@/lib/ingest/xml";
+import { decodeXmlBytes } from "@/lib/ingest/xml";
 
 export { IngestValidationError } from "@/lib/ingest/errors";
 
@@ -29,41 +29,77 @@ export function assertFileSize(size: number, maxBytes: number): void {
   }
 }
 
-function findMusicXmlEntry(
-  entries: Record<string, Uint8Array>,
-  names: string[],
-  rootfile: string,
-): Uint8Array | undefined {
-  const normalizedRoot = rootfile.replace(/^\/+/, "");
-  if (entries[normalizedRoot]) {
-    return entries[normalizedRoot];
-  }
+type ArchiveEntry = {
+  name: string;
+  originalSize: number;
+};
 
-  const caseInsensitiveMatch = names.find(
-    (name) => name.toLowerCase() === normalizedRoot.toLowerCase(),
-  );
-  return caseInsensitiveMatch ? entries[caseInsensitiveMatch] : undefined;
+function validateEntry(
+  entry: UnzipFileInfo,
+  state: { count: number; total: number },
+  options: { maxUncompressedBytes: number; maxFiles: number },
+): void {
+  state.count += 1;
+  if (state.count > options.maxFiles) {
+    throw new IngestValidationError(".mxl archive contains too many files");
+  }
+  if (
+    entry.name.includes("..") ||
+    entry.name.startsWith("/") ||
+    entry.name.includes("\\")
+  ) {
+    throw new IngestValidationError(".mxl archive contains unsafe paths");
+  }
+  state.total += entry.originalSize;
+  if (state.total > options.maxUncompressedBytes) {
+    throw new IngestValidationError(
+      ".mxl archive is too large when uncompressed",
+    );
+  }
 }
 
-function findFallbackMusicXmlEntry(
-  entries: Record<string, Uint8Array>,
+function readArchive(
+  buffer: Uint8Array,
+  options: { maxUncompressedBytes: number; maxFiles: number },
+  predicate: (entry: ArchiveEntry) => boolean,
+): {
+  entries: Record<string, Uint8Array>;
+  names: string[];
+} {
+  const names: string[] = [];
+  const state = { count: 0, total: 0 };
+  const entries = unzipSync(buffer, {
+    filter: (entry) => {
+      validateEntry(entry, state, options);
+      names.push(entry.name);
+      return predicate(entry);
+    },
+  });
+  return { entries, names };
+}
+
+function findMusicXmlEntry(
   names: string[],
-): { xml: Uint8Array; originalName: string } | null {
+  rootfile: string,
+): string | undefined {
+  const normalizedRoot = rootfile.replace(/^\/+/, "");
+  const exact = names.find((name) => name === normalizedRoot);
+  if (exact) {
+    return exact;
+  }
+  return names.find(
+    (name) => name.toLowerCase() === normalizedRoot.toLowerCase(),
+  );
+}
+
+function findFallbackMusicXmlEntry(names: string[]): string | null {
   const candidates = names.filter(
     (name) =>
       !name.toLowerCase().startsWith("meta-inf/") &&
       /\.(musicxml|xml)$/i.test(name),
   );
 
-  if (candidates.length !== 1) {
-    return null;
-  }
-
-  const originalName = candidates[0];
-  return {
-    xml: entries[originalName],
-    originalName,
-  };
+  return candidates.length === 1 ? candidates[0] : null;
 }
 
 export function extractMusicXmlFromMxl(
@@ -72,66 +108,81 @@ export function extractMusicXmlFromMxl(
     maxUncompressedBytes: number;
     maxFiles: number;
   },
-): { xml: string; originalName: string } {
-  let entries: Record<string, Uint8Array>;
+): { xml: string } {
+  let archive: ReturnType<typeof readArchive>;
   try {
-    entries = unzipSync(buffer);
-  } catch {
+    // First pass: validate every declaration and extract only the small
+    // container. No score XML is decompressed until the rootfile is known.
+    archive = readArchive(buffer, options, (entry) =>
+      entry.name.toLowerCase().endsWith("meta-inf/container.xml"),
+    );
+  } catch (error) {
+    if (error instanceof IngestValidationError) {
+      throw error;
+    }
     throw new IngestValidationError("Invalid .mxl archive");
   }
 
-  const names = Object.keys(entries);
-  if (names.length === 0) {
+  if (archive.names.length === 0) {
     throw new IngestValidationError(".mxl archive is empty");
   }
-  if (names.length > options.maxFiles) {
-    throw new IngestValidationError(".mxl archive contains too many files");
-  }
 
-  let totalUncompressed = 0;
-  for (const name of names) {
-    if (name.includes("..") || name.startsWith("/") || name.includes("\\")) {
-      throw new IngestValidationError(".mxl archive contains unsafe paths");
-    }
-    totalUncompressed += entries[name].length;
-    if (totalUncompressed > options.maxUncompressedBytes) {
-      throw new IngestValidationError(".mxl archive is too large when uncompressed");
-    }
-  }
-
-  const containerEntry = names.find((name) =>
+  const containerName = archive.names.find((name) =>
     name.toLowerCase().endsWith("meta-inf/container.xml"),
   );
+  const containerEntry = containerName ? archive.entries[containerName] : null;
 
+  let rootName: string | null = null;
   if (containerEntry) {
-    const containerXml = decodeXmlText(entries[containerEntry]);
+    const containerXml = decodeXmlBytes(containerEntry);
     const rootfileMatch = containerXml.match(
       /full-path="([^"]+\.(?:musicxml|xml))"/i,
     );
     const rootfile = rootfileMatch?.[1];
     if (!rootfile) {
-      throw new IngestValidationError("Could not locate MusicXML rootfile in .mxl");
+      throw new IngestValidationError(
+        "Could not locate MusicXML rootfile in .mxl",
+      );
     }
-
-    const musicXmlEntry = findMusicXmlEntry(entries, names, rootfile);
-    if (!musicXmlEntry) {
-      throw new IngestValidationError("MusicXML rootfile missing from .mxl archive");
+    rootName = findMusicXmlEntry(archive.names, rootfile) ?? null;
+    if (!rootName) {
+      throw new IngestValidationError(
+        "MusicXML rootfile missing from .mxl archive",
+      );
     }
-
-    return {
-      xml: decodeXmlText(musicXmlEntry),
-      originalName: rootfile.replace(/^\/+/, ""),
-    };
+  } else {
+    rootName = findFallbackMusicXmlEntry(archive.names);
+    if (!rootName) {
+      throw new IngestValidationError("Missing META-INF/container.xml in .mxl");
+    }
   }
 
-  const fallback = findFallbackMusicXmlEntry(entries, names);
-  if (!fallback) {
-    throw new IngestValidationError("Missing META-INF/container.xml in .mxl");
+  let extracted: Record<string, Uint8Array>;
+  try {
+    // Second pass: decompress only the rootfile. Other entries (images,
+    // thumbnails) do not cost CPU or memory.
+    extracted = readArchive(
+      buffer,
+      options,
+      (entry) => entry.name === rootName,
+    ).entries;
+  } catch (error) {
+    if (error instanceof IngestValidationError) {
+      throw error;
+    }
+    throw new IngestValidationError("Invalid .mxl archive");
+  }
+
+  const rootEntry = rootName ? extracted[rootName] : null;
+  if (!rootEntry) {
+    throw new IngestValidationError("MusicXML rootfile missing from .mxl archive");
+  }
+  if (rootEntry.length > options.maxUncompressedBytes) {
+    throw new IngestValidationError(".mxl archive is too large when uncompressed");
   }
 
   return {
-    xml: decodeXmlText(fallback.xml),
-    originalName: fallback.originalName,
+    xml: decodeXmlBytes(rootEntry),
   };
 }
 
@@ -153,7 +204,7 @@ export function readMusicXmlInput(
   }
 
   return {
-    xml: decodeXmlText(buffer),
+    xml: decodeXmlBytes(buffer),
     originalExtension: extension === "xml" ? "musicxml" : extension,
   };
 }

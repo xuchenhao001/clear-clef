@@ -39,13 +39,6 @@ Implementation order for ClearClef.
 - Tags (many-to-many)
 - Piano-oriented filters: key, difficulty, license
 
-## Phase 7 — Admin score CRUD (done)
-
-- `/admin/scores` list (all visibilities) and `/admin/scores/{id}` edit
-- `PATCH` / `DELETE` / admin download original / admin preview GET
-- Hard delete (D1 + R2); metadata edit; optional MusicXML file replace with preview regen
-- See [ingest.md](ingest.md)
-
 ## Phase 6 — Contents-list catalog UI (done)
 
 - Credit-grouped contents list (replaces card grid)
@@ -56,6 +49,27 @@ Implementation order for ClearClef.
 - Sparse metadata line (`catalog_number · key · time`) on list and detail
 - Auto-submit catalog filters (no Apply button)
 - See [design.md](design.md)
+
+## Phase 7 — Admin score CRUD (done)
+
+- `/admin/scores` list (all visibilities) and `/admin/scores/{id}` edit
+- `PATCH` / `DELETE` / admin download original / admin preview GET
+- Hard delete (D1 + R2); metadata edit; optional MusicXML file replace with preview regen
+- See [ingest.md](ingest.md)
+
+## Phase 8 — Batch upload (done)
+
+- `/admin/batch-upload`: folder picker, metadata/rights/duplicate review, idempotent per-file uploads, Web Worker previews, resume manifest, import filter, private-batch publish
+- See [ingest.md](ingest.md) and ADR-010
+
+## Phase 9 — Free-tier ingest hardening (done)
+
+- Browser Web Worker inspection and JSON-only catalog lookup; no score file in preflight
+- Targeted header metadata extraction, measure-count scan, keys only when mode/title states one
+- Canonical XML handoff as a binary File part; server sanitizes/re-hashes without full parse
+- Declared-size zip-bomb guard, rootfile-only extraction, encoding-aware decode
+- Retry/error states: no blind 503 retries, retry unread, missing-composer filter
+- See [ingest.md](ingest.md), [cloudflare.md](cloudflare.md), and ADR-011
 
 ## Out of scope for v1
 

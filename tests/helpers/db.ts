@@ -7,6 +7,7 @@ const migrations = [
   "0000_init.sql",
   "0001_auth.sql",
   "0002_catalog_number.sql",
+  "0003_batch_import.sql",
 ].map((file) =>
   readFileSync(resolve(process.cwd(), "drizzle", file), "utf8"),
 );

@@ -17,10 +17,6 @@ export const BETTER_AUTH_URL_DEVELOPMENT = "http://localhost:3000";
 
 export const LOCAL_PERSIST_TO = ".cloudflare/state";
 
-export function workerNameForMode(_mode) {
-  return WORKER_NAME;
-}
-
 export function betterAuthUrlForMode(mode) {
   if (mode === "development") {
     return BETTER_AUTH_URL_DEVELOPMENT;
@@ -34,7 +30,7 @@ export function publicSiteOrigins() {
     BETTER_AUTH_URL_PRODUCTION,
     ...BETTER_AUTH_ALTERNATE_ORIGINS,
   ]) {
-    origins.add(new URL(url).origin);
+    origins.add(new globalThis.URL(url).origin);
   }
   return [...origins];
 }

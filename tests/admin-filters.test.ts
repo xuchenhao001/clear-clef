@@ -17,6 +17,7 @@ const sample: AdminCatalogScore[] = [
     license: "Public Domain",
     visibility: "public",
     previewR2Key: null,
+    importId: null,
     createdAt: new Date(),
     tags: [],
   },
@@ -29,6 +30,7 @@ const sample: AdminCatalogScore[] = [
     license: "CC0",
     visibility: "private",
     previewR2Key: null,
+    importId: "import-123",
     createdAt: new Date(),
     tags: [],
   },
@@ -40,17 +42,28 @@ describe("filterAdminScores", () => {
     expect(filterAdminScores(sample, { q: "chopin" })).toHaveLength(1);
     expect(filterAdminScores(sample, { q: "prelude", visibility: "public" })).toHaveLength(1);
   });
+
+  it("filters by batch import", () => {
+    expect(filterAdminScores(sample, { import: "import-123" })).toHaveLength(1);
+    expect(filterAdminScores(sample, { import: "other-import" })).toHaveLength(0);
+  });
 });
 
 describe("parseAdminScoreListFilters", () => {
   it("normalizes visibility and q from search params", () => {
-    expect(parseAdminScoreListFilters({})).toEqual({ visibility: "", q: "" });
+    expect(parseAdminScoreListFilters({})).toEqual({});
     expect(
       parseAdminScoreListFilters({ visibility: "public", q: "bach" }),
     ).toEqual({ visibility: "public", q: "bach" });
-    expect(parseAdminScoreListFilters({ visibility: "invalid" })).toEqual({
-      visibility: "",
-      q: "",
+    expect(parseAdminScoreListFilters({ visibility: "invalid" })).toEqual({});
+    expect(
+      parseAdminScoreListFilters({
+        visibility: "private",
+        import: "6a5d4e3c-1234-4abc-9def-1234567890ab",
+      }),
+    ).toEqual({
+      visibility: "private",
+      import: "6a5d4e3c-1234-4abc-9def-1234567890ab",
     });
   });
 });
@@ -64,6 +77,15 @@ describe("formatAdminScoresSearchPath", () => {
     expect(
       formatAdminScoresSearchPath({ visibility: "private", q: "etude" }),
     ).toBe("/admin/scores?visibility=private&q=etude");
+    expect(
+      formatAdminScoresSearchPath({
+        visibility: "private",
+        q: "etude",
+        import: "6a5d4e3c-1234-4abc-9def-1234567890ab",
+      }),
+    ).toBe(
+      "/admin/scores?visibility=private&q=etude&import=6a5d4e3c-1234-4abc-9def-1234567890ab",
+    );
   });
 });
 

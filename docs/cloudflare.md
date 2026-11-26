@@ -34,6 +34,36 @@ ClearClef uses the native **`cf`** workflow: one **`cloudflare.config.ts`**, no 
 | `development` | `pnpm dev` | `clear-clef` | `http://localhost:3000` |
 | `production` | `pnpm deploy` | `clear-clef` | `https://clearclef.dedog.top` (workers.dev alias still works) |
 
+## Worker CPU budget
+
+| Plan | CPU per HTTP request |
+| --- | --- |
+| Workers Free | **10 ms** |
+| Workers Paid | 5 min maximum; default 30 s |
+
+ClearClef keeps score parsing in the browser so batch review and upload work on the Free plan. `POST /api/admin/uploads/preflight` accepts small JSON lookups only; uploads carry canonical XML prepared by the browser and the server sanitizes/hashes it without a full XML parse. See [ingest.md](ingest.md).
+
+If you move to Workers Paid, raise the explicit limit in [`cloudflare.config.ts`](../cloudflare.config.ts):
+
+```ts
+export default defineConfig((ctx) => ({
+  worker: {
+    // ...
+    limits: { cpuMs: 30_000 },
+  },
+}));
+```
+
+`cf` accepts `worker.limits.cpuMs`; it has no effect above 10 ms on the Free plan. Do not rely on a paid limit to mask a missing parser fast path; the header-only/browser-first path should stay.
+
+To diagnose CPU failures on a deployed Worker:
+
+```bash
+pnpm exec cf o11y telemetry query --body @o11y-query.json
+```
+
+Filter on `$workers.outcome = "exceededCpu"` or `$metadata.error` containing `CPU time limit` for the batch window. A 503 with `exceededCpu` is deterministic for that input and should not be retried blindly.
+
 ## Deploy secrets
 
 Set `BETTER_AUTH_SECRET` on the Worker (dashboard or `cf` secret APIs). Do not commit secrets. Optional: `cf deploy --prebuilt --secrets-file .dev.vars` in a controlled CI step (never commit real `.dev.vars`).

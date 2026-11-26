@@ -7,8 +7,11 @@ alwaysApply: false
 # Ingest / upload
 
 - Accept `.mxl`, `.musicxml`, `.xml` (ABC convert-once is later). Enforce **8 MB** size cap.
-- **XXE:** strip external MusicXML DOCTYPE in [`lib/ingest/xml.ts`](../lib/ingest/xml.ts); reject ENTITY / internal subsets; decompress `.mxl` with zip-slip and bomb guards; parse with `fast-xml-parser` (`processEntities: false`).
-- Require **license** before persist. Extract title/composer/key/time/parts from MusicXML header only at upload time.
+- **XXE:** strip external MusicXML DOCTYPE in [`lib/ingest/xml.ts`](../lib/ingest/xml.ts); reject ENTITY / internal subsets; decompress `.mxl` with declared-size zip-slip/bomb guards before extraction; parse header fragments with `fast-xml-parser` (`processEntities: false`). Browser-prepared canonical XML is re-sanitized and re-hashed on the server.
+- Require **license** before persist. Extract title/composer/key/time/parts from the MusicXML header and first measure only; key is null unless `<mode>` or the title states major/minor.
 - Store `scores/{id}/original.*` + `canonical.musicxml`; set `format`, `visibility`, `owner_id` (admin user).
 - Never ship ingest parsers into public catalog route loaders.
 - Page-1 preview SVG is generated in the admin browser after upload, stored in R2 — not on every catalog request.
+- Batch upload is client-orchestrated: inspect files in a browser Web Worker, send one JSON catalog lookup, then per-file uploads with `upload_key`/`import_id` and canonical XML. Do not add a single Worker request that ingests the whole batch.
+- **CPU:** Workers Free is 10 ms/request. Do not full-parse or hash whole scores in Worker routes; upload fast path must not unzip/full-parse the original.
+- Exact duplicate detection uses the SHA-256 of the sanitized canonical XML; same-work variants are warnings, not blocks.
