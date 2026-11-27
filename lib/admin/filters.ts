@@ -4,6 +4,7 @@ export type AdminScoreListFilters = {
   visibility?: ScoreVisibility | "";
   q?: string;
   import?: string;
+  composer?: string;
   page?: number;
 };
 
@@ -31,6 +32,10 @@ export function formatAdminScoresSearchPath(filters: AdminScoreListFilters): str
   if (importId) {
     params.set("import", importId);
   }
+  const composerId = filters.composer?.trim();
+  if (composerId) {
+    params.set("composer", composerId);
+  }
   if (filters.page && filters.page > 1) {
     params.set("page", String(filters.page));
   }
@@ -48,6 +53,11 @@ export function parseAdminScoreListFilters(
   const importRaw = typeof params.import === "string" ? params.import.trim() : "";
   const importId =
     /^[a-zA-Z0-9-]{8,64}$/.test(importRaw) ? importRaw : undefined;
+  const composerRaw =
+    typeof params.composer === "string" ? params.composer.trim() : "";
+  const composer = /^[a-zA-Z0-9-]{1,80}$/.test(composerRaw)
+    ? composerRaw
+    : undefined;
   const rawPage =
     typeof params.page === "string" ? Number.parseInt(params.page, 10) : 1;
   const page =
@@ -59,6 +69,7 @@ export function parseAdminScoreListFilters(
   if (visibility) filters.visibility = visibility;
   if (q) filters.q = q;
   if (importId) filters.import = importId;
+  if (composer) filters.composer = composer;
   if (page) filters.page = page;
   return filters;
 }

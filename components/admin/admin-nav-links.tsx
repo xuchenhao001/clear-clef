@@ -12,7 +12,7 @@ const ENTRIES = [
   },
   {
     to: "/admin/composers",
-    label: "Composers",
+    label: "Composers & credit",
     match: (path: string) => path.startsWith("/admin/composers"),
   },
   {

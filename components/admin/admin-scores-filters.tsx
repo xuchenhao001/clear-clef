@@ -27,6 +27,7 @@ export function AdminScoresFilters({ current }: AdminScoresFiltersProps) {
         visibility: normalizeAdminVisibilityFilter(visibility),
         q,
         import: current.import,
+        composer: current.composer,
       });
       const existingPath = formatAdminScoresSearchPath({
         visibility: normalizeAdminVisibilityFilter(
@@ -34,6 +35,7 @@ export function AdminScoresFilters({ current }: AdminScoresFiltersProps) {
         ),
         q: new URLSearchParams(searchStr).get("q") ?? "",
         import: new URLSearchParams(searchStr).get("import") ?? "",
+        composer: new URLSearchParams(searchStr).get("composer") ?? "",
       });
       if (nextPath !== existingPath) {
         navigate({ href: nextPath });
@@ -41,9 +43,9 @@ export function AdminScoresFilters({ current }: AdminScoresFiltersProps) {
     }, 300);
 
     return () => window.clearTimeout(timeout);
-  }, [q, visibility, navigate, searchStr, current.import]);
+  }, [q, visibility, navigate, searchStr, current.import, current.composer]);
 
-  const hasFilters = Boolean(visibility || q.trim());
+  const hasFilters = Boolean(visibility || q.trim() || current.composer);
   const searchLive = q.trim().length > 0;
 
   return (

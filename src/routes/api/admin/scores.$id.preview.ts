@@ -10,7 +10,7 @@ import { getScoreById } from "@/lib/scores/queries";
 export const Route = createFileRoute("/api/admin/scores/$id/preview")({
   server: {
     handlers: {
-      GET: async ({ params }) => {
+      GET: async ({ request, params }) => {
         const session = await requireAdminSession();
         if (!session) {
           return Response.json({ error: "Unauthorized" }, { status: 401 });
@@ -18,19 +18,27 @@ export const Route = createFileRoute("/api/admin/scores/$id/preview")({
 
         const { id } = params;
         const score = await getScoreById(id);
-        if (!score?.previewR2Key) {
+        const wantsThumb =
+          new URL(request.url).searchParams.get("thumb") === "1";
+        const key =
+          wantsThumb && score?.previewThumbR2Key
+            ? score.previewThumbR2Key
+            : score?.previewR2Key;
+        if (!key) {
           return Response.json({ error: "Not found" }, { status: 404 });
         }
 
         const bucket = getScoresBucket();
-        const object = await bucket.get(score.previewR2Key);
+        const object = await bucket.get(key);
         if (!object) {
           return Response.json({ error: "Not found" }, { status: 404 });
         }
 
         return new Response(object.body, {
           headers: {
-            "Content-Type": "image/svg+xml",
+            "Content-Type": key.endsWith(".webp")
+              ? "image/webp"
+              : "image/svg+xml",
             "Cache-Control": "private, no-store",
           },
         });

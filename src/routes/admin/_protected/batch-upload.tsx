@@ -2,13 +2,16 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { AdminBatchUpload } from "@/components/admin/batch/admin-batch-upload";
 import { buttonVariants } from "@/components/ui/button";
+import { loadAdminComposerOptions } from "@/src/server/admin";
 import { cn } from "cn";
 
 export const Route = createFileRoute("/admin/_protected/batch-upload")({
+  loader: () => loadAdminComposerOptions(),
   component: AdminBatchUploadPage,
 });
 
 function AdminBatchUploadPage() {
+  const composers = Route.useLoaderData();
   return (
     <div className="flex flex-col gap-8">
       <AdminPageHeader
@@ -27,7 +30,7 @@ function AdminBatchUploadPage() {
           </Link>
         }
       />
-      <AdminBatchUpload />
+      <AdminBatchUpload composers={composers} />
     </div>
   );
 }

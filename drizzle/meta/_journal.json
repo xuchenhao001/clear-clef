@@ -50,6 +50,13 @@
       "when": 1795738200000,
       "tag": "0006_composer_data_backfill",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1795738300000,
+      "tag": "0007_composer_credit_workflow",
+      "breakpoints": true
     }
   ]
 }

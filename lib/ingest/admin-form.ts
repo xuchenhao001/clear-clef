@@ -24,6 +24,9 @@ export type AdminUploadFields = {
   tagList: string[];
   title?: string;
   composer?: string | null;
+  composerId?: string | null;
+  composerRaw?: string | null;
+  keepUncredited?: boolean;
   arranger?: string | null;
   editionLabel?: string | null;
   difficulty?: string | null;
@@ -69,6 +72,16 @@ export function parseAdminUploadFormData(formData: FormData): AdminUploadFields 
   if (title !== undefined) fields.title = title;
   const composer = optionalNullableText(formData, "composer");
   if (composer !== undefined) fields.composer = composer;
+  const composerId = optionalNullableText(formData, "composerId");
+  if (composerId !== undefined) fields.composerId = composerId;
+  const composerRaw = optionalNullableText(formData, "composerRaw");
+  if (composerRaw !== undefined) fields.composerRaw = composerRaw;
+  if (
+    formData.get("keepUncredited") === "1" ||
+    formData.get("keepUncredited") === "true"
+  ) {
+    fields.keepUncredited = true;
+  }
   const arranger = optionalNullableText(formData, "arranger");
   if (arranger !== undefined) fields.arranger = arranger;
   const editionLabel = optionalNullableText(formData, "editionLabel");

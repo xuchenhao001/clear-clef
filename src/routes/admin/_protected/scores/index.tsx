@@ -20,7 +20,7 @@ export const Route = createFileRoute("/admin/_protected/scores/")({
 });
 
 function AdminScoresPage() {
-  const { stats, scores, filters, total, page, pageCount } =
+  const { stats, scores, filters, total, page, pageCount, composer } =
     Route.useLoaderData();
 
   return (
@@ -47,6 +47,24 @@ function AdminScoresPage() {
         }
       />
 
+      {filters.composer ? (
+        <div className="flex flex-wrap items-center justify-between gap-3 border-y border-edition-hairline py-3">
+          <p className="type-body-sm text-edition-muted">
+            Showing works credited to{" "}
+            <span className="text-edition-ink">
+              {composer?.displayName ?? filters.composer}
+            </span>
+            .
+          </p>
+          <Link
+            to="/admin/scores"
+            className="type-hint text-edition-gilt hover:text-edition-ink"
+          >
+            Clear composer
+          </Link>
+        </div>
+      ) : null}
+
       {filters.import ? (
         <div className="flex flex-wrap items-center justify-between gap-3 border-y border-edition-hairline py-3">
           <p className="type-body-sm text-edition-muted">
@@ -72,7 +90,7 @@ function AdminScoresPage() {
         <>
           <Suspense fallback={null}>
             <AdminScoresFilters
-              key={`${filters.q ?? ""}-${filters.visibility ?? ""}`}
+              key={`${filters.q ?? ""}-${filters.visibility ?? ""}-${filters.composer ?? ""}`}
               current={filters}
             />
           </Suspense>

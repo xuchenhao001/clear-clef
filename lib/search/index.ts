@@ -13,8 +13,8 @@ type SearchRow = {
   id: string;
   slug: string;
   title: string;
-  composer: string | null;
   composerDisplay: string | null;
+  composerRaw: string | null;
   composerSort: string | null;
   composerAliases: string | null;
   catalogNumber: string | null;
@@ -27,25 +27,32 @@ async function loadSearchRows(
   database: CatalogDb,
   scoreIds?: string[],
 ): Promise<SearchRow[]> {
-  const base = database
-    .select({
-      id: scores.id,
-      slug: scores.slug,
-      title: scores.title,
-      composer: scores.composer,
-      composerDisplay: composers.displayName,
-      composerSort: composers.sortName,
-      composerAliases: composers.aliases,
-      catalogNumber: scores.catalogNumber,
-      lyricist: scores.lyricist,
-      key: scores.key,
-    })
-    .from(scores)
-    .leftJoin(composers, eq(composers.id, scores.composerId));
+  const base = () =>
+    database
+      .select({
+        id: scores.id,
+        slug: scores.slug,
+        title: scores.title,
+        composerDisplay: composers.displayName,
+        composerRaw: scores.composerRaw,
+        composerSort: composers.sortName,
+        composerAliases: composers.aliases,
+        catalogNumber: scores.catalogNumber,
+        lyricist: scores.lyricist,
+        key: scores.key,
+      })
+      .from(scores)
+      .leftJoin(composers, eq(composers.id, scores.composerId));
 
   const rows = scoreIds
-    ? await base.where(inArray(scores.id, scoreIds))
-    : await base;
+    ? (
+        await Promise.all(
+          chunksOf(scoreIds, 80).map((chunk) =>
+            base().where(inArray(scores.id, chunk)),
+          ),
+        )
+      ).flat()
+    : await base();
 
   const ids = rows.map((row) => row.id);
   if (ids.length === 0) {
@@ -99,11 +106,12 @@ type SearchDocument = {
 };
 
 function buildDocument(row: SearchRow): SearchDocument {
-  const composerDisplay = row.composerDisplay ?? row.composer;
+  const composerDisplay = row.composerDisplay;
   const aliases = aliasesOf(row.composerAliases);
   const searchText = searchTextForScore({
     title: row.title,
     composer: composerDisplay,
+    composerRaw: row.composerRaw,
     composerSortName: row.composerSort,
     composerAliases: aliases,
     catalogNumber: row.catalogNumber,
@@ -121,7 +129,9 @@ function buildDocument(row: SearchRow): SearchDocument {
       row.id,
       cjkSpaced(row.title),
       cjkSpaced(
-        [composerDisplay, row.composerSort, ...aliases].filter(Boolean).join(" "),
+        [composerDisplay, row.composerRaw, row.composerSort, ...aliases]
+          .filter(Boolean)
+          .join(" "),
       ),
       cjkSpaced(row.catalogNumber ?? ""),
       cjkSpaced(row.lyricist ?? ""),
@@ -139,6 +149,14 @@ function buildDocument(row: SearchRow): SearchDocument {
 const INSERT_SQL = `INSERT INTO catalog_search
   (score_id, title, composer, catalog_number, lyricist, key, tags, all_text)
   VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+
+function chunksOf<T>(values: T[], size: number): T[][] {
+  const chunks: T[][] = [];
+  for (let index = 0; index < values.length; index += size) {
+    chunks.push(values.slice(index, index + size));
+  }
+  return chunks;
+}
 
 export async function refreshSearchDocument(
   scoreId: string,
@@ -168,6 +186,82 @@ export async function refreshSearchDocument(
     .where(eq(scores.id, scoreId));
 }
 
+/**
+ * Refresh many documents at once for an admin bulk action. Each FTS insert
+ * carries ten rows (80 bound values) and each score update forty ids, staying
+ * under D1's 100-parameter ceiling without one request per score.
+ */
+export async function refreshSearchDocuments(
+  scoreIds: string[],
+  db?: CatalogDb,
+  options: { composerDisplay?: string } = {},
+): Promise<void> {
+  const database = db ?? getDb();
+  const ids = [...new Set(scoreIds.filter(Boolean))];
+  if (ids.length === 0) return;
+
+  const rows = await loadSearchRows(database, ids);
+  const documents = rows.map((row) => buildDocument(row));
+
+  for (const chunk of chunksOf(ids, 80)) {
+    await rawRun(
+      database,
+      `DELETE FROM catalog_search WHERE score_id IN (${chunk
+        .map(() => "?")
+        .join(", ")})`,
+      chunk,
+    );
+  }
+
+  for (const chunk of chunksOf(documents, 10)) {
+    const placeholders = chunk
+      .map(() => "(?, ?, ?, ?, ?, ?, ?, ?)")
+      .join(", ");
+    await rawRun(
+      database,
+      `INSERT INTO catalog_search
+        (score_id, title, composer, catalog_number, lyricist, key, tags, all_text)
+       VALUES ${placeholders}`,
+      chunk.flatMap((document) => document.values),
+    );
+  }
+
+  for (const chunk of chunksOf(ids, 40)) {
+    if (options.composerDisplay !== undefined) {
+      await rawRun(
+        database,
+        `UPDATE scores SET
+           title_sort = lower(trim(title)),
+           search_text = lower(
+             coalesce(title, '') || ' ' ||
+             ? || ' ' ||
+             coalesce(composer_raw, '') || ' ' ||
+             coalesce(source_filename, '') || ' ' ||
+             coalesce(catalog_number, '') || ' ' ||
+             coalesce(lyricist, '') || ' ' ||
+             coalesce(key, '')
+           )
+         WHERE id IN (${chunk.map(() => "?").join(", ")})`,
+        [options.composerDisplay, ...chunk],
+      );
+    } else {
+      const byId = new Map(
+        documents.map((document) => [
+          String(document.values[0]),
+          document.searchText,
+        ]),
+      );
+      for (const id of chunk) {
+        await rawRun(
+          database,
+          "UPDATE scores SET title_sort = lower(trim(title)), search_text = ? WHERE id = ?",
+          [byId.get(id) ?? "", id],
+        );
+      }
+    }
+  }
+}
+
 export async function rebuildSearchIndex(db?: CatalogDb): Promise<number> {
   const database = db ?? getDb();
   await rawRun(database, "DELETE FROM catalog_search");
@@ -178,7 +272,7 @@ export async function rebuildSearchIndex(db?: CatalogDb): Promise<number> {
      SELECT
        s.id,
        s.title,
-       coalesce(c.display_name, s.composer, ''),
+       coalesce(c.display_name, ''),
        coalesce(s.catalog_number, ''),
        coalesce(s.lyricist, ''),
        coalesce(s.key, ''),
@@ -189,7 +283,9 @@ export async function rebuildSearchIndex(db?: CatalogDb): Promise<number> {
        ), ''),
        lower(
          coalesce(s.title, '') || ' ' ||
-         coalesce(c.display_name, s.composer, '') || ' ' ||
+         coalesce(c.display_name, '') || ' ' ||
+         coalesce(s.composer_raw, '') || ' ' ||
+         coalesce(s.source_filename, '') || ' ' ||
          coalesce(c.sort_name, '') || ' ' ||
          coalesce(c.aliases, '') || ' ' ||
          coalesce(s.catalog_number, '') || ' ' ||
@@ -211,7 +307,9 @@ export async function rebuildSearchIndex(db?: CatalogDb): Promise<number> {
        title_sort = lower(trim(title)),
        search_text = lower(
          coalesce(title, '') || ' ' ||
-         coalesce(composer, '') || ' ' ||
+         coalesce((SELECT display_name FROM composers WHERE id = scores.composer_id), '') || ' ' ||
+         coalesce(composer_raw, '') || ' ' ||
+         coalesce(source_filename, '') || ' ' ||
          coalesce(catalog_number, '') || ' ' ||
          coalesce(lyricist, '') || ' ' ||
          coalesce(key, '')

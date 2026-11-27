@@ -13,6 +13,7 @@ export const composers = sqliteTable(
     id: text("id").primaryKey(),
     slug: text("slug").notNull().unique(),
     displayName: text("display_name").notNull(),
+    normalizedName: text("normalized_name").notNull(),
     sortName: text("sort_name").notNull(),
     aliases: text("aliases").notNull().default("[]"),
     birthYear: integer("birth_year"),
@@ -21,9 +22,23 @@ export const composers = sqliteTable(
     updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
   },
   (table) => [
+    uniqueIndex("composers_normalized_name_idx").on(table.normalizedName),
     index("composers_sort_idx").on(table.sortName),
     index("composers_display_idx").on(table.displayName),
   ],
+);
+
+export const composerAliases = sqliteTable(
+  "composer_aliases",
+  {
+    normalizedAlias: text("normalized_alias").primaryKey(),
+    composerId: text("composer_id")
+      .notNull()
+      .references(() => composers.id, { onDelete: "cascade" }),
+    alias: text("alias").notNull(),
+    createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
+  },
+  (table) => [index("composer_aliases_composer_idx").on(table.composerId)],
 );
 
 export const scores = sqliteTable(
@@ -32,10 +47,12 @@ export const scores = sqliteTable(
     id: text("id").primaryKey(),
     slug: text("slug").notNull().unique(),
     title: text("title").notNull(),
-    composer: text("composer"),
     composerId: text("composer_id").references(() => composers.id, {
       onDelete: "set null",
     }),
+    /** The credit exactly as read from the file, before canonicalisation. */
+    composerRaw: text("composer_raw"),
+    sourceFilename: text("source_filename"),
     arranger: text("arranger"),
     workKey: text("work_key"),
     editionLabel: text("edition_label"),
@@ -84,6 +101,31 @@ export const scores = sqliteTable(
     ),
     index("scores_public_license_idx").on(table.visibility, table.license),
     index("scores_work_key_idx").on(table.workKey),
+    index("scores_unassigned_idx").on(table.composerId, table.createdAt),
+  ],
+);
+
+export const scoreCreditEvents = sqliteTable(
+  "score_credit_events",
+  {
+    id: text("id").primaryKey(),
+    scoreId: text("score_id")
+      .notNull()
+      .references(() => scores.id, { onDelete: "cascade" }),
+    previousComposerId: text("previous_composer_id").references(
+      () => composers.id,
+      { onDelete: "set null" },
+    ),
+    newComposerId: text("new_composer_id").references(() => composers.id, {
+      onDelete: "set null",
+    }),
+    action: text("action").notNull(),
+    actorId: text("actor_id"),
+    createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
+  },
+  (table) => [
+    index("score_credit_events_score_idx").on(table.scoreId, table.createdAt),
+    index("score_credit_events_created_idx").on(table.createdAt),
   ],
 );
 
@@ -125,6 +167,8 @@ export type Score = typeof scores.$inferSelect;
 export type NewScore = typeof scores.$inferInsert;
 export type Composer = typeof composers.$inferSelect;
 export type NewComposer = typeof composers.$inferInsert;
+export type ComposerAlias = typeof composerAliases.$inferSelect;
+export type ScoreCreditEvent = typeof scoreCreditEvents.$inferSelect;
 export type ScoreSlugAlias = typeof scoreSlugAliases.$inferSelect;
 export type Tag = typeof tags.$inferSelect;
 export type ScoreTag = typeof scoreTags.$inferInsert;

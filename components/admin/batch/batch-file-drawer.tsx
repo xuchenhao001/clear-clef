@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { AdminField, AdminInput } from "@/components/admin/admin-field";
+import {
+  ComposerPicker,
+  type ComposerChoice,
+} from "@/components/admin/composer-picker";
 import { adminFormInputClassName } from "@/components/admin/admin-form-styles";
 import { Button } from "@/components/ui/button";
 import type {
@@ -17,6 +21,7 @@ import {
   effectiveVisibility,
 } from "@/lib/batch/state";
 import { LICENSE_OPTIONS } from "@/lib/ingest/constants";
+import type { ComposerWithCount } from "@/lib/scores/composers";
 import { cn } from "cn";
 
 type OverrideField =
@@ -31,6 +36,7 @@ type OverrideField =
 type BatchDrawerProps = {
   row: BatchRow | null;
   settings: BatchSettings;
+  composers: ComposerWithCount[];
   open: boolean;
   editable: boolean;
   previewSvg: string | null;
@@ -169,6 +175,7 @@ function CreditList({
 export function BatchFileDrawer({
   row,
   settings,
+  composers,
   open,
   editable,
   previewSvg,
@@ -200,6 +207,15 @@ export function BatchFileDrawer({
 
   const title = effectiveTitle(row);
   const composer = effectiveComposer(row);
+  const matchedComposer = composers.find(
+    (candidate) =>
+      candidate.displayName.toLowerCase() === composer.trim().toLowerCase(),
+  );
+  const composerChoice: ComposerChoice | null = composer.trim()
+    ? matchedComposer
+      ? { kind: "existing", composer: matchedComposer }
+      : { kind: "create", name: composer.trim() }
+    : null;
   const sourceUrl = effectiveSourceUrl(row, settings);
   const tags = effectiveTags(row, settings);
   const visibility = effectiveVisibility(row, settings);
@@ -340,17 +356,29 @@ export function BatchFileDrawer({
                 htmlFor="batch-file-composer"
                 hint={
                   row.suggestedComposer
-                    ? "Read from the file."
-                    : "Not present in the file. Add it if known; composer is optional."
+                    ? "Read from the file. Pick an authority record, or create a new one."
+                    : "Not present in the file. Composer is optional."
                 }
               >
-                <AdminInput
+                <ComposerPicker
                   id="batch-file-composer"
-                  value={composer}
+                  composers={composers}
+                  value={composerChoice}
                   disabled={!canEdit}
-                  onChange={(event) =>
-                    onOverride(row.key, "composer", event.target.value)
-                  }
+                  suggestedName={row.suggestedComposer}
+                  allowUncredited
+                  allowClear
+                  onChange={(next) => {
+                    if (!next || next.kind === "none") {
+                      onOverride(row.key, "composer", "");
+                    } else if (next.kind === "existing") {
+                      onOverride(row.key, "composer", next.composer.displayName);
+                    } else if (next.kind === "create") {
+                      onOverride(row.key, "composer", next.name);
+                    } else {
+                      onOverride(row.key, "composer", "Uncredited");
+                    }
+                  }}
                 />
               </AdminField>
 

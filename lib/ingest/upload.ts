@@ -58,6 +58,10 @@ export type UploadScoreInput = {
   tagList?: string[];
   title?: string;
   composer?: string | null;
+  /** The credit exactly as read from the file, kept for admin review. */
+  composerRaw?: string | null;
+  /** Explicit reviewed-anonymous decision from the composer picker. */
+  keepUncredited?: boolean;
   arranger?: string | null;
   editionLabel?: string | null;
   workKey?: string | null;
@@ -212,6 +216,10 @@ export async function uploadScore(
     input.composer !== undefined
       ? optionalText(input.composer)
       : metadata.composer;
+  const fileCredit =
+    input.composerRaw !== undefined
+      ? optionalText(input.composerRaw)
+      : metadata.composer;
   const split = splitComposerAndArranger(rawComposer);
   const composerName = split.composer;
   const arranger = optionalText(input.arranger) ?? split.arranger;
@@ -223,8 +231,10 @@ export async function uploadScore(
   const difficulty = canonicalDifficulty(input.difficulty);
 
   const id = crypto.randomUUID();
-  const composerRecord = await getOrCreateComposer(db, composerName);
-  const composerDisplay = composerRecord?.displayName ?? composerName;
+  const composerRecord = input.keepUncredited
+    ? await getOrCreateComposer(db, "Uncredited", { allowUncredited: true })
+    : await getOrCreateComposer(db, composerName);
+  const composerDisplay = composerRecord?.displayName ?? null;
   const titleSort = sortTitle(title);
   const workKeyValue = input.workKey?.trim() || workKey(title, composerDisplay);
 
@@ -260,8 +270,9 @@ export async function uploadScore(
           id,
           slug,
           title,
-          composer: composerDisplay,
           composerId: composerRecord?.id ?? null,
+          composerRaw: fileCredit,
+          sourceFilename: input.filename,
           arranger,
           editionLabel: optionalText(input.editionLabel),
           workKey: workKeyValue,

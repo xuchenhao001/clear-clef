@@ -1,22 +1,48 @@
+"use client";
+
 import { useState } from "react";
 import { useRouter } from "@tanstack/react-router";
-import type { ComposerSummary } from "@/lib/scores/composers";
-import { cn } from "cn";
+import {
+  ComposerPicker,
+  type ComposerChoice,
+} from "@/components/admin/composer-picker";
+import { Button } from "@/components/ui/button";
+import type { ComposerWithCount } from "@/lib/scores/composers";
 
 type AdminComposerMergeFormProps = {
-  composers: Array<ComposerSummary & { scoreCount: number }>;
+  composers: ComposerWithCount[];
 };
 
-export function AdminComposerMergeForm({ composers }: AdminComposerMergeFormProps) {
+export function AdminComposerMergeForm({
+  composers,
+}: AdminComposerMergeFormProps) {
   const router = useRouter();
-  const [sourceId, setSourceId] = useState("");
-  const [targetId, setTargetId] = useState("");
+  const [source, setSource] = useState<ComposerChoice | null>(null);
+  const [target, setTarget] = useState<ComposerChoice | null>(null);
+  const [confirming, setConfirming] = useState(false);
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const mergeable = composers.filter(
+    (composer) => composer.displayName !== "Uncredited",
+  );
+  const sourceComposer =
+    source?.kind === "existing" ? source.composer : null;
+  const targetComposer =
+    target?.kind === "existing" ? target.composer : null;
+
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!sourceComposer || !targetComposer) {
+      setError("Choose the duplicate and the composer to keep.");
+      return;
+    }
+    if (!confirming) {
+      setConfirming(true);
+      return;
+    }
+
     setPending(true);
     setMessage(null);
     setError(null);
@@ -24,73 +50,85 @@ export function AdminComposerMergeForm({ composers }: AdminComposerMergeFormProp
       const response = await fetch("/api/admin/composers/merge", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sourceId, targetId }),
+        body: JSON.stringify({
+          sourceId: sourceComposer.id,
+          targetId: targetComposer.id,
+        }),
       });
-      const json = (await response.json()) as { error?: string; moved?: number };
+      const json = (await response.json()) as {
+        error?: string;
+        moved?: number;
+        target?: { displayName: string };
+      };
       if (!response.ok) {
         throw new Error(json.error ?? "Merge failed");
       }
-      setMessage(`Merged. ${json.moved ?? 0} scores reindexed.`);
-      setSourceId("");
-      setTargetId("");
+      setMessage(
+        `${json.moved ?? 0} ${
+          json.moved === 1 ? "work" : "works"
+        } moved to ${json.target?.displayName ?? targetComposer.displayName}.`,
+      );
+      setSource(null);
+      setTarget(null);
+      setConfirming(false);
       await router.invalidate();
     } catch (mergeError) {
-      setError(mergeError instanceof Error ? mergeError.message : "Merge failed");
+      setError(
+        mergeError instanceof Error ? mergeError.message : "Merge failed",
+      );
     } finally {
       setPending(false);
     }
   }
 
-  const selectClassName =
-    "w-full border border-edition-field-border bg-edition-ground-2 px-3 py-2 type-body-sm text-edition-ink outline-none focus-visible:ring-3 focus-visible:ring-edition-focus-ring";
-
   return (
-    <form
-      onSubmit={submit}
-      className="flex flex-col gap-4 border-y border-edition-hairline py-5"
-    >
-      <p className="type-running-head">Merge a duplicate</p>
+    <form onSubmit={submit} className="flex flex-col gap-4 p-4 sm:p-5">
+      <p className="type-body-sm text-edition-body">
+        Merge a duplicate authority record into the one to keep. Works, aliases
+        and search documents move together. Uncredited cannot be merged; assign
+        those works from the queue.
+      </p>
       <div className="grid gap-4 sm:grid-cols-2">
-        <label className="flex flex-col gap-1.5">
-          <span className="type-label">Merge from</span>
-          <select
-            value={sourceId}
-            onChange={(event) => setSourceId(event.target.value)}
-            required
-            className={cn(selectClassName)}
-          >
-            <option value="">Choose a composer</option>
-            {composers.map((composer) => (
-              <option key={composer.id} value={composer.id}>
-                {composer.displayName} ({composer.scoreCount})
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="flex flex-col gap-1.5">
-          <span className="type-label">Into</span>
-          <select
-            value={targetId}
-            onChange={(event) => setTargetId(event.target.value)}
-            required
-            className={cn(selectClassName)}
-          >
-            <option value="">Choose a composer</option>
-            {composers.map((composer) => (
-              <option key={composer.id} value={composer.id}>
-                {composer.displayName} ({composer.scoreCount})
-              </option>
-            ))}
-          </select>
-        </label>
+        <div className="space-y-2">
+          <span className="type-label">Duplicate to remove</span>
+          <ComposerPicker
+            id="merge-source"
+            composers={mergeable}
+            value={source}
+            onChange={(next) => {
+              setSource(next);
+              setConfirming(false);
+              setMessage(null);
+            }}
+            placeholder="Search the duplicate…"
+          />
+        </div>
+        <div className="space-y-2">
+          <span className="type-label">Composer to keep</span>
+          <ComposerPicker
+            id="merge-target"
+            composers={mergeable}
+            value={target}
+            onChange={(next) => {
+              setTarget(next);
+              setConfirming(false);
+              setMessage(null);
+            }}
+            placeholder="Search the target…"
+          />
+        </div>
       </div>
-      <button
-        type="submit"
-        disabled={pending || !sourceId || !targetId || sourceId === targetId}
-        className="type-hint w-fit border border-edition-gilt px-4 py-2.5 text-edition-gilt hover:bg-edition-gilt hover:text-edition-on-gilt disabled:cursor-not-allowed disabled:border-edition-hairline disabled:text-edition-muted-soft focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-edition-focus-ring"
-      >
-        {pending ? "Merging…" : "Merge composers"}
-      </button>
+
+      {sourceComposer && targetComposer ? (
+        <p className="type-body-sm text-edition-body">
+          {sourceComposer.scoreCount}{" "}
+          {sourceComposer.scoreCount === 1 ? "work" : "works"} under{" "}
+          <span className="text-edition-ink">{sourceComposer.displayName}</span>{" "}
+          will be credited to{" "}
+          <span className="text-edition-ink">{targetComposer.displayName}</span>.
+        </p>
+      ) : null}
+
       {message ? (
         <p className="type-body-sm text-edition-semantic-success" role="status">
           {message}
@@ -101,6 +139,34 @@ export function AdminComposerMergeForm({ composers }: AdminComposerMergeFormProp
           {error}
         </p>
       ) : null}
+
+      <div className="flex flex-wrap items-center gap-3">
+        <Button
+          type="submit"
+          disabled={
+            !sourceComposer ||
+            !targetComposer ||
+            sourceComposer.id === targetComposer.id ||
+            pending
+          }
+        >
+          {pending
+            ? "Merging…"
+            : confirming
+              ? `Confirm merge into ${targetComposer?.displayName ?? ""}`
+              : "Merge composers"}
+        </Button>
+        {confirming ? (
+          <button
+            type="button"
+            className="type-hint text-edition-muted hover:text-edition-ink"
+            onClick={() => setConfirming(false)}
+            disabled={pending}
+          >
+            Cancel
+          </button>
+        ) : null}
+      </div>
     </form>
   );
 }

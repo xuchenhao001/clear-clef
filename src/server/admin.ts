@@ -3,17 +3,29 @@ import { createServerFn } from "@tanstack/react-start";
 import {
   type AdminScoreListFilters,
 } from "@/lib/admin/filters";
+import type { AdminComposerCreditSearch } from "@/lib/admin/composer-credit";
 import { getDb } from "@/lib/db";
 import { rawAll } from "@/lib/db/raw";
 import {
   getAdminScoreById,
   searchAdminScores,
 } from "@/lib/scores/admin";
-import { listComposersWithCounts } from "@/lib/scores/composers";
+import {
+  findComposerById,
+  listComposersWithCounts,
+  type ComposerWithCount,
+} from "@/lib/scores/composers";
+import {
+  getComposerCreditStats,
+  listRecentCreditEvents,
+  listUnassignedImports,
+  listUnassignedScores,
+} from "@/lib/scores/credit";
 
 async function loadCatalogHealth() {
   const [row] = await rawAll<{
     missing_composer: number;
+    uncredited: number;
     missing_key: number;
     missing_difficulty: number;
     missing_preview: number;
@@ -23,7 +35,8 @@ async function loadCatalogHealth() {
   }>(
     getDb(),
     `SELECT
-       (SELECT COUNT(*) FROM scores WHERE visibility = 'public' AND (composer_id IS NULL OR composer_id = '')) AS missing_composer,
+       (SELECT COUNT(*) FROM scores WHERE visibility = 'public' AND composer_id IS NULL) AS missing_composer,
+       (SELECT COUNT(*) FROM scores s JOIN composers c ON c.id = s.composer_id WHERE c.display_name = 'Uncredited') AS uncredited,
        (SELECT COUNT(*) FROM scores WHERE visibility = 'public' AND (key IS NULL OR key = '')) AS missing_key,
        (SELECT COUNT(*) FROM scores WHERE visibility = 'public' AND (difficulty IS NULL OR difficulty = '')) AS missing_difficulty,
        (SELECT COUNT(*) FROM scores WHERE visibility = 'public' AND preview_r2_key IS NULL) AS missing_preview,
@@ -39,6 +52,7 @@ async function loadCatalogHealth() {
   );
   return {
     missingComposer: Number(row?.missing_composer ?? 0),
+    uncredited: Number(row?.uncredited ?? 0),
     missingKey: Number(row?.missing_key ?? 0),
     missingDifficulty: Number(row?.missing_difficulty ?? 0),
     missingPreview: Number(row?.missing_preview ?? 0),
@@ -50,18 +64,24 @@ async function loadCatalogHealth() {
 
 export const loadAdminOverview = createServerFn({ method: "GET" }).handler(
   async () => {
-    const [page, health] = await Promise.all([
+    const [page, health, creditStats] = await Promise.all([
       searchAdminScores({ page: 1 }),
       loadCatalogHealth(),
+      getComposerCreditStats(),
     ]);
-    return { scores: page.items, stats: page.stats, health };
+    return { scores: page.items, stats: page.stats, health, creditStats };
   },
 );
 
 export const loadAdminScoresPage = createServerFn({ method: "GET" })
   .validator((filters: AdminScoreListFilters) => filters)
   .handler(async ({ data: filters }) => {
-    const page = await searchAdminScores(filters);
+    const [page, composer] = await Promise.all([
+      searchAdminScores(filters),
+      filters.composer
+        ? findComposerById(getDb(), filters.composer)
+        : Promise.resolve(null),
+    ]);
     return {
       scores: page.items,
       stats: page.stats,
@@ -69,19 +89,51 @@ export const loadAdminScoresPage = createServerFn({ method: "GET" })
       page: page.page,
       pageCount: page.pageCount,
       filters,
+      composer,
     };
   });
 
 export const loadAdminScoreEdit = createServerFn({ method: "GET" })
   .validator((id: string) => id)
   .handler(async ({ data: id }) => {
-    const score = await getAdminScoreById(id);
+    const [score, composers] = await Promise.all([
+      getAdminScoreById(id),
+      listComposersWithCounts(),
+    ]);
     if (!score) {
       throw notFound();
     }
-    return score;
+    return { score, composers };
   });
 
-export const loadAdminComposers = createServerFn({ method: "GET" }).handler(
-  async () => listComposersWithCounts(),
-);
+export const loadAdminComposerOptions = createServerFn({
+  method: "GET",
+}).handler(async (): Promise<ComposerWithCount[]> => listComposersWithCounts());
+
+export const loadAdminComposerCredit = createServerFn({ method: "GET" })
+  .validator((search: AdminComposerCreditSearch) => search)
+  .handler(async ({ data: search }) => {
+    const [unassigned, composers, stats, events, imports, health] =
+      await Promise.all([
+        listUnassignedScores({
+          q: search.q,
+          import: search.import,
+          visibility: search.visibility,
+          page: search.page,
+        }),
+        listComposersWithCounts(undefined, { query: search.composerQ }),
+        getComposerCreditStats(),
+        listRecentCreditEvents(6),
+        listUnassignedImports(),
+        loadCatalogHealth(),
+      ]);
+    return {
+      unassigned,
+      composers,
+      stats,
+      events,
+      imports,
+      health,
+      search,
+    };
+  });

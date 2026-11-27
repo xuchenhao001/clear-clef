@@ -15,7 +15,10 @@ import {
 import type { CatalogDb } from "@/lib/scores/queries";
 import { slugExists } from "@/lib/scores/queries";
 import { purgePublicScore } from "@/lib/cache/public-pages";
-import { getOrCreateComposer } from "@/lib/scores/composers";
+import {
+  findComposerById,
+  getOrCreateComposer,
+} from "@/lib/scores/composers";
 import { deleteScoreObjects } from "@/lib/scores/r2";
 import { slugifyTitle } from "@/lib/scores/slug";
 import { normalizeSourceUrl } from "@/lib/scores/source-url";
@@ -33,6 +36,9 @@ export type AdminCatalogScore = {
   slug: string;
   title: string;
   composer: string | null;
+  composerId: string | null;
+  composerRaw: string | null;
+  sourceFilename: string | null;
   catalogNumber: string | null;
   license: string;
   visibility: string;
@@ -72,20 +78,29 @@ export async function searchAdminScores(
     values.push(filters.visibility);
   }
   if (filters.import) {
-    where.push("import_id = ?");
+    where.push("s.import_id = ?");
     values.push(filters.import);
+  }
+  if (filters.composer) {
+    where.push("s.composer_id = ?");
+    values.push(filters.composer);
   }
   const q = truncateUtf8(filters.q?.trim() ?? "", 40);
   if (q) {
-    where.push("search_text LIKE ? ESCAPE '\\'");
-    values.push(`%${q.toLowerCase().replace(/[\\%_]/g, (char) => `\\${char}`)}%`);
+    const pattern = `%${q.toLowerCase().replace(/[\\%_]/g, (char) => `\\${char}`)}%`;
+    where.push(`(
+      s.search_text LIKE ? ESCAPE '\\'
+      OR lower(coalesce(s.composer_raw, '')) LIKE ? ESCAPE '\\'
+      OR lower(coalesce(s.source_filename, '')) LIKE ? ESCAPE '\\'
+    )`);
+    values.push(pattern, pattern, pattern);
   }
 
   const whereSql = where.join(" AND ");
   const [countRows, statsRows, allCountRows] = await Promise.all([
     rawAll<{ count: number }>(
       database,
-      `SELECT COUNT(*) AS count FROM scores WHERE ${whereSql}`,
+      `SELECT COUNT(*) AS count FROM scores s WHERE ${whereSql}`,
       values,
     ),
     rawAll<{ visibility: string; count: number }>(
@@ -100,11 +115,14 @@ export async function searchAdminScores(
   const page = Math.min(Math.max(1, filters.page ?? 1), pageCount);
   const rows = await rawAll<Record<string, unknown>>(
     database,
-    `SELECT id, slug, title, composer, catalog_number, license, visibility,
-            preview_r2_key, import_id, created_at
-     FROM scores
+    `SELECT s.id, s.slug, s.title, s.composer_id, s.composer_raw,
+            s.source_filename, s.catalog_number, s.license, s.visibility,
+            s.preview_r2_key, s.import_id, s.created_at,
+            c.display_name AS composer
+     FROM scores s
+     LEFT JOIN composers c ON c.id = s.composer_id
      WHERE ${whereSql}
-     ORDER BY created_at DESC, id
+     ORDER BY s.created_at DESC, s.id
      LIMIT ? OFFSET ?`,
     [...values, ADMIN_PAGE_SIZE, (page - 1) * ADMIN_PAGE_SIZE],
   );
@@ -114,6 +132,9 @@ export async function searchAdminScores(
     slug: String(row.slug),
     title: String(row.title),
     composer: (row.composer as string | null) ?? null,
+    composerId: (row.composer_id as string | null) ?? null,
+    composerRaw: (row.composer_raw as string | null) ?? null,
+    sourceFilename: (row.source_filename as string | null) ?? null,
     catalogNumber: (row.catalog_number as string | null) ?? null,
     license: String(row.license),
     visibility: String(row.visibility),
@@ -162,6 +183,9 @@ export async function getAdminScoreById(
 
 export type UpdateScoreMetadataInput = {
   title: string;
+  /** Authority link chosen by the composer picker. */
+  composerId?: string | null;
+  /** Legacy free-text credit, used only when composerId is absent. */
   composer?: string | null;
   arranger?: string | null;
   editionLabel?: string | null;
@@ -222,10 +246,17 @@ export async function updateScoreMetadata(
   }
 
   const split = splitComposerAndArranger(input.composer);
-  const composerName = split.composer;
   const arranger = input.arranger?.trim() || split.arranger;
-  const composerRecord = await getOrCreateComposer(database, composerName);
-  const composerDisplay = composerRecord?.displayName ?? composerName;
+  const composerRecord =
+    input.composerId !== undefined
+      ? input.composerId
+        ? await findComposerById(database, input.composerId)
+        : null
+      : await getOrCreateComposer(database, split.composer);
+  if (input.composerId && !composerRecord) {
+    throw new IngestValidationError("Composer not found");
+  }
+  const composerDisplay = composerRecord?.displayName ?? null;
   const title = input.title.trim();
   const requestedSlug = normalizedRequestedSlug(input.slug, title, scoreId);
   let nextSlug = existing.slug;
@@ -240,7 +271,6 @@ export async function updateScoreMetadata(
   const set: Partial<typeof scores.$inferInsert> = {
     title,
     slug: nextSlug,
-    composer: composerDisplay,
     composerId: composerRecord?.id ?? null,
     arranger,
     editionLabel: input.editionLabel?.trim() || null,
@@ -259,6 +289,9 @@ export async function updateScoreMetadata(
 
   if (input.defaultVisibleParts !== undefined) {
     set.defaultVisibleParts = input.defaultVisibleParts;
+  }
+  if (!existing.composerRaw && input.composer?.trim()) {
+    set.composerRaw = input.composer.trim();
   }
 
   await database.update(scores).set(set).where(eq(scores.id, scoreId));

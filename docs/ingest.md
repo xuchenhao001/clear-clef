@@ -12,6 +12,8 @@ Public catalog is **read-only** for visitors. Writes go through a protected admi
 | Look up batch matches | `/admin/batch-upload` | `POST /api/admin/uploads/preflight` (JSON) |
 | Create from a batch | `/admin/batch-upload` | `POST /api/admin/upload` (one request per file) |
 | Publish a batch | `/admin/batch-upload` / Scores filter | `POST /api/admin/imports/{importId}/publish` |
+| Assign composer credits | `/admin/composers` | `POST /api/admin/composers/assign` |
+| Merge authorities | `/admin/composers?view=authority` | `POST /api/admin/composers/merge` |
 | List / edit | `/admin/scores`, `/admin/scores/{id}` | `PATCH /api/admin/scores/{id}` |
 | Delete | edit form | `DELETE /api/admin/scores/{id}` |
 | Download original | list / edit | `GET /api/admin/scores/{id}/file` (`Content-Disposition: attachment`) |
@@ -25,8 +27,8 @@ Anyone can *read* the public catalog. Admins *write*.
 
 1. The admin chooses a folder (up to 200 files / 100 MB; 8 MB per file). Nothing is written.
 2. A browser **Web Worker** reads each `.mxl`: it unzips, decodes, sanitizes, extracts metadata/credits, and hashes the canonical XML. No score file is sent to the server Worker during review. This keeps the Cloudflare Worker CPU budget out of the batch review loop.
-3. The browser sends one small JSON lookup to `POST /api/admin/uploads/preflight` with `{ key, filename, size, contentHash, title }` per file. The server performs one exact-hash query and one normalized-title query, then returns exact/similar catalog matches.
-4. The admin reviews titles, credits, license, visibility, tags, duplicates, and missing-composer rows. The license is intentionally blank until chosen.
+3. The browser sends one small JSON lookup to `POST /api/admin/uploads/preflight` with `{ key, filename, size, contentHash, title, composer }` per file. The server performs one exact-hash query and one normalized-title query, then compares composer authority keys before offering similar matches. Two settings of the same title by different composers are not treated as duplicates.
+4. The admin reviews titles, credits, license, visibility, tags, duplicates, and missing-composer rows. Composer is chosen from the authority picker, not typed free-hand; raw file credit remains visible as evidence. The license is intentionally blank until chosen.
 5. The browser uploads included files to the existing `POST /api/admin/upload` two at a time, with a per-file `uploadKey` (idempotency) and one `importId` for the batch. It sends the original file plus the canonical MusicXML as a **File part** (not a text field, so multipart line-ending normalization cannot change the hashed bytes). The server sanitizes and re-hashes the canonical text and stores both; it does not unzip or parse the full original on the fast path. Client metadata is a suggestion only.
 6. Page-1 previews render in a Web Worker and are written through the existing preview route. If the tab closes, the batch manifest remains in `localStorage`; re-selecting the folder matches files by path, size, and modified time, and already-uploaded rows are not sent again.
 7. `/admin/scores?import={importId}` is the durable handoff. “Publish” moves that import's private scores to public and purges their pages.
@@ -37,7 +39,9 @@ Batch limits are UI limits; the server preserves the 8 MB per-file cap and an 8 
 
 If a future deployment enables Workers Paid, `limits.cpuMs` can raise the per-request budget (see [cloudflare.md](cloudflare.md)), but the browser-first path remains the default so the app works on Free.
 
-**Edit:** metadata (title, composer, license, visibility, tags, etc.) is saved via `PATCH`. Slug is stable after create. Optional file replace re-ingests MusicXML into the same `scores/{id}/` prefix (XXE-hardened path) and regenerates page-1 preview in the admin browser. **Delete** removes the D1 row (cascade `score_tags`) and all R2 objects under `scores/{id}/`.
+**Edit:** metadata (title, composer authority, license, visibility, tags, etc.) is saved via `PATCH`. The composer field sends `composerId`; free text is only used for an explicit “create authority record” choice. Slug is stable after create. Optional file replace re-ingests MusicXML into the same `scores/{id}/` prefix (XXE-hardened path) and regenerates page-1 preview in the admin browser. **Delete** removes the D1 row (cascade `score_tags`) and all R2 objects under `scores/{id}/`.
+
+**Credit review:** after upload, a score with no usable credit has `composer_id = NULL` and `composer_raw` preserved. It appears at `/admin/composers?view=unassigned`, where one or many works can be assigned to an existing authority record, a newly created one, or explicitly kept `Uncredited`. If an older row lost its raw credit, **Read credit from file** downloads the original through the admin route, inspects it in the browser and stores the credit as evidence; it never assigns. This queue is the only bulk composer workflow; the merge tool refuses `Uncredited`.
 
 After a successful **single upload** (and client-side page-1 preview), the admin UI redirects to `/admin/scores/{id}?uploaded=1` so metadata can be reviewed before publishing. Batch upload stays on `/admin/batch-upload` and hands off through the import filter.
 
@@ -64,7 +68,7 @@ MusicXML files are XML. Treat uploads as hostile.
 
 Canonical MusicXML stored at ingest is the sanitized original (DOCTYPE stripped, BOM removed) — not a full rewrite to MusicXML 4.x partwise. Batch/admin uploads prepare that canonical text in the browser, but the server re-runs `sanitizeMusicXml` and re-hashes it before storing anything. The original file is stored unchanged; the canonical is the document served to the viewer.
 
-Catalog metadata is normalized at write time: composer names resolve to the `composers` authority file (known variants and `arr.` suffixes included), keys use the canonical key list, difficulty uses the four-level scale, licenses use `LICENSE_OPTIONS`, and `title_sort`/`work_key`/`search_text` are refreshed with the FTS row. The original metadata remains reviewable in the admin form.
+Catalog metadata is normalized at write time: composer credits resolve to the `composers` authority file (known variants and `arr.` suffixes included), keys use the canonical key list, difficulty uses the four-level scale, licenses use `LICENSE_OPTIONS`, and `title_sort`/`work_key`/`search_text` are refreshed with the FTS row. `scores.composer_raw` and `scores.source_filename` keep the original evidence; they are never overwritten by canonicalisation.
 
 Implementation: [`lib/ingest/mxl.ts`](../lib/ingest/mxl.ts), [`lib/ingest/xml.ts`](../lib/ingest/xml.ts), [`lib/ingest/metadata.ts`](../lib/ingest/metadata.ts), [`lib/ingest/inspect.ts`](../lib/ingest/inspect.ts), [`lib/ingest/inspect-client.ts`](../lib/ingest/inspect-client.ts).
 

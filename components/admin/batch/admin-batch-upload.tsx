@@ -47,6 +47,7 @@ import {
 } from "@/lib/batch/storage";
 import { MAX_UPLOAD_BYTES } from "@/lib/ingest/constants";
 import type { InspectedScoreSummary } from "@/lib/ingest/inspect";
+import type { ComposerWithCount } from "@/lib/scores/composers";
 import {
   disposeInspectWorker,
   inspectFile,
@@ -108,7 +109,11 @@ function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : "Something went wrong";
 }
 
-export function AdminBatchUpload() {
+type AdminBatchUploadProps = {
+  composers: ComposerWithCount[];
+};
+
+export function AdminBatchUpload({ composers }: AdminBatchUploadProps) {
   const navigate = useNavigate();
   const router = useRouter();
   const [rows, setRows] = useState<BatchRow[]>([]);
@@ -358,6 +363,9 @@ export function AdminBatchUpload() {
               title:
                 currentRow?.overrides.title ??
                 result.suggestedTitle,
+              composer: currentRow
+                ? effectiveComposer(currentRow)
+                : result.metadata.composer,
             });
           } catch (error) {
             applyRows((previous) =>
@@ -755,6 +763,8 @@ export function AdminBatchUpload() {
         file,
         title: effectiveTitle(row),
         composer: effectiveComposer(row),
+        composerRaw: row.metadata?.composer ?? null,
+        keepUncredited: row.overrides.composer === "Uncredited",
         catalogNumber: effectiveCatalogNumber(row),
         license: effectiveLicense(row, activeSettings),
         visibility: effectiveVisibility(row, activeSettings),
@@ -1026,6 +1036,7 @@ export function AdminBatchUpload() {
         size: row.size,
         contentHash: row.contentHash!,
         title: effectiveTitle(row),
+        composer: effectiveComposer(row),
       }));
     if (items.length === 0) return;
     setCatalogCheckFailed(false);
@@ -1314,6 +1325,7 @@ export function AdminBatchUpload() {
       <BatchFileDrawer
         row={selectedRow}
         settings={settings}
+        composers={composers}
         open={Boolean(openRowKey && selectedRow)}
         editable={
           phase === "review" ||

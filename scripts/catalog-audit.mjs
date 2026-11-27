@@ -29,7 +29,12 @@ const publicCount = one(
   "SELECT COUNT(*) AS count FROM scores WHERE visibility = 'public'",
 ).count;
 const composerRows = all(
-  "SELECT composer, COUNT(*) AS count FROM scores WHERE visibility = 'public' GROUP BY composer ORDER BY count DESC",
+  `SELECT coalesce(c.display_name, '[needs review]') AS composer, COUNT(*) AS count
+   FROM scores s
+   LEFT JOIN composers c ON c.id = s.composer_id
+   WHERE s.visibility = 'public'
+   GROUP BY s.composer_id, c.display_name
+   ORDER BY count DESC`,
 );
 const duplicateTitles = all(
   `SELECT lower(trim(title)) AS title, COUNT(*) AS count
@@ -44,11 +49,13 @@ const badSlugs = all(
 );
 const missing = all(
   `SELECT
-     SUM(CASE WHEN composer IS NULL OR composer = '' THEN 1 ELSE 0 END) AS missing_composer,
-     SUM(CASE WHEN key IS NULL OR key = '' THEN 1 ELSE 0 END) AS missing_key,
-     SUM(CASE WHEN difficulty IS NULL OR difficulty = '' THEN 1 ELSE 0 END) AS missing_difficulty,
-     SUM(CASE WHEN preview_r2_key IS NULL THEN 1 ELSE 0 END) AS missing_preview
-   FROM scores WHERE visibility = 'public'`,
+     coalesce(SUM(CASE WHEN composer_id IS NULL THEN 1 ELSE 0 END), 0) AS unassigned,
+     coalesce(SUM(CASE WHEN c.display_name = 'Uncredited' THEN 1 ELSE 0 END), 0) AS uncredited,
+     coalesce(SUM(CASE WHEN key IS NULL OR key = '' THEN 1 ELSE 0 END), 0) AS missing_key,
+     coalesce(SUM(CASE WHEN difficulty IS NULL OR difficulty = '' THEN 1 ELSE 0 END), 0) AS missing_difficulty,
+     coalesce(SUM(CASE WHEN preview_r2_key IS NULL THEN 1 ELSE 0 END), 0) AS missing_preview
+   FROM scores s LEFT JOIN composers c ON c.id = s.composer_id
+   WHERE s.visibility = 'public'`,
 )[0];
 const unusedTags = all(
   `SELECT t.slug, t.label FROM tags t

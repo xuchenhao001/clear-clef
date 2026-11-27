@@ -83,6 +83,17 @@ Implementation order for ClearClef.
 - Versioned public media URLs; no immutable caching of mutable score files
 - ADR-012 to ADR-015
 
+## Phase 11 — Composer credit workflow (done)
+
+- `/admin/composers` is a three-view workbench: unassigned queue, authority file, maintenance
+- `composer_id IS NULL` means needs review; `Uncredited` is reviewed anonymous
+- Raw file credit and source filename preserved as queue evidence
+- Searchable composer picker in assignment, score edit and batch drawer; explicit create
+- Bulk assignment with chunked writes, audit events, FTS refresh and public-page purge
+- Authority lookup uses `normalized_name` + unique alias table; merge refuses `Uncredited`
+- Admin score list filters by composer; preflight similar matches compare composer keys
+- ADR-016
+
 ## Out of scope for v1
 
 - In-browser note editor, transposition UI, community comments

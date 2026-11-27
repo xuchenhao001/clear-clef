@@ -19,7 +19,7 @@ export const Route = createFileRoute("/admin/_protected/scores/$id")({
 });
 
 function AdminScoreEditPage() {
-  const score = Route.useLoaderData();
+  const { score, composers } = Route.useLoaderData();
   const tagsValue = score.tags
     .map((tag: { label: string }) => tag.label)
     .join(", ");
@@ -41,10 +41,12 @@ function AdminScoreEditPage() {
       <AdminScoreEditForm
         scoreId={score.id}
         slug={score.slug}
+        composers={composers}
+        initialComposerId={score.composerId}
+        composerRaw={score.composerRaw}
         initialVisibility={score.visibility as "public" | "unlisted" | "private"}
         initial={{
           title: score.title,
-          composer: score.composer ?? "",
           arranger: score.arranger ?? "",
           editionLabel: score.editionLabel ?? "",
           slug: score.slug,

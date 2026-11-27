@@ -61,6 +61,8 @@ export const Route = createFileRoute("/api/admin/upload")({
             tagList: fields.tagList,
             title: fields.title,
             composer: fields.composer,
+            composerRaw: fields.composerRaw,
+            keepUncredited: fields.keepUncredited,
             arranger: fields.arranger,
             editionLabel: fields.editionLabel,
             difficulty: fields.difficulty,

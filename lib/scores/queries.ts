@@ -285,18 +285,18 @@ async function queryCatalogPage(
     filters.sort ?? (filters.q?.trim() ? "relevance" : "composer");
   const order =
     sort === "title"
-      ? "s.title_sort COLLATE NOCASE, COALESCE(c.sort_name, s.composer) COLLATE NOCASE, s.id"
+      ? "s.title_sort COLLATE NOCASE, c.sort_name COLLATE NOCASE, s.id"
       : sort === "newest"
         ? "s.created_at DESC, s.id"
         : sort === "relevance" && searchMode === "fts" && part.joins
-          ? "bm25(catalog_search), COALESCE(c.sort_name, s.composer) COLLATE NOCASE, s.title_sort COLLATE NOCASE, s.id"
-          : "COALESCE(c.sort_name, s.composer) COLLATE NOCASE, s.title_sort COLLATE NOCASE, s.id";
+          ? "bm25(catalog_search), c.sort_name COLLATE NOCASE, s.title_sort COLLATE NOCASE, s.id"
+          : "c.sort_name COLLATE NOCASE, s.title_sort COLLATE NOCASE, s.id";
 
   const rows = await rawAll<Record<string, unknown>>(
     database,
     `SELECT
        s.id, s.slug, s.title,
-       COALESCE(c.display_name, s.composer) AS composer,
+       c.display_name AS composer,
        c.slug AS composer_slug,
        s.catalog_number, s.key, s.time_signature, s.difficulty,
        s.arranger, s.edition_label, s.work_key,
@@ -564,7 +564,7 @@ export async function getPublicScoreBySlug(
       id: scores.id,
       slug: scores.slug,
       title: scores.title,
-      composer: scores.composer,
+      composerId: scores.composerId,
       composerSlug: composers.slug,
       composerDisplay: composers.displayName,
       birthYear: composers.birthYear,
@@ -609,7 +609,7 @@ export async function getPublicScoreBySlug(
     canonicalDifficulty(row.difficulty) ?? row.difficulty;
   const related = await getRelatedPublicScores(
     row.id,
-    row.composerDisplay ?? row.composer,
+    row.composerId,
     database,
   );
 
@@ -617,7 +617,7 @@ export async function getPublicScoreBySlug(
     id: row.id,
     slug: row.slug,
     title: row.title,
-    composer: row.composerDisplay ?? row.composer,
+    composer: row.composerDisplay,
     composerSlug: row.composerSlug,
     composerDates:
       row.birthYear && row.deathYear
@@ -645,10 +645,10 @@ export async function getPublicScoreBySlug(
 
 async function getRelatedPublicScores(
   scoreId: string,
-  composer: string | null,
+  composerId: string | null,
   database: CatalogDb,
 ): Promise<RelatedScore[]> {
-  if (!composer) {
+  if (!composerId) {
     return [];
   }
 
@@ -664,7 +664,7 @@ async function getRelatedPublicScores(
     .where(
       and(
         eq(scores.visibility, "public"),
-        eq(scores.composer, composer),
+        eq(scores.composerId, composerId),
       ),
     )
     .orderBy(asc(scores.title))

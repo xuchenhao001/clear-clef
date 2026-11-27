@@ -77,6 +77,7 @@ export function slugifyTitle(title: string, fallbackId?: string): string {
 export function searchTextForScore(input: {
   title: string;
   composer?: string | null;
+  composerRaw?: string | null;
   composerSortName?: string | null;
   composerAliases?: string[];
   catalogNumber?: string | null;
@@ -89,6 +90,7 @@ export function searchTextForScore(input: {
     [
       input.title,
       input.composer,
+      input.composerRaw,
       input.composerSortName,
       ...(input.composerAliases ?? []),
       input.catalogNumber,

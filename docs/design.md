@@ -70,6 +70,14 @@ The score controls and the page label sit on the ground. The sheet sits on the f
 
 Sign-in, upload, edit, and batch settings. Popups that must float (a select menu, the batch file drawer) use `surface-board`. Everything else is type on the ground.
 
+## Composers & credit
+
+- `/admin/composers` is a workbench, not a dashboard. Three URL-backed views: **Unassigned works**, **Authority file**, **Maintenance**. The queue is the default whenever works need a decision.
+- The queue is a register on the ground: checkbox, real page-1 preview, title, catalogue facts, raw file credit (“File credit: …”), filename in mono, batch/date and visibility. No cards, no thumbnails-only grid.
+- The composer picker is a searchable combobox with aliases and work counts, a suggestion from the raw credit, an explicit **Create “…”** option, and **Keep uncredited** as a reviewed-anonymous action. It is never a native `<select>` with every composer.
+- One filled action on the queue: **Assign N**. `Keep uncredited` is secondary. A collapsed **Merge duplicate composers** tool lives in the authority view and excludes `Uncredited`.
+- Maintenance tools (legacy slugs, search rebuild, health, recent decisions) are out of the page header and off the assignment path.
+
 ## Batch upload
 
 - The file queue is a register on the ground: title, composer (or “No composer in file (optional)”), path in mono, one text status, and a `Review` hint. No cards, no thumbnails in the queue.

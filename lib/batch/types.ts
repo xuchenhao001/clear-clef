@@ -83,6 +83,7 @@ export type PreflightLookupItem = {
   size: number;
   contentHash: string;
   title: string;
+  composer?: string | null;
 };
 
 export type PreflightLookupResult = {

@@ -13,7 +13,7 @@ export const Route = createFileRoute("/admin/_protected/")({
 });
 
 function AdminOverviewPage() {
-  const { scores, stats, health } = Route.useLoaderData();
+  const { scores, stats, health, creditStats } = Route.useLoaderData();
   const recentScores = scores.slice(0, 5);
 
   return (
@@ -54,12 +54,24 @@ function AdminOverviewPage() {
           <h2 id="catalog-health" className="type-running-head">
             Catalog health
           </h2>
-          <Link to="/admin/composers" className="type-hint text-edition-gilt hover:text-edition-ink">
-            Composer authority
+          <Link
+            to="/admin/composers"
+            search={{
+              view:
+                creditStats.unassigned > 0 ? "unassigned" : "authority",
+            }}
+            className="type-hint text-edition-gilt hover:text-edition-ink"
+          >
+            {creditStats.unassigned > 0
+              ? `Assign ${creditStats.unassigned} composer ${
+                  creditStats.unassigned === 1 ? "credit" : "credits"
+                } →`
+              : "Composer credit"}
           </Link>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <AdminStatCard label="No composer link" value={health.missingComposer} />
+          <AdminStatCard label="No composer" value={health.missingComposer} />
+          <AdminStatCard label="Reviewed anonymous" value={health.uncredited} />
           <AdminStatCard label="No key" value={health.missingKey} />
           <AdminStatCard label="No difficulty" value={health.missingDifficulty} />
           <AdminStatCard label="No preview" value={health.missingPreview} />

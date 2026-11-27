@@ -83,8 +83,8 @@ Short architecture decision records. Update when a decision is reversed.
 
 - **Status:** Accepted
 - **Context:** The public catalog had 81 score rows under 38 free-text credit headings. The same composer appeared as `Chopin`, `Fredrik Chopin`, `Frédéric Chopin`, `J.S. Bach` and `J. S. Bach`; arrangers were mixed into composer names; repeated titles were indistinguishable.
-- **Decision:** Add a `composers` authority table with canonical display/sort names, dates and aliases. Scores reference `composer_id`; `composer` remains a display cache during migration. Arranger is separate. `work_key` clusters editions and `edition_label` distinguishes them. Known aliases resolve automatically on write; admins can merge records at `/admin/composers`.
-- **Consequences:** Composer grouping, search and future composer pages use one identity. A full work/edition table is deferred until work-level pages are needed. Migration `0006` canonicalizes the known legacy spellings and labels duplicate editions; ambiguous names are merged by an admin at `/admin/composers`, and the search index is rebuilt there.
+- **Decision:** Add a `composers` authority table with canonical display/sort names, dates and aliases. Scores reference `composer_id` as the only authority link; the old `scores.composer` display cache is dropped. Arranger is separate. `work_key` clusters editions and `edition_label` distinguishes them. Known aliases resolve automatically on write; admins can merge records at `/admin/composers?view=authority`.
+- **Consequences:** Composer grouping, search and future composer pages use one identity. A full work/edition table is deferred until work-level pages are needed. Migration `0006` canonicalizes known legacy spellings and labels duplicate editions; migration `0007` adds normalised names, the alias table, raw-credit provenance and the review queue. Ambiguous names are merged by an admin, and the search index is rebuilt from Maintenance.
 
 ## ADR-013: SQLite FTS5 search in D1
 
@@ -106,3 +106,10 @@ Short architecture decision records. Update when a decision is reversed.
 - **Context:** Preview and score URLs returned `immutable` while admin preview `PUT` and file replacement overwrote the same R2 key. Browsers and the edge could serve the old score for a year.
 - **Decision:** Build public media URLs with `?v=contentHash` or `?v=previewVersion`. Serve `immutable` only when the token matches; redirect unversioned/stale tokens to the current URL. Store a 320×452 WebP thumbnail for catalog rows and keep the SVG as fallback.
 - **Consequences:** File replacement changes the URL. HTML pages are purged as before. Cached old URLs redirect instead of leaking stale notation.
+
+## ADR-016: Composer credit queue and null-means-review
+
+- **Status:** Accepted
+- **Context:** `Uncredited` was both the unresolved queue and a real composer record. It could never empty, intentionally anonymous works kept resurfacing, and a merge of `Uncredited` into a real composer would bulk-assign unrelated works. Raw file credits and filenames were discarded during canonicalisation.
+- **Decision:** `scores.composer_id IS NULL` means **needs review**. The `Uncredited` authority record means **reviewed anonymous** and is assigned only through the explicit **Keep uncredited** action. Preserve `composer_raw` and `source_filename`; resolve authorities through `normalized_name` plus a unique alias table; expose `/admin/composers` as Unassigned works / Authority file / Maintenance. Assignment is a chunked service with an audit row, FTS refresh and page purge. Merge rejects `Uncredited`.
+- **Consequences:** The queue is genuinely emptyable and every assignment is auditable. Legacy rows parked under `Uncredited` move to `NULL` in `0007`, so existing catalogs get one review pass. The raw credit is evidence, never an automatic assignment. A future work/edition model can build on the same `composer_id` link.

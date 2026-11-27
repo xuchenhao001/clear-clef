@@ -4,6 +4,10 @@ import { useRef, useState } from "react";
 import { AdminDangerZone } from "@/components/admin/admin-danger-zone";
 import { AdminField, AdminInput } from "@/components/admin/admin-field";
 import {
+  ComposerPicker,
+  type ComposerChoice,
+} from "@/components/admin/composer-picker";
+import {
   AdminCatalogFields,
   AdminRightsFields,
   AdminScoreFileInput,
@@ -13,12 +17,12 @@ import { AdminSection } from "@/components/admin/admin-section";
 import { AdminScoreEditSidebar } from "@/components/admin/admin-score-edit-sidebar";
 import { AdminStickyActions } from "@/components/admin/admin-sticky-actions";
 import { inspectFile } from "@/lib/ingest/inspect-client";
+import type { ComposerWithCount } from "@/lib/scores/composers";
 import { renderPreviewFromFile } from "@/lib/verovio/preview-client";
 import { uploadPreviewThumb } from "@/lib/verovio/preview-thumb";
 
 type ScoreFormState = {
   title: string;
-  composer: string;
   arranger: string;
   editionLabel: string;
   slug: string;
@@ -35,6 +39,9 @@ type ScoreFormState = {
 type AdminScoreEditFormProps = {
   scoreId: string;
   slug: string;
+  composers: ComposerWithCount[];
+  initialComposerId: string | null;
+  composerRaw: string | null;
   initial: ScoreFormState;
   initialVisibility: "public" | "unlisted" | "private";
   hasPreview: boolean;
@@ -46,13 +53,23 @@ function buildPatchFormData(
   form: ScoreFormState,
   license: string,
   visibility: ScoreVisibility,
+  composerChoice: ComposerChoice | null,
+  uncreditedId: string | null,
   file: File | null,
   canonicalXml?: string,
   contentHash?: string,
 ): FormData {
   const formData = new FormData();
   formData.set("title", form.title);
-  formData.set("composer", form.composer);
+  if (composerChoice?.kind === "existing") {
+    formData.set("composerId", composerChoice.composer.id);
+  } else if (composerChoice?.kind === "uncredited" && uncreditedId) {
+    formData.set("composerId", uncreditedId);
+  } else if (composerChoice?.kind === "create") {
+    formData.set("composer", composerChoice.name);
+  } else {
+    formData.set("composer", "");
+  }
   formData.set("arranger", form.arranger);
   formData.set("editionLabel", form.editionLabel);
   formData.set("slug", form.slug);
@@ -85,6 +102,9 @@ function buildPatchFormData(
 export function AdminScoreEditForm({
   scoreId,
   slug,
+  composers,
+  initialComposerId,
+  composerRaw,
   initial,
   initialVisibility,
   hasPreview,
@@ -93,6 +113,17 @@ export function AdminScoreEditForm({
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState(initial);
+  const [composerChoice, setComposerChoice] = useState<ComposerChoice | null>(
+    () => {
+      const composer = initialComposerId
+        ? composers.find((item) => item.id === initialComposerId)
+        : null;
+      return composer ? { kind: "existing", composer } : null;
+    },
+  );
+  const uncredited = composers.find(
+    (composer) => composer.displayName === "Uncredited",
+  );
   const [license, setLicense] = useState(initial.license);
   const [formVisibility, setFormVisibility] = useState(initialVisibility);
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
@@ -125,10 +156,15 @@ export function AdminScoreEditForm({
         canonicalXml = inspected.canonicalXml;
         contentHash = inspected.contentHash;
       }
+      if (composerChoice?.kind === "uncredited" && !uncredited) {
+        throw new Error("The Uncredited authority record is missing");
+      }
       const formData = buildPatchFormData(
         form,
         license,
         formVisibility,
+        composerChoice,
+        uncredited?.id ?? null,
         file,
         canonicalXml,
         contentHash,
@@ -220,13 +256,25 @@ export function AdminScoreEditForm({
               onChange={(event) => updateField("title", event.target.value)}
             />
           </AdminField>
-          <AdminField label="Composer" htmlFor="composer" hint="Canonical name. Known aliases are merged automatically.">
-            <AdminInput
+          <AdminField
+            label="Composer"
+            htmlFor="composer"
+            hint="Search the authority file, create a new record, or keep the work uncredited. Known aliases resolve to the same composer."
+          >
+            <ComposerPicker
               id="composer"
-              type="text"
-              value={form.composer}
-              onChange={(event) => updateField("composer", event.target.value)}
+              composers={composers}
+              value={composerChoice}
+              onChange={setComposerChoice}
+              suggestedName={composerRaw}
+              allowUncredited
+              allowClear
             />
+            {composerRaw ? (
+              <p className="type-caption-mono text-edition-muted">
+                File credit: “{composerRaw}”
+              </p>
+            ) : null}
           </AdminField>
           <AdminField label="Arranger" htmlFor="arranger">
             <AdminInput

@@ -11,14 +11,26 @@ Authority records: one row per person or credited entity.
 | Column | Type | Notes |
 | --- | --- | --- |
 | `id` | text PK | UUID |
-| `slug` | text unique | Filter / URL value |
+| `slug` | text unique | Public filter / URL value |
 | `display_name` | text | Canonical public credit |
+| `normalized_name` | text unique | `display_name` lowercased and trimmed; authority lookup key |
 | `sort_name` | text | Library sort form, e.g. `Beethoven, Ludwig van` |
-| `aliases` | text / JSON | Search aliases; merged on admin review |
+| `aliases` | text / JSON | Search aliases; retained for the FTS document |
 | `birth_year`, `death_year` | integer | Optional |
 | `created_at`, `updated_at` | integer | Milliseconds |
 
-Known variants (`Fredrik Chopin`, `J.S. Bach`, `Ludwig van Beethoven(1770–1827)`) resolve to one record through `lib/catalog/composers.ts`. `scores.composer` remains a display cache during the expand/contract migration; `composer_id` is the authority link.
+Known variants (`Fredrik Chopin`, `J.S. Bach`, `Ludwig van Beethoven(1770–1827)`) resolve to one record through `lib/catalog/composers.ts`. `scores.composer_id` is the only authority link; there is no display-name cache on `scores`.
+
+### `composer_aliases`
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `normalized_alias` | text PK | Lookup key, one composer per alias |
+| `composer_id` | text FK | `composers.id`, cascade delete |
+| `alias` | text | Display form |
+| `created_at` | integer | Milliseconds |
+
+`getOrCreateComposer` resolves by `normalized_name` first and `composer_aliases` second. The unique keys make concurrent uploads safe; a new credit never silently creates a duplicate authority row. Blank and `unknown` credits return `null`; only the explicit **Keep uncredited** action assigns the `Uncredited` record.
 
 ### `scores`
 
@@ -27,8 +39,9 @@ Known variants (`Fredrik Chopin`, `J.S. Bach`, `Ludwig van Beethoven(1770–1827
 | `id` | text PK | UUID or similar |
 | `slug` | text unique | Stable URL segment; old slugs live in `score_slug_aliases` |
 | `title` | text | Required for catalog |
-| `composer` | text | Display cache |
-| `composer_id` | text FK | `composers.id` |
+| `composer_id` | text FK | `composers.id`; `NULL` means **needs review** |
+| `composer_raw` | text | Credit exactly as read from the file, before canonicalisation |
+| `source_filename` | text | Uploaded filename, shown as evidence in the queue |
 | `arranger` | text | Kept separate from composer |
 | `work_key` | text | Normalized work cluster (title + composer) |
 | `edition_label` | text | Distinguishes editions/arrangements |
@@ -55,6 +68,22 @@ Known variants (`Fredrik Chopin`, `J.S. Bach`, `Ludwig van Beethoven(1770–1827
 | `import_id` | text | Batch grouping |
 | `created_at`, `updated_at` | integer | Milliseconds |
 
+`composer_id IS NULL` is the review queue. `composer_id = Uncredited` means an admin reviewed the work and decided it is anonymous. Public projections render both as “Uncredited”, but only the first appears in the assignment queue.
+
+### `score_credit_events`
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `id` | text PK | UUID |
+| `score_id` | text FK | `scores.id`, cascade delete |
+| `previous_composer_id` | text FK | Nullable |
+| `new_composer_id` | text FK | Nullable |
+| `action` | text | `assign` or `keep_uncredited` |
+| `actor_id` | text | Admin user id |
+| `created_at` | integer | Milliseconds |
+
+The audit trail powers “Recent credit decisions” and makes bulk assignment reviewable. It is intentionally small: assignment, keep-uncredited and merge-adjacent fixes; not a general event log.
+
 ### `score_slug_aliases`
 
 | Column | Type | Notes |
@@ -63,7 +92,7 @@ Known variants (`Fredrik Chopin`, `J.S. Bach`, `Ludwig van Beethoven(1770–1827
 | `score_id` | text FK | Current score |
 | `created_at` | integer | When the slug was replaced |
 
-`/scores/{old-slug}` returns a 301 to the current slug. The admin Composers page has **Fix legacy slugs** for rows created before the slug policy; it replaces `untitled-*` with title-based slugs and keeps aliases.
+`/scores/{old-slug}` returns a 301 to the current slug. **Composers & credit → Maintenance** has **Fix legacy slugs** for rows created before the slug policy; it replaces `untitled-*` with title-based slugs and keeps aliases.
 
 ### `catalog_search`
 
@@ -75,7 +104,7 @@ SQLite FTS5 virtual table:
 | `title`, `composer`, `catalog_number`, `lyricist`, `key`, `tags` | Weighted fields |
 | `all_text` | Slug, aliases, CJK character-spaced text |
 
-`lib/search/index.ts` refreshes one row after score/tag/composer changes. Admins can rebuild the whole index and fix legacy slugs on `/admin/composers`.
+`lib/search/index.ts` refreshes one row after score/tag/composer changes. Admins can rebuild the whole index and fix legacy slugs from **Composers & credit → Maintenance**.
 
 ### `tags`, `score_tags`
 
@@ -91,6 +120,16 @@ Managed in [`lib/db/auth-schema.ts`](../lib/db/auth-schema.ts) and [`drizzle/000
 - `verification`
 
 Public sign-up is disabled. On first boot, create the admin at `/admin/setup`.
+
+## Composer credit queue
+
+`/admin/composers` has three URL-backed views:
+
+- `?view=unassigned` (default) — `scores.composer_id IS NULL`, searchable by title, raw credit, filename, catalogue number or slug, filterable by visibility and import batch.
+- `?view=authority` — authority records, alias search, works drill-down (`/admin/scores?composer={id}`) and the guarded merge tool.
+- `?view=maintenance` — legacy-slug cleanup, search rebuild, catalog health and recent credit decisions.
+
+Assignment writes `composer_id`, recomputes `work_key`, refreshes the score's FTS row, purges the public page and inserts a `score_credit_events` row. Merge rejects the `Uncredited` record explicitly; bulk assignment is the only path from the queue to a real composer.
 
 ## Public queries
 

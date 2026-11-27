@@ -6,6 +6,7 @@ import {
   getPublicScoreBySlug,
   searchPublicCatalog,
 } from "@/lib/scores/queries";
+import { getOrCreateComposer } from "@/lib/scores/composers";
 import { applyMigrations, createTestDb, destroyTestDb } from "@/tests/helpers/db";
 import { cleanupScores } from "@/tests/helpers/cleanup";
 
@@ -100,11 +101,12 @@ describe("catalog queries", () => {
     applyMigrations(sqlite);
 
     const now = new Date();
+    const bach = await getOrCreateComposer(db as never, "J.S. Bach");
     await db.insert(catalogSchema.scores).values({
       id: "score-bwv",
       slug: "bwv-846",
       title: "Prelude in C major",
-      composer: "J.S. Bach",
+      composerId: bach?.id,
       catalogNumber: "BWV 846",
       key: "C major",
       timeSignature: "4/4",

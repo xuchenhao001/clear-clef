@@ -57,6 +57,7 @@ export const Route = createFileRoute("/api/admin/scores/$id")({
             title: fields.title,
             license: fields.license,
             visibility: fields.visibility,
+            composerId: fields.composerId,
             composer: fields.composer,
             arranger: fields.arranger,
             editionLabel: fields.editionLabel,

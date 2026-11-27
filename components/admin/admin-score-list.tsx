@@ -74,12 +74,34 @@ export function AdminScoreList({
                     />
                     <span className="type-shelf hidden shrink-0 sm:inline">{aside}</span>
                   </span>
-                  {score.composer ? (
-                    <span className="mt-1 block type-shelf">{score.composer}</span>
-                  ) : null}
+                  <span className="mt-1 block type-shelf">
+                    {score.composer ? (
+                      score.composer
+                    ) : (
+                      <span className="text-edition-muted">
+                        Uncredited · needs a composer decision
+                      </span>
+                    )}
+                    {score.composerRaw &&
+                    score.composerRaw !== score.composer ? (
+                      <span className="type-caption-mono text-edition-muted">
+                        {" "}
+                        · file credit: “{score.composerRaw}”
+                      </span>
+                    ) : null}
+                  </span>
                   <span className="mt-1 block type-shelf sm:hidden">{aside}</span>
                 </Link>
                 <span className="flex shrink-0 items-center gap-4">
+                  {!score.composerId ? (
+                    <Link
+                      to="/admin/composers"
+                      search={{ view: "unassigned", q: score.title }}
+                      className="type-hint text-edition-gilt hover:text-edition-ink"
+                    >
+                      Assign
+                    </Link>
+                  ) : null}
                   {score.visibility === "public" ? (
                     <Link
                       to="/scores/$slug"

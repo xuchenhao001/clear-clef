@@ -140,6 +140,8 @@ export type UploadBatchInput = {
   file: File;
   title: string;
   composer: string;
+  composerRaw?: string | null;
+  keepUncredited?: boolean;
   catalogNumber: string;
   license: string;
   visibility: ScoreVisibility;
@@ -166,6 +168,12 @@ export async function uploadBatchFile(
   formData.set("file", input.file, input.file.name);
   formData.set("title", input.title);
   formData.set("composer", input.composer);
+  if (input.composerRaw) {
+    formData.set("composerRaw", input.composerRaw);
+  }
+  if (input.keepUncredited) {
+    formData.set("keepUncredited", "1");
+  }
   formData.set("catalogNumber", input.catalogNumber);
   formData.set("license", input.license);
   formData.set("visibility", input.visibility);

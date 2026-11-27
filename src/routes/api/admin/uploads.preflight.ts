@@ -23,6 +23,8 @@ function readItem(value: unknown): PreflightLookupItem {
   const contentHash =
     typeof item.contentHash === "string" ? item.contentHash.trim() : "";
   const title = typeof item.title === "string" ? item.title.trim() : "";
+  const composer =
+    typeof item.composer === "string" ? item.composer.trim().slice(0, 200) : null;
   const size = typeof item.size === "number" ? item.size : Number.NaN;
 
   if (!key || key.length > 100) {
@@ -41,7 +43,7 @@ function readItem(value: unknown): PreflightLookupItem {
     throw new IngestValidationError("Preflight title is too long");
   }
 
-  return { key, filename, size, contentHash, title };
+  return { key, filename, size, contentHash, title, composer };
 }
 
 export const Route = createFileRoute("/api/admin/uploads/preflight")({

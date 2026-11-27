@@ -31,6 +31,7 @@ export const Route = createFileRoute("/_site/scores/$slug")({
 function ScoreDetailPage() {
   const score = Route.useLoaderData();
   const location = useLocation();
+  const composerLabel = score.composer ?? "Uncredited";
   const fromCatalog = (
     location.state as { fromCatalog?: CatalogSearch } | undefined
   )?.fromCatalog;
@@ -49,29 +50,27 @@ function ScoreDetailPage() {
           >
             Catalogue
           </Link>
-          {score.composer ? (
-            <>
-              <span aria-hidden className="type-hint text-edition-muted-soft">
-                /
-              </span>
-              <Link
-                to="/"
-                search={{ composer: score.composerSlug ? [score.composerSlug] : undefined }}
-                className="type-hint hover:text-edition-gilt"
-              >
-                {score.composer}
-              </Link>
-            </>
-          ) : null}
+          <span aria-hidden className="type-hint text-edition-muted-soft">
+            /
+          </span>
+          {score.composerSlug ? (
+            <Link
+              to="/"
+              search={{ composer: [score.composerSlug] }}
+              className="type-hint hover:text-edition-gilt"
+            >
+              {composerLabel}
+            </Link>
+          ) : (
+            <span className="type-hint text-edition-muted">{composerLabel}</span>
+          )}
         </nav>
 
         <header className="space-y-3">
-          {score.composer ? (
-            <p className="type-eyebrow">
-              {score.composer}
-              {score.composerDates ? ` · ${score.composerDates}` : ""}
-            </p>
-          ) : null}
+          <p className="type-eyebrow">
+            {composerLabel}
+            {score.composerDates ? ` · ${score.composerDates}` : ""}
+          </p>
           <h1
             className="type-masthead-sm"
             lang={isCjk(score.title) ? "zh-Hans" : undefined}
@@ -171,7 +170,7 @@ function ScoreDetailPage() {
         <section className="mt-14 border-t border-edition-hairline pt-8" aria-labelledby="related-works">
           <div className="flex items-baseline justify-between gap-4 border-b border-edition-hairline pb-3">
             <h2 id="related-works" className="type-running-head">
-              More by {score.composer ?? "this credit"}
+              More by {composerLabel}
             </h2>
             {score.composerSlug ? (
               <Link
