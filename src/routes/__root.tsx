@@ -5,6 +5,7 @@ import {
   createRootRoute,
 } from "@tanstack/react-router";
 import { ThemeInit } from "@/components/theme-init";
+import { absoluteUrl } from "@/lib/seo/site";
 import appCss from "@/src/styles/globals.css?url";
 import fontsCss from "@/src/styles/fonts.css?url";
 
@@ -17,13 +18,17 @@ export const Route = createRootRoute({
         content: "width=device-width, initial-scale=1, viewport-fit=cover",
       },
       {
-        title: "ClearClef",
+        title: "ClearClef · Licensed piano scores",
       },
       {
         name: "description",
         content:
-          "Public catalog of Common Western Musical Notation scores. MusicXML on Cloudflare.",
+          "Browse and read licensed piano scores engraved from MusicXML. Search by composer, title, catalogue number, key, difficulty or tag.",
       },
+      { property: "og:site_name", content: "ClearClef" },
+      { property: "og:type", content: "website" },
+      { property: "og:image", content: absoluteUrl("/og-default.png") },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       { rel: "stylesheet", href: fontsCss },

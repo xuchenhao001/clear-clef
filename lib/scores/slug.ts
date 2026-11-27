@@ -1,20 +1,11 @@
-export function slugifyTitle(title: string): string {
-  const base = title
-    .toLowerCase()
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 80);
-
-  return base || "score";
-}
+import { slugifyTitle } from "@/lib/catalog/normalize";
 
 export async function createUniqueSlug(
   title: string,
   exists: (slug: string) => Promise<boolean>,
+  fallbackId?: string,
 ): Promise<string> {
-  const base = slugifyTitle(title);
+  const base = slugifyTitle(title, fallbackId);
   if (!(await exists(base))) {
     return base;
   }
@@ -28,3 +19,5 @@ export async function createUniqueSlug(
 
   return `${base}-${crypto.randomUUID().slice(0, 8)}`;
 }
+
+export { slugifyTitle };

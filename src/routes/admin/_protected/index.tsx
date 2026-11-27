@@ -13,7 +13,7 @@ export const Route = createFileRoute("/admin/_protected/")({
 });
 
 function AdminOverviewPage() {
-  const { scores, stats } = Route.useLoaderData();
+  const { scores, stats, health } = Route.useLoaderData();
   const recentScores = scores.slice(0, 5);
 
   return (
@@ -48,6 +48,26 @@ function AdminOverviewPage() {
         <AdminStatCard label="Unlisted" value={stats.unlisted} />
         <AdminStatCard label="Private" value={stats.private} />
       </div>
+
+      <section aria-labelledby="catalog-health" className="flex flex-col gap-4">
+        <div className="flex items-baseline justify-between gap-4 border-b border-edition-hairline pb-3">
+          <h2 id="catalog-health" className="type-running-head">
+            Catalog health
+          </h2>
+          <Link to="/admin/composers" className="type-hint text-edition-gilt hover:text-edition-ink">
+            Composer authority
+          </Link>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <AdminStatCard label="No composer link" value={health.missingComposer} />
+          <AdminStatCard label="No key" value={health.missingKey} />
+          <AdminStatCard label="No difficulty" value={health.missingDifficulty} />
+          <AdminStatCard label="No preview" value={health.missingPreview} />
+          <AdminStatCard label="Repeated work keys" value={health.duplicateWorks} />
+          <AdminStatCard label="Unused tags" value={health.unusedTags} />
+          <AdminStatCard label="Search rows" value={health.indexRows} />
+        </div>
+      </section>
 
       {recentScores.length > 0 ? (
         <AdminScoreList

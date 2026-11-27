@@ -71,6 +71,18 @@ Implementation order for ClearClef.
 - Retry/error states: no blind 503 retries, retry unread, missing-composer filter
 - See [ingest.md](ingest.md), [cloudflare.md](cloudflare.md), and ADR-011
 
+## Phase 10 — Catalog authority, search and IA (done)
+
+- Composer authority records with aliases, dates and admin merge
+- Arranger/edition separation; work keys; stable slug aliases with 301s
+- D1 FTS5 search with title/composer/catalogue/key/tag ranking and CJK fallback
+- Multi-select facets with contextual counts, active chips and clear-all
+- 30-per-page pagination; URL state for query, facets, sort and page
+- Search-first catalog hero; mobile filter sheet; number-one preview thumbnails
+- Canonical/OG/JSON-LD/sitemap/robots; filtered pages `noindex,follow`
+- Versioned public media URLs; no immutable caching of mutable score files
+- ADR-012 to ADR-015
+
 ## Out of scope for v1
 
 - In-browser note editor, transposition UI, community comments

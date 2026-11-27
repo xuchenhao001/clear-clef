@@ -14,10 +14,14 @@ import { AdminScoreEditSidebar } from "@/components/admin/admin-score-edit-sideb
 import { AdminStickyActions } from "@/components/admin/admin-sticky-actions";
 import { inspectFile } from "@/lib/ingest/inspect-client";
 import { renderPreviewFromFile } from "@/lib/verovio/preview-client";
+import { uploadPreviewThumb } from "@/lib/verovio/preview-thumb";
 
 type ScoreFormState = {
   title: string;
   composer: string;
+  arranger: string;
+  editionLabel: string;
+  slug: string;
   lyricist: string;
   catalogNumber: string;
   license: string;
@@ -49,6 +53,9 @@ function buildPatchFormData(
   const formData = new FormData();
   formData.set("title", form.title);
   formData.set("composer", form.composer);
+  formData.set("arranger", form.arranger);
+  formData.set("editionLabel", form.editionLabel);
+  formData.set("slug", form.slug);
   formData.set("lyricist", form.lyricist);
   formData.set("catalogNumber", form.catalogNumber);
   formData.set("license", license);
@@ -150,6 +157,11 @@ export function AdminScoreEditForm({
         if (!previewResponse.ok) {
           throw new Error("Score saved, but preview generation failed");
         }
+        try {
+          await uploadPreviewThumb(scoreId, previewSvg);
+        } catch {
+          // The catalog falls back to the larger SVG preview.
+        }
       }
 
       setMessage("Changes saved.");
@@ -208,12 +220,38 @@ export function AdminScoreEditForm({
               onChange={(event) => updateField("title", event.target.value)}
             />
           </AdminField>
-          <AdminField label="Composer" htmlFor="composer">
+          <AdminField label="Composer" htmlFor="composer" hint="Canonical name. Known aliases are merged automatically.">
             <AdminInput
               id="composer"
               type="text"
               value={form.composer}
               onChange={(event) => updateField("composer", event.target.value)}
+            />
+          </AdminField>
+          <AdminField label="Arranger" htmlFor="arranger">
+            <AdminInput
+              id="arranger"
+              type="text"
+              value={form.arranger}
+              onChange={(event) => updateField("arranger", event.target.value)}
+              placeholder="E. Muirhead"
+            />
+          </AdminField>
+          <AdminField label="Edition" htmlFor="editionLabel">
+            <AdminInput
+              id="editionLabel"
+              type="text"
+              value={form.editionLabel}
+              onChange={(event) => updateField("editionLabel", event.target.value)}
+              placeholder="Easy piano, original edition…"
+            />
+          </AdminField>
+          <AdminField label="URL slug" htmlFor="slug" hint="Changing this leaves a 301 redirect from the old address.">
+            <AdminInput
+              id="slug"
+              type="text"
+              value={form.slug}
+              onChange={(event) => updateField("slug", event.target.value)}
             />
           </AdminField>
           <AdminField label="Lyricist" htmlFor="lyricist">

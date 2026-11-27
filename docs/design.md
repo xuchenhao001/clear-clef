@@ -52,7 +52,15 @@ Both themes are dark. Lamp (`:root`) is a warm brown-black. Night (`.dark`) is c
 - A register is `stat-row`: label left, value right, hairline underneath.
 - The page container is `max-w-[1200px]`.
 
-The catalog index filters by linking, one value at a time. Choosing the active value again clears it. Admin sections (Overview, Scores, Upload, Batch upload) use the same index, not a second top navigation.
+The catalog is **search-first**. A labelled search field sits under the masthead; the index rail is for filters, not for typing. Facets are collapsible, show counts, and support multi-select. On phones the rail becomes a full-screen `surface-board` sheet opened by a filter button; no long filter list appears before the first work.
+
+The default browse is 30 works per page, grouped by composer. Search and non-composer sorts are flat, with the composer shown on each row. The composer heading in a grouped list is a link to that composer filter; the composer is not repeated inside the group. Arranger and edition sit on their own line.
+
+Pagination is type on the ground: Previous, numbered pages, Next. The current page is gilt. No infinite scroll.
+
+SEO and sharing: default browse pages are indexable with canonical and `rel=prev/next`; search and facet pages are `noindex,follow`. Score pages carry canonical, Open Graph, and `MusicComposition` JSON-LD.
+
+Media: catalog thumbnails are 320×452 WebP, lazy-loaded, with the full SVG as fallback. Every public media URL carries a version token.
 
 ## Viewer
 

@@ -22,6 +22,34 @@
       "when": 1788573300000,
       "tag": "0002_catalog_number",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1788573400000,
+      "tag": "0003_batch_import",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1795738000000,
+      "tag": "0004_catalog_authority_search",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1795738100000,
+      "tag": "0005_preview_thumb",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1795738200000,
+      "tag": "0006_composer_data_backfill",
+      "breakpoints": true
     }
   ]
 }

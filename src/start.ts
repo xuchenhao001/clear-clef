@@ -8,9 +8,15 @@ import {
   publicDocumentRequest,
   storePublicDocument,
 } from "@/lib/cache/public-pages";
+import { canonicalHostRedirect } from "@/lib/seo/canonical-host";
 
 const csrfMiddleware = createCsrfMiddleware({
   filter: (ctx) => ctx.handlerType === "serverFn",
+});
+
+const canonicalHostMiddleware = createMiddleware().server(async ({ next, request }) => {
+  const redirect = canonicalHostRedirect(request);
+  return redirect ?? next();
 });
 
 const publicHtmlCache = createMiddleware().server(async ({ next, request }) => {
@@ -31,5 +37,5 @@ const publicHtmlCache = createMiddleware().server(async ({ next, request }) => {
 });
 
 export const startInstance = createStart(() => ({
-  requestMiddleware: [csrfMiddleware, publicHtmlCache],
+  requestMiddleware: [csrfMiddleware, canonicalHostMiddleware, publicHtmlCache],
 }));

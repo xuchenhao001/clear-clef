@@ -4,7 +4,10 @@ import { publicSiteOrigins } from "@/lib/worker-bindings";
 export { PUBLIC_PAGE_REVALIDATE_SECONDS } from "@/lib/cache/constants";
 export { publicDocumentRequest, publicPageCacheControl } from "@/lib/cache/public-document";
 
-function workerCache(): Cache {
+function workerCache(): Cache | null {
+  if (typeof caches === "undefined") {
+    return null;
+  }
   return (caches as CacheStorage & { default: Cache }).default;
 }
 
@@ -12,13 +15,17 @@ function workerCache(): Cache {
 export async function matchPublicDocument(request: Request): Promise<Response | null> {
   const key = publicDocumentRequest(request);
   if (!key) return null;
-  return (await workerCache().match(key)) ?? null;
+  const cache = workerCache();
+  if (!cache) return null;
+  return (await cache.match(key)) ?? null;
 }
 
 /** Store a successful HTML response for the public document TTL. */
 export async function storePublicDocument(request: Request, response: Response) {
   const key = publicDocumentRequest(request);
   if (!key || response.status !== 200) return;
+  const cache = workerCache();
+  if (!cache) return;
 
   const headers = new Headers(response.headers);
   headers.set("Cache-Control", publicPageCacheControl);
@@ -27,7 +34,7 @@ export async function storePublicDocument(request: Request, response: Response) 
     statusText: response.statusText,
     headers,
   });
-  await workerCache().put(key, stored);
+  await cache.put(key, stored);
 }
 
 /**
@@ -36,8 +43,20 @@ export async function storePublicDocument(request: Request, response: Response) 
  */
 export async function purgePublicScore(slug: string) {
   const cache = workerCache();
+  if (!cache) return;
   for (const origin of publicSiteOrigins()) {
     await cache.delete(new Request(`${origin}/`));
     await cache.delete(new Request(`${origin}/scores/${slug}`));
+    await cache.delete(new Request(`${origin}/sitemap.xml`));
+    await cache.delete(new Request(`${origin}/robots.txt`));
+  }
+}
+
+export async function purgePublicCatalog() {
+  const cache = workerCache();
+  if (!cache) return;
+  for (const origin of publicSiteOrigins()) {
+    await cache.delete(new Request(`${origin}/`));
+    await cache.delete(new Request(`${origin}/sitemap.xml`));
   }
 }

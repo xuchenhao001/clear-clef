@@ -211,6 +211,13 @@ export async function putScorePreview(
   if (!response.ok) {
     throw await readError(response);
   }
+
+  try {
+    const { uploadPreviewThumb } = await import("@/lib/verovio/preview-thumb");
+    await uploadPreviewThumb(scoreId, svg);
+  } catch {
+    // The catalog falls back to the larger SVG preview.
+  }
 }
 
 export async function publishImport(importId: string): Promise<number> {

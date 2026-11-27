@@ -23,18 +23,3 @@ export function CatalogNavLink() {
     </Link>
   );
 }
-
-export function AdminNavLink() {
-  const pathname = useRouterState({ select: (state) => state.location.pathname });
-  const onAdmin = pathname.startsWith("/admin");
-
-  return (
-    <Link
-      to="/admin"
-      className={navLinkClassName(onAdmin)}
-      aria-current={onAdmin ? "page" : undefined}
-    >
-      Register
-    </Link>
-  );
-}

@@ -7,6 +7,7 @@ import { AdminSection } from "@/components/admin/admin-section";
 import { AdminStickyActions } from "@/components/admin/admin-sticky-actions";
 import { inspectFile } from "@/lib/ingest/inspect-client";
 import { renderPreviewFromFile } from "@/lib/verovio/preview-client";
+import { uploadPreviewThumb } from "@/lib/verovio/preview-thumb";
 
 export function AdminUploadForm() {
   const navigate = useNavigate();
@@ -19,6 +20,9 @@ export function AdminUploadForm() {
   const [tags, setTags] = useState("");
   const [catalogNumber, setCatalogNumber] = useState("");
   const [sourceUrl, setSourceUrl] = useState("");
+  const [scoreKey, setScoreKey] = useState("");
+  const [timeSignature, setTimeSignature] = useState("");
+  const [difficulty, setDifficulty] = useState("");
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -32,6 +36,9 @@ export function AdminUploadForm() {
     formData.set("tags", tags);
     formData.set("catalogNumber", catalogNumber);
     formData.set("sourceUrl", sourceUrl);
+    formData.set("key", scoreKey);
+    formData.set("timeSignature", timeSignature);
+    formData.set("difficulty", difficulty);
     const file = formData.get("file");
 
     if (!(file instanceof File)) {
@@ -78,6 +85,11 @@ export function AdminUploadForm() {
 
       if (!previewResponse.ok) {
         throw new Error("Score uploaded, but preview generation failed");
+      }
+      try {
+        await uploadPreviewThumb(uploadJson.id, previewSvg);
+      } catch {
+        // The catalog falls back to the larger SVG preview.
       }
 
       navigate({
@@ -134,6 +146,13 @@ export function AdminUploadForm() {
           onTagsChange={setTags}
           catalogNumber={catalogNumber}
           onCatalogNumberChange={setCatalogNumber}
+          showExtendedMetadata
+          scoreKey={scoreKey}
+          onScoreKeyChange={setScoreKey}
+          timeSignature={timeSignature}
+          onTimeSignatureChange={setTimeSignature}
+          difficulty={difficulty}
+          onDifficultyChange={setDifficulty}
         />
       </AdminSection>
 

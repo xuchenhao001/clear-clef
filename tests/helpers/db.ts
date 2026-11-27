@@ -1,16 +1,14 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 
-const migrations = [
-  "0000_init.sql",
-  "0001_auth.sql",
-  "0002_catalog_number.sql",
-  "0003_batch_import.sql",
-].map((file) =>
-  readFileSync(resolve(process.cwd(), "drizzle", file), "utf8"),
-);
+const migrations = readdirSync(resolve(process.cwd(), "drizzle"))
+  .filter((file) => file.endsWith(".sql"))
+  .sort()
+  .map((file) =>
+    readFileSync(resolve(process.cwd(), "drizzle", file), "utf8"),
+  );
 
 export function createTestDb<TSchema extends Record<string, unknown>>(schema: TSchema) {
   const sqlite = new Database(":memory:");

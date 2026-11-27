@@ -22,7 +22,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate:local": "node scripts/d1-migrate-local.mjs",
     "db:ensure:local": "node scripts/ensure-local-d1.mjs",
-    "db:migrate:remote": "node scripts/d1-migrate-remote.mjs"
+    "db:migrate:remote": "node scripts/d1-migrate-remote.mjs",
+    "db:audit": "node scripts/catalog-audit.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",

@@ -4,45 +4,82 @@ Keep the D1 schema small. Prefer nullable columns now for membership and format 
 
 ## Tables
 
+### `composers`
+
+Authority records: one row per person or credited entity.
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `id` | text PK | UUID |
+| `slug` | text unique | Filter / URL value |
+| `display_name` | text | Canonical public credit |
+| `sort_name` | text | Library sort form, e.g. `Beethoven, Ludwig van` |
+| `aliases` | text / JSON | Search aliases; merged on admin review |
+| `birth_year`, `death_year` | integer | Optional |
+| `created_at`, `updated_at` | integer | Milliseconds |
+
+Known variants (`Fredrik Chopin`, `J.S. Bach`, `Ludwig van Beethoven(1770–1827)`) resolve to one record through `lib/catalog/composers.ts`. `scores.composer` remains a display cache during the expand/contract migration; `composer_id` is the authority link.
+
 ### `scores`
 
 | Column | Type (conceptual) | Notes |
 | --- | --- | --- |
 | `id` | text PK | UUID or similar |
-| `slug` | text unique | URL segment |
+| `slug` | text unique | Stable URL segment; old slugs live in `score_slug_aliases` |
 | `title` | text | Required for catalog |
-| `composer` | text | Nullable if unknown |
+| `composer` | text | Display cache |
+| `composer_id` | text FK | `composers.id` |
+| `arranger` | text | Kept separate from composer |
+| `work_key` | text | Normalized work cluster (title + composer) |
+| `edition_label` | text | Distinguishes editions/arrangements |
+| `title_sort` | text | Normalized title for sorting |
+| `search_text` | text | Normalized text for admin/LIKE fallback |
 | `catalog_number` | text | Optional opus or thematic catalog (BWV, Op., etc.) |
 | `lyricist` | text | Nullable |
-| `source_url` | text | Provenance (IMSLP, MuseScore, etc.) |
-| `license` | text | **Required** — see [ingest.md](ingest.md) |
-| `key` | text | e.g. `C major`, `a minor`; null when the file has no `<mode>` and the title does not say major/minor |
+| `source_url` | text | Provenance; http(s) only |
+| `license` | text | **Required** — normalized to `LICENSE_OPTIONS` |
+| `key` | text | Canonical display, e.g. `C# minor` |
 | `time_signature` | text | e.g. `4/4` |
-| `difficulty` | text / int | Piano-oriented filter |
+| `difficulty` | text | `beginner \| easy \| intermediate \| advanced` |
 | `instrument` | text | Default `piano` |
-| `format` | text | `musicxml` \| `abc` \| `mnx` — store format of canonical file; v1 is always `musicxml` |
-| `r2_key` | text | Path to preferred download / viewer source (usually original `.mxl`) |
-| `canonical_r2_key` | text | Sanitized uncompressed MusicXML (DOCTYPE stripped; not a 4.x rewrite) |
-| `preview_r2_key` | text | Path to page-1 SVG |
-| `default_visible_parts` | text / JSON | Part IDs extracted at ingest; stored for future viewer filtering (v1 renders all staves) |
-| `visibility` | text | `public` \| `unlisted` \| `private`; public catalog filters `public` |
-| `owner_id` | text | Nullable until auth; future member ownership |
-| `content_hash` | text | SHA-256 of the sanitized canonical MusicXML (server recomputes it; client preflight uses the same canonical text); exact duplicate detection |
-| `upload_key` | text unique | Client idempotency key for batch retries |
-| `import_id` | text | Groups the scores created by one batch session |
-| `created_at` | integer / text | ISO or unix |
+| `format` | text | `musicxml \| abc \| mnx` — v1 is always `musicxml` |
+| `r2_key` | text | Original `.mxl` / `.musicxml` |
+| `canonical_r2_key` | text | Sanitized uncompressed MusicXML |
+| `preview_r2_key` | text | Page-1 SVG |
+| `preview_thumb_r2_key` | text | Page-1 WebP thumbnail |
+| `preview_version` | text | Version token for immutable preview URLs |
+| `default_visible_parts` | text / JSON | Part IDs; future viewer filtering |
+| `visibility` | text | `public \| unlisted \| private` |
+| `content_hash` | text | SHA-256 of canonical XML; exact duplicate detection |
+| `upload_key` | text unique | Idempotency key |
+| `import_id` | text | Batch grouping |
+| `created_at`, `updated_at` | integer | Milliseconds |
 
-### `tags`
+### `score_slug_aliases`
 
 | Column | Type | Notes |
 | --- | --- | --- |
-| `id` | text PK | |
-| `slug` | text unique | e.g. `bach`, `etude`, `sight-reading` |
-| `label` | text | Display name |
+| `slug` | text PK | Old public URL segment |
+| `score_id` | text FK | Current score |
+| `created_at` | integer | When the slug was replaced |
 
-### `score_tags`
+`/scores/{old-slug}` returns a 301 to the current slug. The admin Composers page has **Fix legacy slugs** for rows created before the slug policy; it replaces `untitled-*` with title-based slugs and keeps aliases.
 
-Many-to-many join: `score_id`, `tag_id` (composite PK).
+### `catalog_search`
+
+SQLite FTS5 virtual table:
+
+| Column | Notes |
+| --- | --- |
+| `score_id` | `UNINDEXED`, joins to scores |
+| `title`, `composer`, `catalog_number`, `lyricist`, `key`, `tags` | Weighted fields |
+| `all_text` | Slug, aliases, CJK character-spaced text |
+
+`lib/search/index.ts` refreshes one row after score/tag/composer changes. Admins can rebuild the whole index and fix legacy slugs on `/admin/composers`.
+
+### `tags`, `score_tags`
+
+Unchanged many-to-many. `score_tags (tag_id)` is indexed for facet counts. Only tags attached to public scores appear in public facets.
 
 ### Better Auth tables
 
@@ -63,9 +100,20 @@ Always constrain public list/detail:
 WHERE visibility = 'public'
 ```
 
-`getPublicScoreBySlug` selects a public projection; internal fields (`owner_id`, `content_hash`, `upload_key`, `import_id`, storage keys it does not need) must not ride along in public loader data.
+`getPublicScoreBySlug` returns a public projection with **no** `owner_id`, `content_hash`, `upload_key`, `import_id` or storage keys. Media is exposed as versioned `/api/...?v=…` URLs.
 
 Unlisted may be reachable by slug later; private requires owner/auth.
+
+## Catalog search and pagination
+
+`searchPublicCatalog()` returns one page of 30 works plus contextual facet counts. Facet values are URL slugs (`c-sharp-minor`, `public-domain`, `intermediate`). The query layer maps slugs back to canonical stored values.
+
+- `q` uses FTS5 `bm25` ranking with title/composer/catalogue weights.
+- CJK text is character-spaced into the index so partial Chinese titles match.
+- If FTS5 returns nothing, the query falls back to normalized `search_text` (D1 limits `LIKE` patterns to 50 bytes).
+- Facet counts exclude the facet being counted and apply the other filters.
+- Page 2 redirects to the last real page if it is out of range.
+- Search and filtered results are `noindex,follow`; default browse pages are indexable with self-canonical and `rel=prev/next`.
 
 ## R2 layout
 
@@ -75,7 +123,10 @@ Prefer `.mxl` for the original upload when the client sent compressed MusicXML. 
 scores/{id}/original.mxl          # or original.musicxml / original.abc if that was uploaded
 scores/{id}/canonical.musicxml    # Sanitized MusicXML (DOCTYPE stripped; not a 4.x rewrite)
 scores/{id}/preview.svg           # page 1 only, generated at ingest
+scores/{id}/preview-thumb.webp    # 320×452 catalog thumbnail, generated in the admin browser
 ```
+
+Media URLs include a version token (`?v=contentHash` or `?v=previewVersion`). The public API serves `Cache-Control: immutable` only when the token matches; old or unversioned URLs redirect to the current token.
 
 All catalog objects live under `scores/{id}/`. Public HTML caching is handled at the edge (see [architecture.md](architecture.md)), not as R2 keys.
 

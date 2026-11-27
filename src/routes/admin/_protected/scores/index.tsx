@@ -20,7 +20,8 @@ export const Route = createFileRoute("/admin/_protected/scores/")({
 });
 
 function AdminScoresPage() {
-  const { allScores, scores, filters } = Route.useLoaderData();
+  const { stats, scores, filters, total, page, pageCount } =
+    Route.useLoaderData();
 
   return (
     <div className="flex flex-col gap-8">
@@ -60,7 +61,7 @@ function AdminScoresPage() {
         </div>
       ) : null}
 
-      {allScores.length === 0 ? (
+      {stats.total === 0 ? (
         <AdminEmptyState
           title="No scores in the catalog"
           description="Upload a MusicXML file to create the first public catalog entry."
@@ -84,7 +85,47 @@ function AdminScoresPage() {
               primaryLabel="Clear filters"
             />
           ) : (
-            <AdminScoreList scores={scores} />
+            <>
+              <div className="flex flex-wrap items-baseline justify-between gap-3">
+                <p className="type-shelf">
+                  Showing {(page - 1) * 50 + 1}–
+                  {Math.min(page * 50, total)} of {total}
+                </p>
+                {pageCount > 1 ? (
+                  <nav
+                    aria-label="Score pages"
+                    className="flex items-center gap-4 type-hint"
+                  >
+                    {page > 1 ? (
+                      <Link
+                        to="/admin/scores"
+                        search={{
+                          ...filters,
+                          page: page - 1,
+                        }}
+                      >
+                        Previous
+                      </Link>
+                    ) : null}
+                    <span className="type-shelf">
+                      Page {page} of {pageCount}
+                    </span>
+                    {page < pageCount ? (
+                      <Link
+                        to="/admin/scores"
+                        search={{
+                          ...filters,
+                          page: page + 1,
+                        }}
+                      >
+                        Next
+                      </Link>
+                    ) : null}
+                  </nav>
+                ) : null}
+              </div>
+              <AdminScoreList scores={scores} />
+            </>
           )}
         </>
       )}

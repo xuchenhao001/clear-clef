@@ -27,21 +27,25 @@ export async function attachTagsToRows<T extends { id: string }>(
   }
 
   const scoreIds = rows.map((row) => row.id);
-  const tagRows = await database
-    .select({
-      scoreId: scoreTags.scoreId,
-      slug: tags.slug,
-      label: tags.label,
-    })
-    .from(scoreTags)
-    .innerJoin(tags, eq(tags.id, scoreTags.tagId))
-    .where(inArray(scoreTags.scoreId, scoreIds));
-
   const tagsByScore = new Map<string, ScoreTagSummary[]>();
-  for (const row of tagRows) {
-    const existing = tagsByScore.get(row.scoreId) ?? [];
-    existing.push({ slug: row.slug, label: row.label });
-    tagsByScore.set(row.scoreId, existing);
+
+  for (let offset = 0; offset < scoreIds.length; offset += 80) {
+    const chunk = scoreIds.slice(offset, offset + 80);
+    const tagRows = await database
+      .select({
+        scoreId: scoreTags.scoreId,
+        slug: tags.slug,
+        label: tags.label,
+      })
+      .from(scoreTags)
+      .innerJoin(tags, eq(tags.id, scoreTags.tagId))
+      .where(inArray(scoreTags.scoreId, chunk));
+
+    for (const row of tagRows) {
+      const existing = tagsByScore.get(row.scoreId) ?? [];
+      existing.push({ slug: row.slug, label: row.label });
+      tagsByScore.set(row.scoreId, existing);
+    }
   }
 
   return rows.map((row) => ({

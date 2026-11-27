@@ -21,6 +21,13 @@ import {
 } from "@/lib/ingest/metadata";
 import { sanitizeMusicXml, XmlSecurityError } from "@/lib/ingest/xml";
 import { purgePublicScore } from "@/lib/cache/public-pages";
+import { splitComposerAndArranger } from "@/lib/catalog/composers";
+import {
+  canonicalLicense,
+  canonicalDifficulty,
+  canonicalKey,
+} from "@/lib/catalog/vocab";
+import { sortTitle, workKey } from "@/lib/catalog/normalize";
 import {
   deleteR2Object,
   putScoreMusicXmlObjects,
@@ -29,7 +36,10 @@ import {
   toOriginalExtension,
 } from "@/lib/scores/r2";
 import { attachTagsToScore } from "@/lib/scores/tags";
+import { getOrCreateComposer } from "@/lib/scores/composers";
 import { createUniqueSlug } from "@/lib/scores/slug";
+import { normalizeSourceUrl } from "@/lib/scores/source-url";
+import { refreshSearchDocument } from "@/lib/search";
 import {
   findScoreByContentHash,
   type ScoreMatch,
@@ -48,6 +58,11 @@ export type UploadScoreInput = {
   tagList?: string[];
   title?: string;
   composer?: string | null;
+  arranger?: string | null;
+  editionLabel?: string | null;
+  workKey?: string | null;
+  difficulty?: string | null;
+  key?: string | null;
   uploadKey?: string | null;
   importId?: string | null;
   allowDuplicate?: boolean;
@@ -193,13 +208,25 @@ export async function uploadScore(
     throw new IngestValidationError("Title is required");
   }
 
-  const composer =
+  const rawComposer =
     input.composer !== undefined
       ? optionalText(input.composer)
       : metadata.composer;
+  const split = splitComposerAndArranger(rawComposer);
+  const composerName = split.composer;
+  const arranger = optionalText(input.arranger) ?? split.arranger;
   const catalogNumber =
     optionalText(input.catalogNumber) ?? optionalText(metadata.catalogNumber);
-  const sourceUrl = optionalText(input.sourceUrl);
+  const sourceUrl = normalizeSourceUrl(input.sourceUrl);
+  const license = canonicalLicense(input.license) ?? input.license.trim();
+  const key = canonicalKey(input.key ?? metadata.key) ?? metadata.key;
+  const difficulty = canonicalDifficulty(input.difficulty);
+
+  const id = crypto.randomUUID();
+  const composerRecord = await getOrCreateComposer(db, composerName);
+  const composerDisplay = composerRecord?.displayName ?? composerName;
+  const titleSort = sortTitle(title);
+  const workKeyValue = input.workKey?.trim() || workKey(title, composerDisplay);
 
   if (!input.allowDuplicate) {
     const duplicate = await findScoreByContentHash(db, contentHash);
@@ -208,7 +235,6 @@ export async function uploadScore(
     }
   }
 
-  const id = crypto.randomUUID();
   const extension = toOriginalExtension(originalExtension);
   const r2Key = scoreOriginalR2Key(id, extension);
   const canonicalR2Key = scoreCanonicalR2Key(id);
@@ -228,25 +254,31 @@ export async function uploadScore(
     await putScoreMusicXmlObjects(id, extension, input.bytes, canonicalXml);
 
     for (let attempt = 0; attempt < 5; attempt += 1) {
-      const slug = await createUniqueSlug(title, slugTaken);
+      const slug = await createUniqueSlug(title, slugTaken, id);
       try {
         await db.insert(scores).values({
           id,
           slug,
           title,
-          composer,
+          composer: composerDisplay,
+          composerId: composerRecord?.id ?? null,
+          arranger,
+          editionLabel: optionalText(input.editionLabel),
+          workKey: workKeyValue,
+          titleSort,
           catalogNumber,
           lyricist: metadata.lyricist,
           sourceUrl,
-          license: input.license.trim(),
-          key: metadata.key,
+          license,
+          key,
           timeSignature: metadata.timeSignature,
-          difficulty: null,
+          difficulty,
           instrument: "piano",
           format: "musicxml",
           r2Key,
           canonicalR2Key,
           previewR2Key: null,
+          previewVersion: null,
           defaultVisibleParts: metadata.defaultVisibleParts,
           visibility: input.visibility,
           ownerId: input.ownerId,
@@ -254,6 +286,7 @@ export async function uploadScore(
           uploadKey,
           importId,
           createdAt: new Date(),
+          updatedAt: new Date(),
         });
         insertedSlug = slug;
         inserted = true;
@@ -297,6 +330,12 @@ export async function uploadScore(
     } catch (error) {
       console.error("Could not attach tags to uploaded score", error);
     }
+  }
+
+  try {
+    await refreshSearchDocument(id, db);
+  } catch (error) {
+    console.error("Could not refresh the catalog search index", error);
   }
 
   try {
@@ -350,6 +389,7 @@ export async function replaceScoreFile(
         canonicalR2Key,
         contentHash,
         defaultVisibleParts: metadata.defaultVisibleParts,
+        updatedAt: new Date(),
       })
       .where(eq(scores.id, scoreId));
   } catch (error) {

@@ -13,6 +13,9 @@ export const Route = createFileRoute("/admin/login")({
   validateSearch: (search): LoginSearch => ({
     next: typeof search.next === "string" ? search.next : undefined,
   }),
+  head: () => ({
+    meta: [{ name: "robots", content: "noindex, nofollow" }],
+  }),
   beforeLoad: async () => {
     if (await checkNeedsAdminSetup()) {
       throw redirect({ to: "/admin/setup" });

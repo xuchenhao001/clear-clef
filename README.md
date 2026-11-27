@@ -16,17 +16,17 @@ I wanted one place where a piece is a **record**, not a file: composer, key, dif
 
 | | |
 | --- | --- |
-| **Catalogue** | Credit-grouped contents list, page-1 engraving previews, and one-value-at-a-time filters for key, difficulty, licence and tag. |
+| **Catalogue** | Search-first contents list with composer authority, D1 FTS5 search, contextual key/difficulty/licence/tag facets, and 30-per-page pagination. |
 | **Reader** | Page-by-page SVG from MusicXML, streamed from R2 and rendered client-side with Verovio. Nothing is engraved on the server. |
 | **Practice mode** | Full-screen overlay with single-page or two-page spread layout, keyboard and swipe page turns, auto-hiding chrome, screen wake lock, and position restored across reflow. |
-| **Curator** | Protected admin: single upload or a whole folder, duplicate detection, editable metadata, original download, delete, and a private-to-public publish step. |
+| **Curator** | Protected admin: single upload or a whole folder, duplicate detection, composer merge, editable metadata, original download, delete, and a private-to-public publish step. |
 | **AI transcription** | A local GPU lab that transcribes full-length piano audio to ABC, MIDI and MusicXML, with a batch queue and an audio preview, ready for review and upload. |
 
 ## Screens
 
 ![Catalogue](docs/assets/catalogue.webp)
 
-*Catalogue: credit-grouped contents list with key, licence and tag filters, and a page-1 engraving preview per work.*
+*Catalogue: search, contextual facets, composer-grouped contents and page-1 previews.*
 
 ![Score reader](docs/assets/score.webp)
 
@@ -95,7 +95,7 @@ flowchart TB
 | Auth | Better Auth on D1, email/password, admin role, no public sign-up |
 | Engraving | Verovio WASM, client-only |
 | Deploy | `cf build` + `cf deploy --prebuilt` |
-| Tests | Vitest, 27 suites |
+| Tests | Vitest, 31 suites |
 
 ## Three constraints that shaped the build
 
@@ -146,6 +146,7 @@ Open `/admin/setup` on first run to create the admin account. Then:
 - `pnpm test` — Vitest
 - `pnpm typecheck` — TypeScript
 - `pnpm lint` — ESLint
+- `pnpm db:audit` — catalog metadata audit
 
 More detail in [docs/local-dev.md](docs/local-dev.md) and [docs/cloudflare.md](docs/cloudflare.md).
 

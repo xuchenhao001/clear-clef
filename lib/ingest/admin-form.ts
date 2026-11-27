@@ -24,6 +24,11 @@ export type AdminUploadFields = {
   tagList: string[];
   title?: string;
   composer?: string | null;
+  arranger?: string | null;
+  editionLabel?: string | null;
+  difficulty?: string | null;
+  key?: string | null;
+  slug?: string | null;
   uploadKey?: string;
   importId?: string;
   allowDuplicate?: boolean;
@@ -64,6 +69,16 @@ export function parseAdminUploadFormData(formData: FormData): AdminUploadFields 
   if (title !== undefined) fields.title = title;
   const composer = optionalNullableText(formData, "composer");
   if (composer !== undefined) fields.composer = composer;
+  const arranger = optionalNullableText(formData, "arranger");
+  if (arranger !== undefined) fields.arranger = arranger;
+  const editionLabel = optionalNullableText(formData, "editionLabel");
+  if (editionLabel !== undefined) fields.editionLabel = editionLabel;
+  const difficulty = optionalNullableText(formData, "difficulty");
+  if (difficulty !== undefined) fields.difficulty = difficulty;
+  const key = optionalNullableText(formData, "key");
+  if (key !== undefined) fields.key = key;
+  const slug = optionalNullableText(formData, "slug");
+  if (slug !== undefined) fields.slug = slug;
   const uploadKey = optionalText(formData, "uploadKey");
   if (uploadKey) fields.uploadKey = uploadKey;
   const importId = optionalText(formData, "importId");
@@ -100,6 +115,9 @@ export async function readCanonicalField(
 export type AdminPatchFields = AdminUploadFields & {
   title: string;
   composer: string | null;
+  arranger: string | null;
+  editionLabel: string | null;
+  slug: string | null;
   lyricist: string | null;
   key: string | null;
   timeSignature: string | null;
@@ -113,6 +131,11 @@ export function parseAdminPatchFormData(formData: FormData): AdminPatchFields {
     ...base,
     title: String(formData.get("title") ?? ""),
     composer: formData.get("composer") ? String(formData.get("composer")) : null,
+    arranger: formData.get("arranger") ? String(formData.get("arranger")) : null,
+    editionLabel: formData.get("editionLabel")
+      ? String(formData.get("editionLabel"))
+      : null,
+    slug: formData.get("slug") ? String(formData.get("slug")) : null,
     lyricist: formData.get("lyricist") ? String(formData.get("lyricist")) : null,
     key: formData.get("key") ? String(formData.get("key")) : null,
     timeSignature: formData.get("timeSignature")

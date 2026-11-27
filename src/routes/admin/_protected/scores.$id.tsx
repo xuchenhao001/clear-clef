@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { AdminScoreEditForm } from "@/components/admin/AdminScoreEditForm";
 import { AdminUploadedBanner } from "@/components/admin/admin-upload-banner";
+import { canonicalDifficulty, canonicalKey } from "@/lib/catalog/vocab";
 import { loadAdminScoreEdit } from "@/src/server/admin";
 
 type ScoreEditSearch = {
@@ -44,12 +45,16 @@ function AdminScoreEditPage() {
         initial={{
           title: score.title,
           composer: score.composer ?? "",
+          arranger: score.arranger ?? "",
+          editionLabel: score.editionLabel ?? "",
+          slug: score.slug,
           lyricist: score.lyricist ?? "",
           catalogNumber: score.catalogNumber ?? "",
           license: score.license,
-          key: score.key ?? "",
+          key: canonicalKey(score.key) ?? score.key ?? "",
           timeSignature: score.timeSignature ?? "",
-          difficulty: score.difficulty ?? "",
+          difficulty:
+            canonicalDifficulty(score.difficulty) ?? score.difficulty ?? "",
           sourceUrl: score.sourceUrl ?? "",
           tags: tagsValue,
         }}

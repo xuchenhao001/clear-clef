@@ -5,6 +5,7 @@
 1. `cp .dev.vars.example .dev.vars` and set `BETTER_AUTH_SECRET` (≥32 chars).
 2. `pnpm db:migrate:local` if `drizzle/*.sql` changed (or `pnpm db:ensure:local`).
 3. `pnpm dev` — runs **`cf dev`** (Vite in **`development`** mode); `BETTER_AUTH_URL` is `http://localhost:3000` from `cloudflare.config.ts`.
+4. After a schema-only migration or legacy data import, run `pnpm db:audit`. Migration `0004`–`0006` builds the authority/search schema and backfills the known legacy composer spellings. Use `/admin/composers` for **Fix legacy slugs**, composer merges and **Rebuild search index**.
 
 ## How Worker `env` is filled
 

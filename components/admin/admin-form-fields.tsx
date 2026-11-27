@@ -1,6 +1,11 @@
 
 import { AdminField, AdminInput } from "@/components/admin/admin-field";
 import { EditionSelect } from "@/components/ui/edition-select";
+import {
+  canonicalKey,
+  DIFFICULTY_OPTIONS,
+  KEY_OPTIONS,
+} from "@/lib/catalog/vocab";
 import { LICENSE_OPTIONS } from "@/lib/ingest/constants";
 
 export type ScoreVisibility = "public" | "unlisted" | "private";
@@ -109,15 +114,25 @@ export function AdminCatalogFields({
       {showExtendedMetadata ? (
         <>
           <div className="grid gap-5 sm:grid-cols-2">
-            <AdminField label="Key" htmlFor="key">
-              <AdminInput
-                id="key"
-                name="key"
-                type="text"
-                value={scoreKey}
-                onChange={(event) => onScoreKeyChange?.(event.target.value)}
-              />
-            </AdminField>
+            <EditionSelect
+              name="key"
+              label="Key"
+              value={canonicalKey(scoreKey) ?? scoreKey}
+              placeholder="Not set"
+              labelVariant="form"
+              triggerVariant="boxed"
+              items={[
+                { label: "Not set", value: "" },
+                ...KEY_OPTIONS.map((key) => ({
+                  label: key.label,
+                  value: key.value,
+                })),
+                ...(scoreKey && !canonicalKey(scoreKey)
+                  ? [{ label: scoreKey, value: scoreKey }]
+                  : []),
+              ]}
+              onValueChange={(value) => onScoreKeyChange?.(value)}
+            />
             <AdminField label="Time signature" htmlFor="timeSignature">
               <AdminInput
                 id="timeSignature"
@@ -125,18 +140,26 @@ export function AdminCatalogFields({
                 type="text"
                 value={timeSignature}
                 onChange={(event) => onTimeSignatureChange?.(event.target.value)}
+                placeholder="4/4"
               />
             </AdminField>
           </div>
-          <AdminField label="Difficulty" htmlFor="difficulty">
-            <AdminInput
-              id="difficulty"
-              name="difficulty"
-              type="text"
-              value={difficulty}
-              onChange={(event) => onDifficultyChange?.(event.target.value)}
-            />
-          </AdminField>
+          <EditionSelect
+            name="difficulty"
+            label="Difficulty"
+            value={difficulty}
+            placeholder="Not set"
+            labelVariant="form"
+            triggerVariant="boxed"
+            items={[
+              { label: "Not set", value: "" },
+              ...DIFFICULTY_OPTIONS.map((option) => ({
+                label: option.label,
+                value: option.value,
+              })),
+            ]}
+            onValueChange={(value) => onDifficultyChange?.(value)}
+          />
         </>
       ) : null}
       <AdminField

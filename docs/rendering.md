@@ -58,8 +58,9 @@ const tk = new VerovioToolkit(module);
 
 - Generate **page-1 SVG** once at ingest in the **admin browser** (Verovio after upload succeeds).
 - Batch review uses a separate lightweight inspection Worker (unzip/metadata/hash); previews use one Verovio Worker and toolkit, serialized. A failed preview is per-row and retryable from the original in R2.
-- Store via `PUT /api/admin/scores/{id}/preview` as `scores/{id}/preview.svg` in R2.
-- Catalog rows use `GET /api/scores/{id}/preview` on desktop — **do not** engrave on the server per request.
+- Store via `PUT /api/admin/scores/{id}/preview` as `scores/{id}/preview.svg` and a 320×452 WebP at `scores/{id}/preview-thumb.webp` in R2.
+- Catalog rows use the WebP thumb when present, otherwise the SVG, with `loading="lazy"` and dimensions. **Do not** engrave on the server per request.
+- Public preview/file URLs carry a version token and only receive `immutable` caching when the token matches.
 
 ## Fonts
 

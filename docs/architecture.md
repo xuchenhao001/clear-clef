@@ -53,10 +53,11 @@ flowchart TB
 
 ### Public browse (cacheable)
 
-1. List and detail routes use **loaders** that call `createServerFn` helpers (`src/server/public.ts`).
-2. They query D1 for metadata (`visibility = 'public'`).
-3. They render HTML title, composer, license, tags, and a static page-1 preview when available (`head` on score routes).
-4. They **must not** import Verovio or any WASM.
+1. The catalog loader calls `searchPublicCatalog()` through `createServerFn` (`src/server/public.ts`).
+2. Default browse is 30 works per page, grouped by composer; `?q=` uses FTS5 relevance; facets and sort are URL state.
+3. Filtered and search pages are `noindex,follow` and are not stored in the Workers Cache API. Default browse and score pages are cached for 60s and purged on admin writes.
+4. Page-1 previews and score files are served from versioned URLs; only a matching `v` token gets `immutable`.
+5. They **must not** import Verovio or any WASM.
 
 ### Score viewer (client-only)
 
@@ -91,10 +92,13 @@ Access in server code: `import { env } from "cloudflare:workers"`.
 
 | Asset | Policy |
 | --- | --- |
-| R2 score / preview objects | `Cache-Control: public, max-age=31536000, immutable` (content-addressed or versioned keys) |
-| Catalog HTML (`/`, `/scores/{slug}`) | Workers Cache API (`src/start.ts`): match before render, store for 60s, `purgePublicScore(slug)` after admin writes. Keys use the request origin and must match `BETTER_AUTH_URL` for purge to hit. |
-| Filtered catalog (`/?key=…`) | Treat as dynamic; do not rely on shared HTML cache for filtered URLs |
+| R2 score / preview / thumb objects | `Cache-Control: public, max-age=31536000, immutable` **only on versioned URLs** (`?v=…`); unversioned or stale URLs redirect to the current token |
+| Catalog HTML (`/`, `/scores/{slug}`) | Workers Cache API (`src/start.ts`): match before render, store for 60s, `purgePublicScore(slug)` after admin writes. Default browse only; filtered/search pages are `no-cache`. |
+| Filtered / search catalog | Dynamic; `Cache-Control: public, max-age=0, must-revalidate`, `noindex,follow` |
+| Sitemap / robots | Generated from D1; one-hour cache; yielded to Cloudflare's managed robots configuration when present |
 | Vite client assets | Immutable hashed filenames (`.cloudflare/output/` after `cf build`) |
+
+Public media version tokens come from `contentHash` (score files) and `previewVersion` (regenerated previews). Replacing a file therefore changes the URL and cannot leave a year-long stale cache entry.
 
 ## Related docs
 

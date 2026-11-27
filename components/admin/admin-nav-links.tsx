@@ -11,6 +11,11 @@ const ENTRIES = [
       path === "/admin/scores" || path.startsWith("/admin/scores/"),
   },
   {
+    to: "/admin/composers",
+    label: "Composers",
+    match: (path: string) => path.startsWith("/admin/composers"),
+  },
+  {
     to: "/admin/upload",
     label: "Upload",
     match: (path: string) => path.startsWith("/admin/upload"),

@@ -64,6 +64,8 @@ MusicXML files are XML. Treat uploads as hostile.
 
 Canonical MusicXML stored at ingest is the sanitized original (DOCTYPE stripped, BOM removed) — not a full rewrite to MusicXML 4.x partwise. Batch/admin uploads prepare that canonical text in the browser, but the server re-runs `sanitizeMusicXml` and re-hashes it before storing anything. The original file is stored unchanged; the canonical is the document served to the viewer.
 
+Catalog metadata is normalized at write time: composer names resolve to the `composers` authority file (known variants and `arr.` suffixes included), keys use the canonical key list, difficulty uses the four-level scale, licenses use `LICENSE_OPTIONS`, and `title_sort`/`work_key`/`search_text` are refreshed with the FTS row. The original metadata remains reviewable in the admin form.
+
 Implementation: [`lib/ingest/mxl.ts`](../lib/ingest/mxl.ts), [`lib/ingest/xml.ts`](../lib/ingest/xml.ts), [`lib/ingest/metadata.ts`](../lib/ingest/metadata.ts), [`lib/ingest/inspect.ts`](../lib/ingest/inspect.ts), [`lib/ingest/inspect-client.ts`](../lib/ingest/inspect-client.ts).
 
 ## Metadata extraction

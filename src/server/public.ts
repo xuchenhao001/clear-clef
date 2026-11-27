@@ -1,20 +1,16 @@
-import { notFound } from "@tanstack/react-router";
+import { notFound, redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import type { CatalogFilters } from "@/lib/scores/queries";
 import {
   getPublicScoreBySlug,
-  listFilterOptions,
-  listPublicScores,
+  resolveSlugAlias,
+  searchPublicCatalog,
+  type CatalogFilters,
 } from "@/lib/scores/queries";
 
 export const loadCatalogPage = createServerFn({ method: "GET" })
   .validator((filters: CatalogFilters) => filters)
   .handler(async ({ data: filters }) => {
-    const [catalog, filterOptions] = await Promise.all([
-      listPublicScores(filters),
-      listFilterOptions(),
-    ]);
-    return { catalog, filterOptions };
+    return searchPublicCatalog(filters);
   });
 
 export const loadPublicScore = createServerFn({ method: "GET" })
@@ -22,6 +18,14 @@ export const loadPublicScore = createServerFn({ method: "GET" })
   .handler(async ({ data: slug }) => {
     const score = await getPublicScoreBySlug(slug);
     if (!score) {
+      const alias = await resolveSlugAlias(slug);
+      if (alias) {
+        throw redirect({
+          to: "/scores/$slug",
+          params: { slug: alias },
+          statusCode: 301,
+        });
+      }
       throw notFound();
     }
     return score;

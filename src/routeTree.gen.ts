@@ -10,6 +10,8 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SiteRouteRouteImport } from './routes/_site/route'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SiteIndexRouteImport } from './routes/_site/index'
 import { Route as AdminProtectedRouteRouteImport } from './routes/admin/_protected/route'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
@@ -17,13 +19,17 @@ import { Route as AdminSetupRouteImport } from './routes/admin/setup'
 import { Route as SiteScoresSlugRouteImport } from './routes/_site/scores.$slug'
 import { Route as AdminProtectedIndexRouteImport } from './routes/admin/_protected/index'
 import { Route as AdminProtectedBatchUploadRouteImport } from './routes/admin/_protected/batch-upload'
+import { Route as AdminProtectedComposersRouteImport } from './routes/admin/_protected/composers'
 import { Route as AdminProtectedUploadRouteImport } from './routes/admin/_protected/upload'
 import { Route as ApiAdminSetupRouteImport } from './routes/api/admin/setup'
 import { Route as ApiAdminUploadRouteImport } from './routes/api/admin/upload'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AdminProtectedScoresIndexRouteImport } from './routes/admin/_protected/scores/index'
 import { Route as AdminProtectedScoresIdRouteImport } from './routes/admin/_protected/scores.$id'
+import { Route as ApiAdminCatalogFixSlugsRouteImport } from './routes/api/admin/catalog.fix-slugs'
+import { Route as ApiAdminComposersMergeRouteImport } from './routes/api/admin/composers.merge'
 import { Route as ApiAdminScoresIdRouteImport } from './routes/api/admin/scores.$id'
+import { Route as ApiAdminSearchReindexRouteImport } from './routes/api/admin/search.reindex'
 import { Route as ApiAdminUploadsPreflightRouteImport } from './routes/api/admin/uploads.preflight'
 import { Route as ApiScoresIdFileRouteImport } from './routes/api/scores.$id.file'
 import { Route as ApiScoresIdPreviewRouteImport } from './routes/api/scores.$id.preview'
@@ -33,6 +39,16 @@ import { Route as ApiAdminScoresIdPreviewRouteImport } from './routes/api/admin/
 
 const SiteRouteRoute = SiteRouteRouteImport.update({
   id: '/_site',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SiteIndexRoute = SiteIndexRouteImport.update({
@@ -71,6 +87,11 @@ const AdminProtectedBatchUploadRoute =
     path: '/batch-upload',
     getParentRoute: () => AdminProtectedRouteRoute,
   } as any)
+const AdminProtectedComposersRoute = AdminProtectedComposersRouteImport.update({
+  id: '/composers',
+  path: '/composers',
+  getParentRoute: () => AdminProtectedRouteRoute,
+} as any)
 const AdminProtectedUploadRoute = AdminProtectedUploadRouteImport.update({
   id: '/upload',
   path: '/upload',
@@ -102,9 +123,24 @@ const AdminProtectedScoresIdRoute = AdminProtectedScoresIdRouteImport.update({
   path: '/scores/$id',
   getParentRoute: () => AdminProtectedRouteRoute,
 } as any)
+const ApiAdminCatalogFixSlugsRoute = ApiAdminCatalogFixSlugsRouteImport.update({
+  id: '/api/admin/catalog/fix-slugs',
+  path: '/api/admin/catalog/fix-slugs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminComposersMergeRoute = ApiAdminComposersMergeRouteImport.update({
+  id: '/api/admin/composers/merge',
+  path: '/api/admin/composers/merge',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAdminScoresIdRoute = ApiAdminScoresIdRouteImport.update({
   id: '/api/admin/scores/$id',
   path: '/api/admin/scores/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminSearchReindexRoute = ApiAdminSearchReindexRouteImport.update({
+  id: '/api/admin/search/reindex',
+  path: '/api/admin/search/reindex',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAdminUploadsPreflightRoute =
@@ -142,18 +178,24 @@ const ApiAdminScoresIdPreviewRoute = ApiAdminScoresIdPreviewRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof SiteIndexRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin': typeof AdminProtectedRouteRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
   '/admin/setup': typeof AdminSetupRoute
   '/scores/$slug': typeof SiteScoresSlugRoute
   '/admin/batch-upload': typeof AdminProtectedBatchUploadRoute
+  '/admin/composers': typeof AdminProtectedComposersRoute
   '/admin/upload': typeof AdminProtectedUploadRoute
   '/api/admin/setup': typeof ApiAdminSetupRoute
   '/api/admin/upload': typeof ApiAdminUploadRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/admin/': typeof AdminProtectedIndexRoute
   '/admin/scores/$id': typeof AdminProtectedScoresIdRoute
+  '/api/admin/catalog/fix-slugs': typeof ApiAdminCatalogFixSlugsRoute
+  '/api/admin/composers/merge': typeof ApiAdminComposersMergeRoute
   '/api/admin/scores/$id': typeof ApiAdminScoresIdRouteWithChildren
+  '/api/admin/search/reindex': typeof ApiAdminSearchReindexRoute
   '/api/admin/uploads/preflight': typeof ApiAdminUploadsPreflightRoute
   '/api/scores/$id/file': typeof ApiScoresIdFileRoute
   '/api/scores/$id/preview': typeof ApiScoresIdPreviewRoute
@@ -163,18 +205,24 @@ export interface FileRoutesByFullPath {
   '/api/admin/scores/$id/preview': typeof ApiAdminScoresIdPreviewRoute
 }
 export interface FileRoutesByTo {
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/setup': typeof AdminSetupRoute
   '/': typeof SiteIndexRoute
   '/scores/$slug': typeof SiteScoresSlugRoute
   '/admin/batch-upload': typeof AdminProtectedBatchUploadRoute
+  '/admin/composers': typeof AdminProtectedComposersRoute
   '/admin/upload': typeof AdminProtectedUploadRoute
   '/api/admin/setup': typeof ApiAdminSetupRoute
   '/api/admin/upload': typeof ApiAdminUploadRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/admin': typeof AdminProtectedIndexRoute
   '/admin/scores/$id': typeof AdminProtectedScoresIdRoute
+  '/api/admin/catalog/fix-slugs': typeof ApiAdminCatalogFixSlugsRoute
+  '/api/admin/composers/merge': typeof ApiAdminComposersMergeRoute
   '/api/admin/scores/$id': typeof ApiAdminScoresIdRouteWithChildren
+  '/api/admin/search/reindex': typeof ApiAdminSearchReindexRoute
   '/api/admin/uploads/preflight': typeof ApiAdminUploadsPreflightRoute
   '/api/scores/$id/file': typeof ApiScoresIdFileRoute
   '/api/scores/$id/preview': typeof ApiScoresIdPreviewRoute
@@ -186,19 +234,25 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_site': typeof SiteRouteRouteWithChildren
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/_protected': typeof AdminProtectedRouteRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
   '/admin/setup': typeof AdminSetupRoute
   '/_site/': typeof SiteIndexRoute
   '/_site/scores/$slug': typeof SiteScoresSlugRoute
   '/admin/_protected/batch-upload': typeof AdminProtectedBatchUploadRoute
+  '/admin/_protected/composers': typeof AdminProtectedComposersRoute
   '/admin/_protected/upload': typeof AdminProtectedUploadRoute
   '/api/admin/setup': typeof ApiAdminSetupRoute
   '/api/admin/upload': typeof ApiAdminUploadRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/admin/_protected/': typeof AdminProtectedIndexRoute
   '/admin/_protected/scores/$id': typeof AdminProtectedScoresIdRoute
+  '/api/admin/catalog/fix-slugs': typeof ApiAdminCatalogFixSlugsRoute
+  '/api/admin/composers/merge': typeof ApiAdminComposersMergeRoute
   '/api/admin/scores/$id': typeof ApiAdminScoresIdRouteWithChildren
+  '/api/admin/search/reindex': typeof ApiAdminSearchReindexRoute
   '/api/admin/uploads/preflight': typeof ApiAdminUploadsPreflightRoute
   '/api/scores/$id/file': typeof ApiScoresIdFileRoute
   '/api/scores/$id/preview': typeof ApiScoresIdPreviewRoute
@@ -211,18 +265,24 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/robots.txt'
+    | '/sitemap.xml'
     | '/admin'
     | '/admin/login'
     | '/admin/setup'
     | '/scores/$slug'
     | '/admin/batch-upload'
+    | '/admin/composers'
     | '/admin/upload'
     | '/api/admin/setup'
     | '/api/admin/upload'
     | '/api/auth/$'
     | '/admin/'
     | '/admin/scores/$id'
+    | '/api/admin/catalog/fix-slugs'
+    | '/api/admin/composers/merge'
     | '/api/admin/scores/$id'
+    | '/api/admin/search/reindex'
     | '/api/admin/uploads/preflight'
     | '/api/scores/$id/file'
     | '/api/scores/$id/preview'
@@ -232,18 +292,24 @@ export interface FileRouteTypes {
     | '/api/admin/scores/$id/preview'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/robots.txt'
+    | '/sitemap.xml'
     | '/admin/login'
     | '/admin/setup'
     | '/'
     | '/scores/$slug'
     | '/admin/batch-upload'
+    | '/admin/composers'
     | '/admin/upload'
     | '/api/admin/setup'
     | '/api/admin/upload'
     | '/api/auth/$'
     | '/admin'
     | '/admin/scores/$id'
+    | '/api/admin/catalog/fix-slugs'
+    | '/api/admin/composers/merge'
     | '/api/admin/scores/$id'
+    | '/api/admin/search/reindex'
     | '/api/admin/uploads/preflight'
     | '/api/scores/$id/file'
     | '/api/scores/$id/preview'
@@ -254,19 +320,25 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/_site'
+    | '/robots.txt'
+    | '/sitemap.xml'
     | '/admin/_protected'
     | '/admin/login'
     | '/admin/setup'
     | '/_site/'
     | '/_site/scores/$slug'
     | '/admin/_protected/batch-upload'
+    | '/admin/_protected/composers'
     | '/admin/_protected/upload'
     | '/api/admin/setup'
     | '/api/admin/upload'
     | '/api/auth/$'
     | '/admin/_protected/'
     | '/admin/_protected/scores/$id'
+    | '/api/admin/catalog/fix-slugs'
+    | '/api/admin/composers/merge'
     | '/api/admin/scores/$id'
+    | '/api/admin/search/reindex'
     | '/api/admin/uploads/preflight'
     | '/api/scores/$id/file'
     | '/api/scores/$id/preview'
@@ -278,13 +350,18 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   SiteRouteRoute: typeof SiteRouteRouteWithChildren
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AdminProtectedRouteRoute: typeof AdminProtectedRouteRouteWithChildren
   AdminLoginRoute: typeof AdminLoginRoute
   AdminSetupRoute: typeof AdminSetupRoute
   ApiAdminSetupRoute: typeof ApiAdminSetupRoute
   ApiAdminUploadRoute: typeof ApiAdminUploadRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiAdminCatalogFixSlugsRoute: typeof ApiAdminCatalogFixSlugsRoute
+  ApiAdminComposersMergeRoute: typeof ApiAdminComposersMergeRoute
   ApiAdminScoresIdRoute: typeof ApiAdminScoresIdRouteWithChildren
+  ApiAdminSearchReindexRoute: typeof ApiAdminSearchReindexRoute
   ApiAdminUploadsPreflightRoute: typeof ApiAdminUploadsPreflightRoute
   ApiScoresIdFileRoute: typeof ApiScoresIdFileRoute
   ApiScoresIdPreviewRoute: typeof ApiScoresIdPreviewRoute
@@ -298,6 +375,20 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof SiteRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_site/': {
@@ -349,6 +440,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminProtectedBatchUploadRouteImport
       parentRoute: typeof AdminProtectedRouteRoute
     }
+    '/admin/_protected/composers': {
+      id: '/admin/_protected/composers'
+      path: '/composers'
+      fullPath: '/admin/composers'
+      preLoaderRoute: typeof AdminProtectedComposersRouteImport
+      parentRoute: typeof AdminProtectedRouteRoute
+    }
     '/admin/_protected/upload': {
       id: '/admin/_protected/upload'
       path: '/upload'
@@ -391,11 +489,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminProtectedScoresIdRouteImport
       parentRoute: typeof AdminProtectedRouteRoute
     }
+    '/api/admin/catalog/fix-slugs': {
+      id: '/api/admin/catalog/fix-slugs'
+      path: '/api/admin/catalog/fix-slugs'
+      fullPath: '/api/admin/catalog/fix-slugs'
+      preLoaderRoute: typeof ApiAdminCatalogFixSlugsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/composers/merge': {
+      id: '/api/admin/composers/merge'
+      path: '/api/admin/composers/merge'
+      fullPath: '/api/admin/composers/merge'
+      preLoaderRoute: typeof ApiAdminComposersMergeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/admin/scores/$id': {
       id: '/api/admin/scores/$id'
       path: '/api/admin/scores/$id'
       fullPath: '/api/admin/scores/$id'
       preLoaderRoute: typeof ApiAdminScoresIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/search/reindex': {
+      id: '/api/admin/search/reindex'
+      path: '/api/admin/search/reindex'
+      fullPath: '/api/admin/search/reindex'
+      preLoaderRoute: typeof ApiAdminSearchReindexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/admin/uploads/preflight': {
@@ -459,6 +578,7 @@ const SiteRouteRouteWithChildren = SiteRouteRoute._addFileChildren(
 
 interface AdminProtectedRouteRouteChildren {
   AdminProtectedBatchUploadRoute: typeof AdminProtectedBatchUploadRoute
+  AdminProtectedComposersRoute: typeof AdminProtectedComposersRoute
   AdminProtectedUploadRoute: typeof AdminProtectedUploadRoute
   AdminProtectedIndexRoute: typeof AdminProtectedIndexRoute
   AdminProtectedScoresIdRoute: typeof AdminProtectedScoresIdRoute
@@ -467,6 +587,7 @@ interface AdminProtectedRouteRouteChildren {
 
 const AdminProtectedRouteRouteChildren: AdminProtectedRouteRouteChildren = {
   AdminProtectedBatchUploadRoute: AdminProtectedBatchUploadRoute,
+  AdminProtectedComposersRoute: AdminProtectedComposersRoute,
   AdminProtectedUploadRoute: AdminProtectedUploadRoute,
   AdminProtectedIndexRoute: AdminProtectedIndexRoute,
   AdminProtectedScoresIdRoute: AdminProtectedScoresIdRoute,
@@ -491,13 +612,18 @@ const ApiAdminScoresIdRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   SiteRouteRoute: SiteRouteRouteWithChildren,
+  RobotsDottxtRoute: RobotsDottxtRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   AdminProtectedRouteRoute: AdminProtectedRouteRouteWithChildren,
   AdminLoginRoute: AdminLoginRoute,
   AdminSetupRoute: AdminSetupRoute,
   ApiAdminSetupRoute: ApiAdminSetupRoute,
   ApiAdminUploadRoute: ApiAdminUploadRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiAdminCatalogFixSlugsRoute: ApiAdminCatalogFixSlugsRoute,
+  ApiAdminComposersMergeRoute: ApiAdminComposersMergeRoute,
   ApiAdminScoresIdRoute: ApiAdminScoresIdRouteWithChildren,
+  ApiAdminSearchReindexRoute: ApiAdminSearchReindexRoute,
   ApiAdminUploadsPreflightRoute: ApiAdminUploadsPreflightRoute,
   ApiScoresIdFileRoute: ApiScoresIdFileRoute,
   ApiScoresIdPreviewRoute: ApiScoresIdPreviewRoute,

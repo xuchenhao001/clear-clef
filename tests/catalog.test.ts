@@ -2,7 +2,10 @@ import { afterEach, describe, expect, it } from "vitest";
 import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import * as catalogSchema from "@/lib/db/schema";
-import { listPublicScores, getPublicScoreBySlug } from "@/lib/scores/queries";
+import {
+  getPublicScoreBySlug,
+  searchPublicCatalog,
+} from "@/lib/scores/queries";
 import { applyMigrations, createTestDb, destroyTestDb } from "@/tests/helpers/db";
 import { cleanupScores } from "@/tests/helpers/cleanup";
 
@@ -51,9 +54,10 @@ describe("catalog queries", () => {
       },
     ]);
 
-    const rows = await listPublicScores({}, db as never);
-    expect(rows).toHaveLength(1);
-    expect(rows[0]?.slug).toBe("public-score");
+    const page = await searchPublicCatalog({}, db as never);
+    expect(page.items).toHaveLength(1);
+    expect(page.items[0]?.slug).toBe("public-score");
+    expect(page.totalPublic).toBe(1);
 
     const detail = await getPublicScoreBySlug("public-score", db as never);
     expect(detail?.title).toBe("Public Score");
@@ -62,7 +66,7 @@ describe("catalog queries", () => {
     expect(missing).toBeNull();
   });
 
-  it("filters by license", async () => {
+  it("filters by license slug", async () => {
     ({ sqlite, db } = createTestDb(catalogSchema));
     applyMigrations(sqlite);
 
@@ -86,12 +90,12 @@ describe("catalog queries", () => {
       },
     ]);
 
-    const rows = await listPublicScores({ license: "CC0" }, db as never);
-    expect(rows).toHaveLength(1);
-    expect(rows[0]?.slug).toBe("cc0-score");
+    const page = await searchPublicCatalog({ license: ["cc0"] }, db as never);
+    expect(page.items).toHaveLength(1);
+    expect(page.items[0]?.slug).toBe("cc0-score");
   });
 
-  it("returns catalog metadata and tags on list rows", async () => {
+  it("returns catalog metadata without internal storage keys", async () => {
     ({ sqlite, db } = createTestDb(catalogSchema));
     applyMigrations(sqlite);
 
@@ -106,27 +110,22 @@ describe("catalog queries", () => {
       timeSignature: "4/4",
       license: "Public Domain",
       visibility: "public",
+      r2Key: "scores/score-bwv/original.mxl",
+      previewR2Key: "scores/score-bwv/preview.svg",
+      contentHash: "hash",
       createdAt: now,
     });
 
-    await db.insert(catalogSchema.tags).values({
-      id: "tag-prelude",
-      slug: "prelude",
-      label: "Prelude",
-    });
-    await db.insert(catalogSchema.scoreTags).values({
-      scoreId: "score-bwv",
-      tagId: "tag-prelude",
-    });
-
-    const rows = await listPublicScores({}, db as never);
-    expect(rows).toHaveLength(1);
-    expect(rows[0]).toMatchObject({
+    const page = await searchPublicCatalog({}, db as never);
+    expect(page.items[0]).toMatchObject({
       slug: "bwv-846",
       catalogNumber: "BWV 846",
       key: "C major",
+      keyLabel: "C major",
       timeSignature: "4/4",
-      tags: [{ slug: "prelude", label: "Prelude" }],
+      hasPreview: true,
     });
+    expect(JSON.stringify(page.items)).not.toContain("r2Key");
+    expect(JSON.stringify(page.items)).not.toContain("previewR2Key");
   });
 });

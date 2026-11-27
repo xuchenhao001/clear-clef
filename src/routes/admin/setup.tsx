@@ -4,6 +4,9 @@ import { AdminSetupForm } from "@/components/admin/AdminSetupForm";
 import { checkNeedsAdminSetup } from "@/src/server/auth";
 
 export const Route = createFileRoute("/admin/setup")({
+  head: () => ({
+    meta: [{ name: "robots", content: "noindex, nofollow" }],
+  }),
   beforeLoad: async () => {
     if (!(await checkNeedsAdminSetup())) {
       throw redirect({ to: "/admin/login" });

@@ -2,11 +2,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { getScoresBucket } from "@/lib/cloudflare";
 import { scoreFileContentType, toScoreFile } from "@/lib/score-file";
 import { getScoreById } from "@/lib/scores/queries";
+import { scoreFileVersion } from "@/lib/scores/versions";
 
 export const Route = createFileRoute("/api/scores/$id/file")({
   server: {
     handlers: {
-      GET: async ({ params }) => {
+      GET: async ({ request, params }) => {
         const { id } = params;
         const score = await getScoreById(id);
         if (!score || score.visibility !== "public") {
@@ -16,6 +17,14 @@ export const Route = createFileRoute("/api/scores/$id/file")({
         const scoreFile = toScoreFile(score);
         if (!scoreFile) {
           return Response.json({ error: "Not found" }, { status: 404 });
+        }
+
+        const version = scoreFileVersion(score);
+        const requestUrl = new URL(request.url);
+        const requestedVersion = requestUrl.searchParams.get("v");
+        if (requestedVersion !== version) {
+          requestUrl.searchParams.set("v", version);
+          return Response.redirect(requestUrl.toString(), 302);
         }
 
         const bucket = getScoresBucket();
@@ -28,6 +37,7 @@ export const Route = createFileRoute("/api/scores/$id/file")({
           headers: {
             "Content-Type": scoreFileContentType(scoreFile),
             "Cache-Control": "public, max-age=31536000, immutable",
+            ETag: `"${version}"`,
           },
         });
       },

@@ -1,12 +1,11 @@
-import { AdminNavLink, CatalogNavLink } from "@/components/site-header-nav";
+import { CatalogNavLink } from "@/components/site-header-nav";
 import { ThemeMenu } from "@/components/theme-menu";
 import { Wordmark } from "@/components/wordmark";
 
 /**
  * The header is a rail, not a board: a hairline's worth of ground above the
- * page, the logotype, the sections, and nothing else. The logotype is bone slab
- * with one vermilion mark — the game's logotype is white with a single red
- * numeral, and gilt belongs to metal and to the current tab, not to type.
+ * page, the logotype, the sections, and nothing else. Staff access lives in the
+ * footer so the public rail stays about the catalogue.
  */
 export function SiteHeader() {
   return (
@@ -16,7 +15,6 @@ export function SiteHeader() {
           <Wordmark />
           <span aria-hidden className="h-5 w-px bg-edition-hairline" />
           <CatalogNavLink />
-          <AdminNavLink />
         </nav>
         <div className="flex items-center gap-4">
           <ThemeMenu />

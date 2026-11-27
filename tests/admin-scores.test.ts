@@ -14,7 +14,7 @@ import * as catalogSchema from "@/lib/db/schema";
 import {
   deleteScore,
   getAdminScoreById,
-  listAdminScores,
+  searchAdminScores,
   updateScoreMetadata,
 } from "@/lib/scores/admin";
 import { replaceTagsForScore } from "@/lib/scores/tags";
@@ -71,7 +71,8 @@ describe("admin scores", () => {
 
   it("lists all visibilities for admin", async () => {
     await seedScores();
-    const rows = await listAdminScores(db as never);
+    const page = await searchAdminScores({}, db as never);
+    const rows = page.items;
     expect(rows).toHaveLength(2);
     expect(rows.map((row) => row.slug).sort()).toEqual([
       "private-score",
@@ -79,6 +80,12 @@ describe("admin scores", () => {
     ]);
     const publicRow = rows.find((row) => row.id === "score-public");
     expect(publicRow?.tags).toEqual([{ slug: "bach", label: "Bach" }]);
+    expect(page.stats).toEqual({
+      total: 2,
+      public: 1,
+      unlisted: 0,
+      private: 1,
+    });
   });
 
   it("loads admin score detail with tags", async () => {
@@ -118,6 +125,31 @@ describe("admin scores", () => {
       .where(eq(catalogSchema.tags.id, joins[0]!.tagId))
       .get();
     expect(tag?.slug).toBe("etude");
+  });
+
+  it("paginates the admin list and filters by user query", async () => {
+    await seedScores();
+    const now = Date.now();
+    await db.insert(catalogSchema.scores).values(
+      Array.from({ length: 53 }, (_, index) => ({
+        id: `bulk-${index}`,
+        slug: `bulk-${index}`,
+        title: index === 0 ? "Unique Etude" : `Bulk Work ${index}`,
+        license: "Public Domain",
+        visibility: "private" as const,
+        searchText: index === 0 ? "unique etude" : `bulk work ${index}`,
+        createdAt: new Date(now - index * 1000),
+      })),
+    );
+
+    const page = await searchAdminScores({ page: 2 }, db as never);
+    expect(page.total).toBe(55);
+    expect(page.items).toHaveLength(5);
+    expect(page.pageCount).toBe(2);
+
+    const filtered = await searchAdminScores({ q: "unique" }, db as never);
+    expect(filtered.total).toBe(1);
+    expect(filtered.items[0]?.title).toBe("Unique Etude");
   });
 
   it("deletes score row and tag joins", async () => {

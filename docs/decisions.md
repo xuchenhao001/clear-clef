@@ -78,3 +78,31 @@ Short architecture decision records. Update when a decision is reversed.
 - **Context:** Workers Free has a 10 ms CPU limit. Full MusicXML metadata parsing and hashing in the preflight route caused deterministic `exceededCpu` 503s for ordinary scores (227 KB XML ≈ 13 ms; 2.36 MB ≈ 127 ms). Retrying those 503s multiplied the failures.
 - **Decision:** Read and inspect batch files in a browser Web Worker (unzip, decode, sanitize, targeted header metadata, hash). Send one JSON catalog lookup per batch; the server never receives score files during review. Uploads carry the original file plus canonical XML as a binary File part; the server sanitizes, re-hashes, extracts metadata from the header, and stores both without a full parse. The server-side reader remains the fallback for clients that do not send canonical XML.
 - **Consequences:** Batch review works within the Free CPU budget; the server still treats canonical XML as hostile and rejects DOCTYPE/ENTITY/internal subsets. The client hash is advisory for review and is verified against the server hash on upload. Full-document fallback parsing is limited to small/unusual inputs, and canonical XML has an 8 MB cap.
+
+## ADR-012: Composer authority and edition labels
+
+- **Status:** Accepted
+- **Context:** The public catalog had 81 score rows under 38 free-text credit headings. The same composer appeared as `Chopin`, `Fredrik Chopin`, `Frédéric Chopin`, `J.S. Bach` and `J. S. Bach`; arrangers were mixed into composer names; repeated titles were indistinguishable.
+- **Decision:** Add a `composers` authority table with canonical display/sort names, dates and aliases. Scores reference `composer_id`; `composer` remains a display cache during migration. Arranger is separate. `work_key` clusters editions and `edition_label` distinguishes them. Known aliases resolve automatically on write; admins can merge records at `/admin/composers`.
+- **Consequences:** Composer grouping, search and future composer pages use one identity. A full work/edition table is deferred until work-level pages are needed. Migration `0006` canonicalizes the known legacy spellings and labels duplicate editions; ambiguous names are merged by an admin at `/admin/composers`, and the search index is rebuilt there.
+
+## ADR-013: SQLite FTS5 search in D1
+
+- **Status:** Accepted
+- **Context:** The catalog needs title, composer, catalogue-number, key, tag and CJK search with ranking, without adding an external search service. D1 caps bound parameters at 100 and LIKE patterns at 50 bytes.
+- **Decision:** Maintain a `catalog_search` FTS5 table from application writes. Query with `bm25` weights, prefix tokens, escaped syntax and CJK character spacing. Fall back to normalized `search_text` for CJK or unusual queries. Rebuild through a CLI/admin action.
+- **Consequences:** Search stays inside D1 and Workers. The index must be refreshed after score/tag/composer writes; a stale index is repaired with the rebuild action. No external vendor, no per-request full-document parse.
+
+## ADR-014: Pagination, URL state and indexability
+
+- **Status:** Accepted
+- **Context:** The catalog loaded every score and every preview, and filter state was a one-value-at-a-time link. Search, pagination and shareable filtered URLs need one typed state.
+- **Decision:** Catalog state is `q`, repeatable facet slugs, `sort` and `page`, parsed by `lib/catalog/url-state.ts` and serialized with standard query strings. Page size is 30; offset pagination now, keyset later if the catalog passes ~10k. Default browse is indexable; search/facet pages are `noindex,follow`; page 2+ is self-canonical with `rel=prev/next`.
+- **Consequences:** Old JSON-array query URLs and display-string facets remain readable. Deep pages are cheap at current scale; count queries are cached by the page render.
+
+## ADR-015: Versioned public media URLs
+
+- **Status:** Accepted
+- **Context:** Preview and score URLs returned `immutable` while admin preview `PUT` and file replacement overwrote the same R2 key. Browsers and the edge could serve the old score for a year.
+- **Decision:** Build public media URLs with `?v=contentHash` or `?v=previewVersion`. Serve `immutable` only when the token matches; redirect unversioned/stale tokens to the current URL. Store a 320×452 WebP thumbnail for catalog rows and keep the SVG as fallback.
+- **Consequences:** File replacement changes the URL. HTML pages are purged as before. Cached old URLs redirect instead of leaking stale notation.
